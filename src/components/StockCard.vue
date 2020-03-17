@@ -12,7 +12,7 @@
     >
       {{ stock.name }}
       <b-card-text>Price: {{ stock.value }}</b-card-text>
-      <b-button variant="success" @click="boughtStock">Buy</b-button>
+      <b-button variant="success" @click="boughtStock(stock)">Buy</b-button>
       <b-row class="my-1" v-for="type in types" :key="type">
         <b-col sm="3">
           <label :for="`type-${type}`">
@@ -42,7 +42,6 @@ export default Vue.extend({
   methods: {
     stockGetter() {
       this.stocks = this.$store.getters.getStocks;
-      console.log(this.stocks);
     },
     newPrices() {
       this.BMW_Stock = this.$store.commit(
@@ -50,10 +49,34 @@ export default Vue.extend({
         this.BMW_Stock
       );
     },
-    boughtStock() {
-      console.log(this.stocks);
-      this.$store.commit("userBoughtStocks", this.toBuy);
-      console.log(this.$store.getters.userStocksGetters);
+    boughtStock(stock) {
+      console.log(stock);
+      //   name: "BMW"
+      // value: "200$"
+      // numberOfStocks: 1000
+      console.log(stock.name, stock.value);
+      Array.prototype.forEach(element => {
+        console.log(element);
+      });
+      let providedName = stock.name;
+      let storeStock = this.$store.getters.getStocks;
+      let selectedStock = 0;
+      // let stockValue = storeStock[stock.name];
+      //   console.log(stockValue);
+      storeStock.forEach(stock => {
+        if (stock.name == providedName) {
+          selectedStock = stock.value;
+        }
+      });
+      console.log(selectedStock);
+      // for (let i = 0; i < storeStock.length; i++) {
+      //   if (stock.name == storeStock[i].name) {
+      //     this.$store.commit("userBoughtStocks", stock);
+      //   } else {
+      //     console.log("heloo");
+      //   }
+      // }
+      console.log(this.$store.getters.getUserStocks);
     }
   },
   async beforeMount() {
