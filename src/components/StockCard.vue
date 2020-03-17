@@ -33,9 +33,9 @@ import Vue from "vue";
 export default Vue.extend({
   data() {
     return {
-      stocks: null,
+      stocks: null, // Dev Note:  At least initialize with empty [] to get functionality 
       toBuy: 1,
-      types: ["number"]
+      types: ["number"] // Dev Note:  the heck is this ?
     };
   },
 

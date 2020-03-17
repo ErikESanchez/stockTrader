@@ -8,7 +8,7 @@ export default new Vuex.Store({
     stocks: [
       {
         name: "BMW",
-        value: 200 + "$"
+        value: 200 + "$" // ? Dev Note: why cant this just be a string of "200$" or a number of 200.
       },
       {
         name: "Google",
@@ -23,11 +23,11 @@ export default new Vuex.Store({
         value: 100 + "$"
       }
     ],
-    userStocks: [],
-
-    funds: 10000 + "$"
+    userStocks: [], // Could rename to portfolio
+    funds: 10000 + "$" // Could add this to portfolio class
   },
   getters: {
+    // I would rename to getTotalFunds
     totalFunds: state => {
       return state.funds;
     },
