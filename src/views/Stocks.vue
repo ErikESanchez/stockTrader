@@ -7,7 +7,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import StockCards from "../components/StockCards";
+import StockCards from "../components/StockCard.vue";
 export default Vue.extend({
   name: "stocks",
   components: {

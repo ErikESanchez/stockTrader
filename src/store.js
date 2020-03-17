@@ -5,24 +5,24 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
     state: {
-        stocks: {
-            BMW_Stock: {
-                name: 'BMW',
-                value: 200 + '$'
+        stocks: [
+            {
+                name: "BMW",
+                value: 200 + "$"
             },
-            Google_Stock: {
-                name: 'Google',
-                value: 150 + '$'
+            {
+                name: "Google",
+                value: 150 + "$"
             },
-            Apple_Stock: {
-                name: 'Apple',
-                value: 1000 + '$'
+            {
+                name: "Apple",
+                value: 1000 + "$"
             },
-            Twitter_Stock: {
-                name: 'Twitter',
-                value: 100 + '$'
+            {
+                name: "Twitter",
+                value: 100 + "$"
             }
-        },
+        ],
         userStocks: {
 
         },
@@ -34,7 +34,7 @@ export default new Vuex.Store({
         totalFunds: state => {
             return state.funds
         },
-        stockGetter: state => {
+        getStocks: state => {
             return state.stocks
         },
         userStocksGetter: state => {
