@@ -33,7 +33,7 @@ import Vue from "vue";
 export default Vue.extend({
   data() {
     return {
-      stocks: null, // Dev Note:  At least initialize with empty [] to get functionality 
+      stocks: null, // Dev Note:  At least initialize with empty [] to get functionality
       toBuy: 1,
       types: ["number"] // Dev Note:  the heck is this ?
     };
@@ -49,34 +49,22 @@ export default Vue.extend({
         this.BMW_Stock
       );
     },
+    // Future problem: How to organize stock if bought the same
     boughtStock(stock) {
-      console.log(stock);
-      //   name: "BMW"
-      // value: "200$"
-      // numberOfStocks: 1000
-      console.log(stock.name, stock.value);
-      Array.prototype.forEach(element => {
-        console.log(element);
-      });
-      let providedName = stock.name;
-      let storeStock = this.$store.getters.getStocks;
-      let selectedStock = 0;
-      // let stockValue = storeStock[stock.name];
-      //   console.log(stockValue);
-      storeStock.forEach(stock => {
-        if (stock.name == providedName) {
-          selectedStock = stock.value;
-        }
-      });
-      console.log(selectedStock);
-      // for (let i = 0; i < storeStock.length; i++) {
-      //   if (stock.name == storeStock[i].name) {
-      //     this.$store.commit("userBoughtStocks", stock);
-      //   } else {
-      //     console.log("heloo");
-      //   }
-      // }
-      console.log(this.$store.getters.getUserStocks);
+      console.log(`User bought ${stock}`);
+      // Todo: add interface or class
+      let boughtStock = {
+        stockName: stock.name,
+        stockValue: stock.value
+      };
+      // Dev Comment: I dont like how you have to type in as a string in the commit, leads to a lot of mistakes.
+      // I would make a mutation schema and export into this file and call it  store.schema.stockBuy
+      // which will return string of stockBuy just to make less mistakes and add more functionality
+      this.$store.commit("stockBuy", boughtStock); // commit is the same as mutation
+      // getUserStocks getter does not exist in the store
+      // That is why it returned undefined
+      console.log(this.$store.getters.getUserStocks); // this mistake would have been avoided with typescript
+      console.log(this.$store.getters.userStocksGetter); // the user now has stock of whatever HE just boght
     }
   },
   async beforeMount() {
