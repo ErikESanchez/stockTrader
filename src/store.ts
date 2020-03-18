@@ -8,39 +8,58 @@ export default new Vuex.Store({
     stocks: [
       {
         name: "BMW",
-        value: 200 + "$" // ? Dev Note: why cant this just be a string of "200$" or a number of 200.
+        value: 200 + "$",
+        stockQuantity: 100 // ? Dev Note: why cant this just be a string of "200$" or a number of 200.
       },
       {
         name: "Google",
-        value: 150 + "$"
+        value: 150 + "$",
+        stockQuantity: 599
       },
       {
         name: "Apple",
-        value: 1000 + "$"
+        value: 1000 + "$",
+        stockQuantity: 1233
       },
       {
         name: "Twitter",
-        value: 100 + "$"
+        value: 100 + "$",
+        stockQuantity: 100
       }
     ],
-    userStocks: [], // Could rename to portfolio
-    funds: 10000 + "$" // Could add this to portfolio class
+    portfolio: [
+      {
+        funds: 10000 + "$" // Could add this to portfolio class
+      }
+    ],
   },
   getters: {
     // I would rename to getTotalFunds
     totalFunds: state => {
-      return state.funds;
+      return state.portfolio[0].funds;
     },
     getStocks: state => {
       return state.stocks;
     },
-    userStocksGetter: state => {
-      return state.userStocks;
+    getUserStocks: state => {
+      return state.portfolio;
     }
   },
   mutations: {
-    stockBuy(state, newStock) {
-      state.userStocks.push(newStock);
+    buyNewStock(state, newStock) {
+      state.portfolio.push(newStock);
+
+    },
+    buyMoreStock(state, payload) {
+      console.log(state, payload)
+      state.portfolio.forEach((element, index) => {
+        console.log(element, index)
+        if (element[index].name == payload.name) {
+          element[index].stockQuantity = payload.stockQuantity
+        }
+      });
+      // let index = 0
+      // state.portfolio
     }
   },
   actions: {}

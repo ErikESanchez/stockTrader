@@ -48,7 +48,14 @@ export default Vue.extend({
   created() {
     this.funds = this.$store.getters.totalFunds;
   },
-  methods: {}
+  methods: {
+    newPrices() {
+      this.BMW_Stock = this.$store.commit(
+        "generateStockPrices",
+        this.BMW_Stock
+      );
+    }
+  }
 });
 </script>
 

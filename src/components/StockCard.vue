@@ -21,7 +21,7 @@
           </label>
         </b-col>
         <b-col sm="9">
-          <b-form-input :id="`type-${type}`" :type="type">{{toBuy}}</b-form-input>
+          <b-form-input :id="`type-${type}`" :type="type">{{stock.stockQuantity}}</b-form-input>
         </b-col>
       </b-row>
     </b-card>
@@ -29,11 +29,12 @@
 </template>
 
 <script lang="ts">
+/* eslint-disable */
 import Vue from "vue";
 export default Vue.extend({
   data() {
     return {
-      stocks: null, // Dev Note:  At least initialize with empty [] to get functionality
+      stocks: [], // Dev Note:  At least initialize with empty [] to get functionality
       toBuy: 1,
       types: ["number"] // Dev Note:  the heck is this ?
     };
@@ -43,28 +44,33 @@ export default Vue.extend({
     stockGetter() {
       this.stocks = this.$store.getters.getStocks;
     },
-    newPrices() {
-      this.BMW_Stock = this.$store.commit(
-        "generateStockPrices",
-        this.BMW_Stock
-      );
-    },
+
     // Future problem: How to organize stock if bought the same
     boughtStock(stock) {
       console.log(`User bought ${stock}`);
       // Todo: add interface or class
+      let bought = Number(this.toBuy.data);
       let boughtStock = {
         stockName: stock.name,
-        stockValue: stock.value
+        stockValue: stock.value,
+        stockQuantity: stock.stockQuantity
       };
+      this.$store.getters.getUserStocks.forEach((element, index) => {
+        // console.log(element, index);
+        console.log(element[index].name, boughtStock.stockName);
+        if (element.name == boughtStock.stockName) {
+          this.$store.commit("buyMoreStock", boughtStock);
+        } else {
+          this.$store.commit("buyNewStock", boughtStock);
+        }
+      });
       // Dev Comment: I dont like how you have to type in as a string in the commit, leads to a lot of mistakes.
       // I would make a mutation schema and export into this file and call it  store.schema.stockBuy
       // which will return string of stockBuy just to make less mistakes and add more functionality
-      this.$store.commit("stockBuy", boughtStock); // commit is the same as mutation
       // getUserStocks getter does not exist in the store
       // That is why it returned undefined
       console.log(this.$store.getters.getUserStocks); // this mistake would have been avoided with typescript
-      console.log(this.$store.getters.userStocksGetter); // the user now has stock of whatever HE just boght
+      // console.log(this.$store.getters.userStocksGetter); // the user now has stock of whatever HE just boght
     }
   },
   async beforeMount() {
