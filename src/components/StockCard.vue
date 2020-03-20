@@ -21,7 +21,7 @@
           </label>
         </b-col>
         <b-col sm="9">
-          <b-form-input :id="`type-${type}`" :type="type">{{stock.stockQuantity}}</b-form-input>
+          <b-form-input :id="`type-${type}`" :type="type">{{ bought }}</b-form-input>
         </b-col>
       </b-row>
     </b-card>
@@ -34,7 +34,8 @@ import Vue from "vue";
 export default Vue.extend({
   data() {
     return {
-      stocks: [], // Dev Note:  At least initialize with empty [] to get functionality
+      stocks: [],
+      bought: null, // Dev Note:  At least initialize with empty [] to get functionality
       toBuy: 1,
       types: ["number"] // Dev Note:  the heck is this ?
     };
@@ -53,14 +54,21 @@ export default Vue.extend({
       let boughtStock = {
         stockName: stock.name,
         stockValue: stock.value,
-        stockQuantity: stock.stockQuantity
+        stockQuantity: bought
       };
-      this.$store.getters.getUserStocks.forEach((element, index) => {
+      let userStocks = this.$store.getters.getUserStocks;
+      for (let i = 0; i < userStocks.length; i++) {
+        console.log(userStocks.name);
+      }
+      userStocks.forEach((element, index) => {
         // console.log(element, index);
-        console.log(element[index].name, boughtStock.stockName);
+        console.log(element, boughtStock.stockName);
+        console.log(element.name == boughtStock.stockName);
         if (element.name == boughtStock.stockName) {
+          console.log("Bought More Stock");
           this.$store.commit("buyMoreStock", boughtStock);
         } else {
+          console.log("Bought New Stock");
           this.$store.commit("buyNewStock", boughtStock);
         }
       });
