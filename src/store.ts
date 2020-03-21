@@ -1,6 +1,7 @@
 import Vue from "vue";
+// { Store }
 import Vuex from "vuex";
-
+// TOdo: store modules 
 Vue.use(Vuex);
 
 export default new Vuex.Store({
@@ -27,40 +28,52 @@ export default new Vuex.Store({
         stockQuantity: 100
       }
     ],
-    portfolio: [
-      {
-        funds: 10000 + "$" // Could add this to portfolio class
-      }
-    ],
+    portfolio: {
+      funds: 10000 + "$",
+      stocks: []
+    }
   },
   getters: {
-    // I would rename to getTotalFunds
-    totalFunds: state => {
-      return state.portfolio[0].funds;
+    getTotalFunds: state => {
+      return state.portfolio.funds;
     },
-    getStocks: state => {
+    getAllStocks: state => {
       return state.stocks;
     },
     getUserStocks: state => {
-      return state.portfolio;
-    }
+      return state.portfolio.stocks;
+    },
   },
   mutations: {
     buyNewStock(state, newStock) {
-      state.portfolio.push(newStock);
+      state.portfolio.stocks.push(newStock);
 
     },
     buyMoreStock(state, payload) {
-      console.log(state, payload)
-      state.portfolio.forEach((element, index) => {
-        console.log(element, index)
-        if (element[index].name == payload.name) {
-          element[index].stockQuantity = payload.stockQuantity
+      let userStocksQuantity = []
+      userStocksQuantity.push(payload.stockQuantity)
+      let userStocks = state.portfolio.stocks
+      let allStocks = state.stocks
+      userStocks.forEach((stock, index) => {
+        console.log("all stocks quantity", allStocks[index].stockQuantity)
+        if (allStocks[index].name == payload.stockName) {
+          let newAllStockQuantity = allStocks[index].stockQuantity - payload.stockQuantity
+          state.stocks[index].stockQuantity = newAllStockQuantity
+          payload.stockQuantity = +payload.stockQuantity
+          userStocks[index].stockQuantity = +userStocks[index].stockQuantity
+          let newUserStockQuantity = userStocks[index].stockQuantity + payload.stockQuantity
+          state.portfolio.stocks[index].stockQuantity = newUserStockQuantity
+          console.log(typeof payload.stockQuantity, "newuserestockq", newUserStockQuantity)
         }
       });
-      // let index = 0
-      // state.portfolio
     }
   },
   actions: {}
 });
+
+export let storeSchema = {
+  mutations: {
+    buyNewStock: "buyNewStock",
+    buyMoreStock: 'buyMoreStock'
+  },
+}

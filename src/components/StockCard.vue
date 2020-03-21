@@ -12,7 +12,7 @@
     >
       {{ stock.name }}
       <b-card-text>Price: {{ stock.value }}</b-card-text>
-      <b-button variant="success" @click="boughtStock(stock)">Buy</b-button>
+      <b-button variant="success" @click="boughtStock(stock, bought)">Buy</b-button>
       <b-row class="my-1" v-for="type in types" :key="type">
         <b-col sm="3">
           <label :for="`type-${type}`">
@@ -21,7 +21,7 @@
           </label>
         </b-col>
         <b-col sm="9">
-          <b-form-input :id="`type-${type}`" :type="type">{{ bought }}</b-form-input>
+          <b-form-input :id="`type-${type}`" :type="type" v-model="bought">{{ bought }}</b-form-input>
         </b-col>
       </b-row>
     </b-card>
@@ -31,6 +31,7 @@
 <script lang="ts">
 /* eslint-disable */
 import Vue from "vue";
+import store, { storeSchema } from "@/store.ts";
 export default Vue.extend({
   data() {
     return {
@@ -43,42 +44,35 @@ export default Vue.extend({
 
   methods: {
     stockGetter() {
-      this.stocks = this.$store.getters.getStocks;
+      this.stocks = this.$store.getters.getAllStocks;
     },
-
     // Future problem: How to organize stock if bought the same
-    boughtStock(stock) {
-      console.log(`User bought ${stock}`);
+    boughtStock(stock, amount: number) {
+      let userStocks = this.$store.getters.getUserStocks;
+      let allStocks = this.$store.getters.getAllStocks;
       // Todo: add interface or class
-      let bought = Number(this.toBuy.data);
       let boughtStock = {
         stockName: stock.name,
         stockValue: stock.value,
-        stockQuantity: bought
+        stockQuantity: amount
       };
-      let userStocks = this.$store.getters.getUserStocks;
-      for (let i = 0; i < userStocks.length; i++) {
-        console.log(userStocks.name);
+      console.log(userStocks);
+      if (userStocks.length == 0) {
+        this.$store.commit(storeSchema.mutations.buyNewStock, boughtStock);
+        console.log("You now own your first stock, congratulations!");
+      } else if (userStocks.length >= 1) {
+        userStocks.forEach((stock, index) => {
+          console.log();
+          if (userStocks[index].stockName == boughtStock.stockName) {
+            console.log("Buy more same stock");
+            this.$store.commit(storeSchema.mutations.buyMoreStock, boughtStock);
+          } else {
+            console.log("new stock");
+            this.$store.commit(storeSchema.mutations.buyNewStock, boughtStock);
+          }
+        });
       }
-      userStocks.forEach((element, index) => {
-        // console.log(element, index);
-        console.log(element, boughtStock.stockName);
-        console.log(element.name == boughtStock.stockName);
-        if (element.name == boughtStock.stockName) {
-          console.log("Bought More Stock");
-          this.$store.commit("buyMoreStock", boughtStock);
-        } else {
-          console.log("Bought New Stock");
-          this.$store.commit("buyNewStock", boughtStock);
-        }
-      });
-      // Dev Comment: I dont like how you have to type in as a string in the commit, leads to a lot of mistakes.
-      // I would make a mutation schema and export into this file and call it  store.schema.stockBuy
-      // which will return string of stockBuy just to make less mistakes and add more functionality
-      // getUserStocks getter does not exist in the store
-      // That is why it returned undefined
-      console.log(this.$store.getters.getUserStocks); // this mistake would have been avoided with typescript
-      // console.log(this.$store.getters.userStocksGetter); // the user now has stock of whatever HE just boght
+      // console.log("user", userStocks, allStocks, amount);
     }
   },
   async beforeMount() {
