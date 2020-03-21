@@ -21,7 +21,7 @@
           </label>
         </b-col>
         <b-col sm="9">
-          <b-form-input :id="`type-${type}`" :type="type">{{ bought }}</b-form-input>
+          <b-form-input :id="`type-${type}`" :type="type" v-model="bought">{{ bought }}</b-form-input>
         </b-col>
       </b-row>
     </b-card>
@@ -48,7 +48,7 @@ export default Vue.extend({
 
   methods: {
     stockGetter() {
-      this.stocks = this.$store.getters.getStocks;
+      this.stocks = this.$store.getters.getAllStocks;
     },
     // Future problem: How to organize stock if bought the same
     buyStock(stock: stock, amount: number) {

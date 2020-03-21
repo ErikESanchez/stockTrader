@@ -46,7 +46,7 @@ export default Vue.extend({
     };
   },
   created() {
-    this.funds = this.$store.getters.totalFunds;
+    this.funds = this.$store.getters.getTotalFunds;
   },
   methods: {
     newPrices() {

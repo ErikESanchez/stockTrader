@@ -1,5 +1,7 @@
 import Vue from "vue";
+// { Store }
 import Vuex from "vuex";
+// TOdo: store modules 
 Vue.use(Vuex);
 
 export default new Vuex.Store({
@@ -34,9 +36,9 @@ export default new Vuex.Store({
 
   getters: {
     getTotalFunds: state => {
-      return state.portfolio[0].funds;
+      return state.portfolio.funds;
     },
-    getStocks: state => {
+    getAllStocks: state => {
       return state.stocks;
     },
     getUserStocks: state => {
@@ -105,4 +107,11 @@ interface stockTransactionData {
 interface userStock {
   name: string;
   stocksOwned: Array<stockTransactionData>;
+}
+
+export let storeSchema = {
+  mutations: {
+    buyNewStock: "buyNewStock",
+    buyMoreStock: 'buyMoreStock'
+  },
 }
