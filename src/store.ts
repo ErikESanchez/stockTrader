@@ -1,7 +1,7 @@
 import Vue from "vue";
-// { Store }
 import Vuex from "vuex";
-// TOdo: store modules 
+import marketData from "@/storeModules/marketData";
+// TOdo: store modules
 Vue.use(Vuex);
 
 export default new Vuex.Store({
@@ -30,7 +30,8 @@ export default new Vuex.Store({
     ],
     portfolio: {
       funds: 10000,
-      myStocks: Array<userStock>()
+      myStocks: Array<userStock>(),
+      historyOfTrades: Array<userStock>()
     }
   },
 
@@ -88,6 +89,9 @@ export default new Vuex.Store({
       }
     }
     // sellStock({ commit, getters }, transactionData: newStockTransaction) {}
+  },
+  modules: {
+    marketData
   }
 });
 
@@ -112,6 +116,6 @@ interface userStock {
 export let storeSchema = {
   mutations: {
     buyNewStock: "buyNewStock",
-    buyMoreStock: 'buyMoreStock'
-  },
-}
+    buyMoreStock: "buyMoreStock"
+  }
+};

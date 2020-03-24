@@ -2,7 +2,6 @@
   <div>
     <b-card
       border-variant="primary"
-      header="`{stock}`"
       header-bg-variant="success"
       header-text-variant="white"
       align="center"
@@ -24,6 +23,7 @@
           <b-form-input :id="`type-${type}`" :type="type" v-model="bought">{{ bought }}</b-form-input>
         </b-col>
       </b-row>
+      <button @click="testData">test btn</button>
     </b-card>
   </div>
 </template>
@@ -32,10 +32,13 @@
 /* eslint-disable */
 import Vue from "vue";
 import { newStockTransaction } from "../store";
+import { TIME_SERIES_DAILY } from "@/storeModules/marketData";
 interface stock {
   name: string;
   value: number;
 }
+// Maze
+// Player
 export default Vue.extend({
   data() {
     return {
@@ -50,7 +53,6 @@ export default Vue.extend({
     stockGetter() {
       this.stocks = this.$store.getters.getAllStocks;
     },
-    // Future problem: How to organize stock if bought the same
     buyStock(stock: stock, amount: number) {
       console.log(stock);
       let formatedTr: newStockTransaction = {
@@ -64,10 +66,24 @@ export default Vue.extend({
       };
       this.$store.dispatch("buyStock", formatedTr);
       console.log("Current stocks", this.$store.getters.getUserStocks);
+    },
+    async testData() {
+      let testPayload: TIME_SERIES_DAILY = {
+        function: "TIME_SERIES_DAILY",
+        symbol: "MSFT"
+      };
+      await this.$store
+        .dispatch("getStockQuote", testPayload)
+        .then(res => {
+          console.log(res);
+        })
+        .catch(err => {
+          console.log(err);
+        });
     }
   },
   async beforeMount() {
-    await this.stockGetter();
+    this.stockGetter();
   }
 });
 </script>

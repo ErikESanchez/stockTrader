@@ -1,7 +1,7 @@
 <template>
   <div>
     <!-- Goal is to make this dynamic so it can render as much data as store sends -->
-    <b-card-group deck class="card-group">
+    <b-card-group deck class="card-columns">
       <stock-card></stock-card>
     </b-card-group>
   </div>
