@@ -5,25 +5,18 @@
       header-bg-variant="success"
       header-text-variant="white"
       align="center"
-      v-for="stock in stocks"
-      :key="stock.data"
-      v-model="toBuy"
+      :key="stock.name"
     >
       {{ stock.name }}
       <b-card-text>Price: {{ stock.value }}</b-card-text>
       <b-button variant="success" @click="buyStock(stock, 1)">Buy</b-button>
-      <b-row class="my-1" v-for="type in types" :key="type">
-        <b-col sm="3">
-          <label :for="`type-${type}`">
-            Type
-            <code>{{ type }}</code>:
-          </label>
-        </b-col>
+      <b-row class="my-1">
+        <b-col sm="3"></b-col>
         <b-col sm="9">
-          <b-form-input :id="`type-${type}`" :type="type" v-model="bought">{{ bought }}</b-form-input>
+          <b-form-input v-model="amountToBuy"></b-form-input>
         </b-col>
       </b-row>
-      <button @click="testData">test btn</button>
+      <!-- <button @click="testData">test btn</button> -->
     </b-card>
   </div>
 </template>
@@ -37,29 +30,25 @@ interface stock {
   name: string;
   value: number;
 }
-// Maze
-// Player
 export default Vue.extend({
   data() {
     return {
-      stocks: [],
-      bought: [], // Dev Note:  At least initialize with empty [] to get functionality
-      toBuy: 1,
-      types: ["number"] // Dev Note:  the heck is this ?
+      amountToBuy: 0
     };
   },
-
+  props: {
+    stock: Object
+  },
+  mounted() {
+    console.log(this.stock);
+  },
   methods: {
-    stockGetter() {
-      this.stocks = this.$store.getters.getAllStocks;
-    },
-    buyStock(stock: stock, amount: number) {
-      console.log(stock);
+    buyStock(stock: stock) {
       let formatedTr: newStockTransaction = {
         stockName: stock.name,
         stockData: {
           priceAtTransaction: stock.value,
-          amount,
+          amount: this.amountToBuy,
           time: new Date()
         },
         buy: true
@@ -81,9 +70,6 @@ export default Vue.extend({
           console.log(err);
         });
     }
-  },
-  async beforeMount() {
-    this.stockGetter();
   }
 });
 </script>
