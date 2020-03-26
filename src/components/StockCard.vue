@@ -13,10 +13,9 @@
       <b-row class="my-1">
         <b-col sm="3"></b-col>
         <b-col sm="9">
-          <b-form-input v-model="amountToBuy"></b-form-input>
+          <b-form-input type="number" v-model="amountToBuy"></b-form-input>
         </b-col>
       </b-row>
-      <!-- <button @click="testData">test btn</button> -->
     </b-card>
   </div>
 </template>
@@ -56,6 +55,7 @@ export default Vue.extend({
       this.$store.dispatch("buyStock", formatedTr);
       console.log("Current stocks", this.$store.getters.getUserStocks);
     },
+    // <button @click="testData">test btn</button>
     async testData() {
       let testPayload: TIME_SERIES_DAILY = {
         function: "TIME_SERIES_DAILY",

@@ -5,7 +5,7 @@ import Router from "vue-router";
 Vue.use(Router);
 
 import Landing from "../views/Landing.vue";
-import Stocks from "../views/Stocks.vue";
+import Stocks from "../views/Stocks.vue"; // I would rename this to market or something
 
 let configRoutes = [
   // * Home
