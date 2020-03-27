@@ -1,0 +1,26 @@
+Difficulty Net: 0: 1 minute, 1: 15 minutes, 2: an hour, 3:all day, 5: a week, 8: 2 weeks, 
+                13, a month, 21: 2 months, 34: 6 months, 55: 1 year, 89: PHD, 144: TECH LEAD
+
+Legend:       
+~: Not Started
+*: Solved
+?: In Progress
+!: Stuck
+
+=================================================================================
+~ 1: When a user buys a stock, it should remove his funds. 
+=================================================================================
+~ 1: Subtract the amount of shares that a stock has when someone buys it. 
+=================================================================================
+~ 1: If the user tries to buy funds with no money give an error to user. 
+=================================================================================
+~ 1: Arrange the cards in a better way. 
+=================================================================================
+~ 1: Fix the navbar. It wont open on mobile
+=================================================================================
+~ 0-1: Add substance to portfolio route. 
+=================================================================================
+~ 3-5: Add a database to load the portfolio and save stock data. 
+=================================================================================
+~ 0-1: Launch the website. If you are going to use an API Difficulty will be 1
+=================================================================================
