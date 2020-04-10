@@ -28,15 +28,19 @@ export default new Vuex.Store({
       }
     ],
     portfolio: {
-      funds: 10000,
+      funds: Array<userPriceHistory>(),
+      latestUserFunds: Number,
       myStocks: Array<userStock>(),
       historyOfTrades: Array<userStock>()
     }
   },
 
   getters: {
-    getTotalFunds: state => {
+    getUserFunds: state => {
       return state.portfolio.funds;
+    },
+    getLatestUserFunds: state => {
+      return state.portfolio.latestUserFunds
     },
     getAllStocks: state => {
       return state.stocks;
@@ -56,15 +60,29 @@ export default new Vuex.Store({
   },
   mutations: {
     updateStocksBuy(state, data: newStockTransaction) {
+
       let newStockPurchaseData: stockTransactionData = {
         priceAtTransaction: data.stockData.priceAtTransaction,
         amount: data.stockData.amount,
         time: data.stockData.time
       };
+      // ! Need to add a limit of how many stocks a user can buy once they hit zero.
+      let userFunds = state.portfolio.funds
+      let latestUserFunds = userFunds.slice(-1)[0]
+      state.portfolio.latestUserFunds = latestUserFunds
+      let totalCost = newStockPurchaseData.priceAtTransaction * Number(newStockPurchaseData.amount)
+      let newFundsTotal = latestUserFunds.funds - totalCost
+      latestUserFunds.funds = newFundsTotal
+      state.portfolio.latestUserFunds = newFundsTotal
+      let userFundsData: userPriceHistory = {
+        funds: newFundsTotal,
+        time: new Date()
+      }
       if (data.alreadyHaveStock) {
         state.portfolio.myStocks.forEach(stock => {
           if (stock.name === data.stockName) {
             stock.stocksOwned.push(newStockPurchaseData);
+            userFunds.push(userFundsData)
           }
         });
       } else {
@@ -72,9 +90,18 @@ export default new Vuex.Store({
           name: data.stockName,
           stocksOwned: [newStockPurchaseData]
         };
+        userFunds.push(userFundsData)
         state.portfolio.myStocks.push(newStock);
       }
-      console.log("Update Stock with a BUY");
+
+    },
+    updateUserFunds(state) {
+      let userFundsData: userPriceHistory = {
+        funds: 10000,
+        time: new Date()
+      }
+      state.portfolio.latestUserFunds = userFundsData.funds
+      state.portfolio.funds.push(userFundsData)
     }
     // updateStocksSell(state, data: newStockTransaction) {}
   },
@@ -110,6 +137,11 @@ interface stockTransactionData {
 interface userStock {
   name: string;
   stocksOwned: Array<stockTransactionData>;
+}
+
+export interface userPriceHistory {
+  funds: number;
+  time: Date
 }
 
 export let storeSchema = {
