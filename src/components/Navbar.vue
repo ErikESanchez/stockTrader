@@ -25,12 +25,13 @@
       </ul>
       <button type="button" class="btn btn-light">End Day</button>
       <button
+        @click="func()"
         type="button"
         class="btn btn-light dropdown-toggle"
         data-toggle="dropdown"
         aria-haspopup="true"
         aria-expanded="false"
-      >Save & Load</button>
+      >Update User Funds</button>
       <button type="button" class="btn btn-light">Save Load</button>
       <a>Funds: {{ funds }}</a>
     </div>
@@ -39,14 +40,19 @@
 
 <script lang="ts">
 import Vue from "vue";
+import { userPriceHistory } from "../store";
+
 export default Vue.extend({
   data() {
     return {
-      funds: null
+      funds: Array<userPriceHistory>()
     };
   },
   created() {
-    this.funds = this.$store.getters.getTotalFunds;
+    this.$store.commit("updateUserFunds");
+    this.funds = this.$store.getters.getLatestUserFunds;
+    console.log(this.funds);
+    // ? How to make the navbar show the most recent form of funds, the code is here, just need to find somewhere to put it
   },
   methods: {
     newPrices() {
@@ -54,6 +60,9 @@ export default Vue.extend({
         "generateStockPrices",
         this.BMW_Stock
       );
+    },
+    func() {
+      this.funds = this.$store.getters.getLatestUserFunds;
     }
   }
 });
