@@ -5,15 +5,15 @@
     </b-navbar-brand>
 
     <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
-    <button
+    <!-- <button
       @click="func()"
       type="button"
       class="btn btn-light dropdown-toggle"
       data-toggle="dropdown"
       aria-haspopup="true"
       aria-expanded="false"
-    >Update User Funds</button>
-    <a>Funds: {{ funds }}</a>
+    >Update User Funds</button> -->
+    <!-- <a>Funds: {{ funds }}</a> -->
 
     <b-collapse id="nav-collapse" is-nav>
       <b-navbar-nav>
@@ -72,33 +72,33 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { TradeStocks } from "../Classes/TradeStocks";
+// import { TradeStocks, userPriceHistory } from "../Classes/TradeStocks";
 
 export default Vue.extend({
   data() {
     return {
-      funds: Array<userPriceHistory>()
+      // funds: Array<userPriceHistory>()
     };
   },
   created() {
-    let tradeStock: TradeStocks = new TradeStocks();
-    tradeStock.updateUserFunds;
-    this.$store.commit("updateUserFunds");
-    this.funds = tradeStock.getLatestUserFunds;
-    console.log(this.funds);
+    // let tradeStock: TradeStocks = new TradeStocks();
+    // tradeStock.updateUserFunds;
+    // this.$store.commit("updateUserFunds");
+    // this.funds = tradeStock.getLatestUserFunds;
+    // console.log(this.funds);
     // ? How to make the navbar show the most recent form of funds, the code is here, just need to find somewhere to put it
   },
   methods: {
     newPrices() {
-      this.BMW_Stock = this.$store.commit(
-        "generateStockPrices",
-        this.BMW_Stock
-      );
+      // this.BMW_Stock = this.$store.commit(
+      //   "generateStockPrices",
+      //   this.BMW_Stock
+      // );
     },
     func() {
-      let tradeStock: TradeStocks = new TradeStocks();
+      // let tradeStock: TradeStocks = new TradeStocks();
 
-      this.funds = this.tradeStock.getLatestUserFunds;
+      // this.funds = this.tradeStock.getLatestUserFunds;
     }
   }
 });

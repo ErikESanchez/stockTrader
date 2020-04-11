@@ -1,20 +1,19 @@
 // import Vue from "vue";
 // import Vuex from "vuex";
 // import marketData from "@/storeModules/marketData";
-// import { userPriceHistory } from './Classes/TradeStocks'
+// import { userPriceHistory, newStockTransaction } from "./Classes/TradeStocks";
+
 // Vue.use(Vuex);
 
 // export default new Vuex.Store({
-//   state: {
-
-//   },
+//   state: {},
 
 //   getters: {
 //     getUserFunds: state => {
 //       return state.portfolio.funds;
 //     },
 //     getLatestUserFunds: state => {
-//       return state.portfolio.latestUserFunds
+//       return state.portfolio.latestUserFunds;
 //     },
 //     getAllStocks: state => {
 //       return state.stocks;
@@ -34,25 +33,24 @@
 //   },
 //   mutations: {
 //     updateStocksBuy(state, data: newStockTransaction) {
-
-
 //       // ! Need to add a limit of how many stocks a user can buy once they hit zero.
-//       let userFunds = state.portfolio.funds
-//       let latestUserFunds = userFunds.slice(-1)[0]
-//       state.portfolio.latestUserFunds = latestUserFunds
-//       let totalCost = newStockPurchaseData.priceAtTransaction * Number(newStockPurchaseData.amount)
-//       let newFundsTotal = latestUserFunds.funds - totalCost
-//       latestUserFunds.funds = newFundsTotal
-//       state.portfolio.latestUserFunds = newFundsTotal
+//       let userFunds = state.portfolio.funds;
+//       let latestUserFunds = userFunds.slice(-1)[0];
+//       state.portfolio.latestUserFunds = latestUserFunds;
+//       let totalCost =
+//         newStockPurchaseData.priceAtTransaction * Number(newStockPurchaseData.amount);
+//       let newFundsTotal = latestUserFunds.funds - totalCost;
+//       latestUserFunds.funds = newFundsTotal;
+//       state.portfolio.latestUserFunds = newFundsTotal;
 //       let userFundsData: userPriceHistory = {
 //         funds: newFundsTotal,
 //         time: new Date()
-//       }
+//       };
 //       if (data.alreadyHaveStock) {
 //         state.portfolio.myStocks.forEach(stock => {
 //           if (stock.name === data.stockName) {
 //             stock.stocksOwned.push(newStockPurchaseData);
-//             userFunds.push(userFundsData)
+//             userFunds.push(userFundsData);
 //           }
 //         });
 //       } else {
@@ -60,17 +58,15 @@
 //           name: data.stockName,
 //           stocksOwned: [newStockPurchaseData]
 //         };
-//         userFunds.push(userFundsData)
+//         userFunds.push(userFundsData);
 //         state.portfolio.myStocks.push(newStock);
 //       }
-
 //     },
 //     updateUserFunds(state) {
 //       let userFundsData: userPriceHistory = {
 //         funds: 10000,
 //         time: new Date()
-//       }
-
+//       };
 //     }
 //     // updateStocksSell(state, data: newStockTransaction) {}
 //   },
@@ -89,13 +85,3 @@
 //     marketData
 //   }
 // });
-
-
-
-
-
-
-
-
-
-

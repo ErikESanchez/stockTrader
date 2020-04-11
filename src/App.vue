@@ -7,6 +7,9 @@
 
 <script lang="ts">
 import Navbar from "./components/Navbar.vue";
+import { Market } from "@/Classes/Market";
+import marketData from "@/stockData.json";
+import { Stock } from "./Classes/Stock";
 export default {
   name: "App",
   components: {
@@ -15,7 +18,17 @@ export default {
   data() {
     return {};
   },
-  created() {}
+  created() {
+    let formatedStocks: Array<Stock> = [];
+    marketData.stocks.forEach(stock => {
+      formatedStocks.push(
+        new Stock(stock.value, stock.stockQuantity, stock.name)
+      );
+    });
+    let market: Market = new Market(formatedStocks);
+    market.startMarket();
+    console.log(market);
+  }
 };
 </script>
 

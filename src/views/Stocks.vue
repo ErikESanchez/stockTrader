@@ -9,9 +9,10 @@
 <script lang="ts">
 import Vue from "vue";
 // import store from "@/store";
-import { TradeStocks } from "../Classes/TradeStocks";
+// import { TradeStocks } from "../Classes/TradeStocks";
 import StockCard from "../components/StockCard.vue";
-import { Stock } from "../Classes/Stock";
+// import { Stock } from "../Classes/Stock";
+// import {store} from '@/store.ts'
 export default Vue.extend({
   name: "stocksView",
   data() {
@@ -23,13 +24,11 @@ export default Vue.extend({
   mounted() {
     this.initializeStocks();
     this.dataReady = true;
-    console.log(TradeStocks);
   },
   methods: {
     initializeStocks() {
-      let tradeStock: TradeStocks = new TradeStocks();
-
-      this.stockData = tradeStock.getAllStocks;
+      // let tradeStock: TradeStocks = new TradeStocks();
+      // this.stockData = ;s
     }
   },
   components: {
