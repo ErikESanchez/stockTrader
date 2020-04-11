@@ -13,19 +13,13 @@ export default {
     Navbar
   },
   data() {
-    return {
-      funds: null,
-      stockPrices: null
-    };
+    return {};
   },
-  created() {
-    this.funds = this.$store.getters.totalFunds;
-  }
+  created() {}
 };
 </script>
 
  <style lang="scss">
 @import "~bootstrap/scss/bootstrap";
-
 </style>
 

@@ -5,6 +5,15 @@
     </b-navbar-brand>
 
     <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
+    <button
+      @click="func()"
+      type="button"
+      class="btn btn-light dropdown-toggle"
+      data-toggle="dropdown"
+      aria-haspopup="true"
+      aria-expanded="false"
+    >Update User Funds</button>
+    <a>Funds: {{ funds }}</a>
 
     <b-collapse id="nav-collapse" is-nav>
       <b-navbar-nav>
@@ -55,23 +64,15 @@
         </li>
       </ul>
       <button type="button" class="btn btn-light">End Day</button>
-      <button
-        @click="func()"
-        type="button"
-        class="btn btn-light dropdown-toggle"
-        data-toggle="dropdown"
-        aria-haspopup="true"
-        aria-expanded="false"
-      >Update User Funds</button>
+      
       <button type="button" class="btn btn-light">Save Load</button>
-      <a>Funds: {{ funds }}</a>
     </div>
   </nav>-->
 </template>
 
 <script lang="ts">
 import Vue from "vue";
-import { userPriceHistory } from "../store";
+import { TradeStocks } from "../Classes/TradeStocks";
 
 export default Vue.extend({
   data() {
@@ -80,8 +81,10 @@ export default Vue.extend({
     };
   },
   created() {
+    let tradeStock: TradeStocks = new TradeStocks();
+    tradeStock.updateUserFunds;
     this.$store.commit("updateUserFunds");
-    this.funds = this.$store.getters.getLatestUserFunds;
+    this.funds = tradeStock.getLatestUserFunds;
     console.log(this.funds);
     // ? How to make the navbar show the most recent form of funds, the code is here, just need to find somewhere to put it
   },
@@ -93,7 +96,9 @@ export default Vue.extend({
       );
     },
     func() {
-      this.funds = this.$store.getters.getLatestUserFunds;
+      let tradeStock: TradeStocks = new TradeStocks();
+
+      this.funds = this.tradeStock.getLatestUserFunds;
     }
   }
 });

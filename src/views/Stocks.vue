@@ -8,7 +8,8 @@
 
 <script lang="ts">
 import Vue from "vue";
-import store from "@/store";
+// import store from "@/store";
+import { TradeStocks } from "../Classes/TradeStocks";
 import StockCard from "../components/StockCard.vue";
 import { Stock } from "../Classes/Stock";
 export default Vue.extend({
@@ -22,10 +23,13 @@ export default Vue.extend({
   mounted() {
     this.initializeStocks();
     this.dataReady = true;
+    console.log(TradeStocks);
   },
   methods: {
     initializeStocks() {
-      this.stockData = store.getters.getAllStocks;
+      let tradeStock: TradeStocks = new TradeStocks();
+
+      this.stockData = tradeStock.getAllStocks;
     }
   },
   components: {
