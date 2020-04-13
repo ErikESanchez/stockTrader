@@ -25,7 +25,8 @@
 import Vue from "vue";
 import { newStockTransaction } from "../Classes/TradeStocks";
 import { TIME_SERIES_DAILY } from "@/storeModules/marketData";
-import { TradeStocks } from "../Classes/TradeStocks";
+import { eventBus } from "../main";
+
 interface stock {
   name: string;
   value: number;
@@ -53,11 +54,10 @@ export default Vue.extend({
         },
         buy: true
       };
-      let tradeStock: TradeStocks = new TradeStocks();
-      tradeStock.ownStock(formatedTr);
-      console.log(tradeStock);
-      // this.$store.dispatch("buyStock", formatedTr);
-      // console.log("Current stocks", this.$store.getters.getUserStocks);
+      this.$store.dispatch("buyStock", formatedTr);
+      eventBus.$emit("fireMethod");
+
+      console.log("Current stocks", this.$store.getters.getUserStocks);
     },
     // <button @click="testData">test btn</button>
     async testData() {

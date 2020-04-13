@@ -28,7 +28,7 @@
           <b-form-input size="sm" class="mr-sm-2" placeholder="Search"></b-form-input>
           <b-button size="sm" class="my-2 my-sm-0" type="submit">Search</b-button>
         </b-nav-form>-->
-
+        <b-nav-item :key="latestUserFunds.funds">Funds: {{ latestUserFunds.funds }}</b-nav-item>
         <b-nav-item-dropdown right>
           <template v-slot:button-content>
             <em>User</em>
@@ -40,65 +40,36 @@
       </b-navbar-nav>
     </b-collapse>
   </b-navbar>
-  <!-- <nav class="navbar navbar-expand-lg navbar-light bg-light nv">
-    <button
-      class="navbar-toggler"
-      type="button"
-      data-toggle="collapse"
-      data-target="#navbarSupportedContent"
-      aria-controls="navbarSupportedContent"
-      aria-expanded="false"
-      aria-label="Toggle navigation"
-    >
-      <span class="navbar-toggler-icon"></span>
-    </button>
-
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-      <ul class="navbar-nav mr-auto">
-        <li class="nav-item">
-          <router-link to="/stocks" class="nav-link">Stocks</router-link>
-          <span class="sr-only">(current)</span>
-        </li>
-        <li class="nav-item">
-          <router-link to="/portfolio" class="nav-link">Portfolio</router-link>
-        </li>
-      </ul>
-      <button type="button" class="btn btn-light">End Day</button>
-      
-      <button type="button" class="btn btn-light">Save Load</button>
-    </div>
-  </nav>-->
 </template>
 
 <script lang="ts">
 import Vue from "vue";
-// import { TradeStocks, userPriceHistory } from "../Classes/TradeStocks";
+import { userPriceHistory } from "../store";
+import { eventBus } from "../main";
 
 export default Vue.extend({
   data() {
     return {
-      // funds: Array<userPriceHistory>()
+      latestUserFunds: Array<userPriceHistory>()
     };
   },
   created() {
-    // let tradeStock: TradeStocks = new TradeStocks();
-    // tradeStock.updateUserFunds;
-    // this.$store.commit("updateUserFunds");
-    // this.funds = tradeStock.getLatestUserFunds;
-    // console.log(this.funds);
+    this.$store.commit("updateUserFunds");
+    this.fundsUpdate();
+    eventBus.$on("fireMethod", () => {
+      this.fundsUpdate();
+    });
     // ? How to make the navbar show the most recent form of funds, the code is here, just need to find somewhere to put it
   },
   methods: {
-    newPrices() {
-      // this.BMW_Stock = this.$store.commit(
-      //   "generateStockPrices",
-      //   this.BMW_Stock
-      // );
+    fundsUpdate() {
+      this.latestUserFunds = this.$store.getters.getUserFunds.slice(-1)[0];
     },
-    func() {
-      // let tradeStock: TradeStocks = new TradeStocks();
-
-      // this.funds = this.tradeStock.getLatestUserFunds;
+    newPrices() {
+      this.BMW_Stock = this.$store.commit(
+        "generateStockPrices",
+        this.BMW_Stock
+      );
     }
   }
 });
