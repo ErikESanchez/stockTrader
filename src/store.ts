@@ -1,65 +1,12 @@
-import Vue from "vue";
-import Vuex from "vuex";
-import marketData from "@/storeModules/marketData";
-Vue.use(Vuex);
+// import Vue from "vue";
+// import Vuex from "vuex";
+// import marketData from "@/storeModules/marketData";
+// import { userPriceHistory, newStockTransaction } from "./Classes/TradeStocks";
 
-export default new Vuex.Store({
-  state: {
-    stocks: [
-      {
-        name: "BMW",
-        value: 200,
-        stockQuantity: 100
-      },
-      {
-        name: "Google",
-        value: 150,
-        stockQuantity: 599
-      },
-      {
-        name: "Apple",
-        value: 1000,
-        stockQuantity: 1233
-      },
-      {
-        name: "Twitter",
-        value: 100,
-        stockQuantity: 100
-      }
-    ],
-    portfolio: {
-      funds: Array<userPriceHistory>(),
-      latestUserFunds: Number,
-      myStocks: Array<userStock>(),
-      historyOfTrades: Array<userStock>()
-    }
-  },
+// Vue.use(Vuex);
 
-  getters: {
-    getUserFunds: state => {
-      return state.portfolio.funds;
-    },
-    getLatestUserFunds: state => {
-      return state.portfolio.latestUserFunds
-    },
-    getAllStocks: state => {
-      return state.stocks;
-    },
-    getUserStocks: state => {
-      return state.portfolio.myStocks;
-    },
-    ownStock: state => (stockName: string): boolean => {
-      let doIOwnStock = false;
-      state.portfolio.myStocks.forEach(stock => {
-        if (stock.name === stockName) {
-          doIOwnStock = true;
-        }
-      });
-      return doIOwnStock;
-    }
-  },
-  mutations: {
-    updateStocksBuy(state, data: newStockTransaction) {
+// export default new Vuex.Store({
+//   state: {},
 
       let newStockPurchaseData: stockTransactionData = {
         priceAtTransaction: data.stockData.priceAtTransaction,
@@ -93,11 +40,11 @@ export default new Vuex.Store({
         userFunds.push(userFundsData)
         state.portfolio.myStocks.push(newStock);
       }
-
+      console.log(state.portfolio.funds.slice(-1)[0])
     },
     updateUserFunds(state) {
       let userFundsData: userPriceHistory = {
-        funds: 10000,
+        funds: 1000,
         time: new Date()
       }
       state.portfolio.latestUserFunds = userFundsData.funds
@@ -107,10 +54,11 @@ export default new Vuex.Store({
   },
   actions: {
     buyStock({ commit, getters }, transactionData: newStockTransaction) {
-      if (getters.ownStock(transactionData.stockName)) {
+      console.log(getters.getLatestUserFunds > 0)
+      if (getters.ownStock(transactionData.stockName) && getters.getLatestUserFunds > 0 == true) {
         transactionData.alreadyHaveStock = true;
         commit("updateStocksBuy", transactionData);
-      } else {
+      } else if (getters.getLatestUserFunds > 0 == true) {
         commit("updateStocksBuy", transactionData);
       }
     }
@@ -134,7 +82,7 @@ interface stockTransactionData {
   time: Date;
 }
 
-interface userStock {
+export interface userStock {
   name: string;
   stocksOwned: Array<stockTransactionData>;
 }

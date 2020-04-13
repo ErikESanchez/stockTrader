@@ -1,7 +1,7 @@
 import { ActionTree } from "vuex";
 import { GetterTree } from "vuex";
 import { MutationTree } from "vuex";
-import { apikey } from "@/apiKey"; // apikey must be lower case
+// import { apikey } from "@/apiKey"; // apikey must be lower case
 import axios from "axios";
 const marketDataUrl = "https://www.alphavantage.co/query";
 
@@ -21,7 +21,7 @@ const actions: ActionTree<any, any> = {
       params: {
         function: payload.function,
         symbol: payload.symbol,
-        apikey
+        // apikey
       }
     });
   }

@@ -23,8 +23,10 @@
 <script lang="ts">
 /* eslint-disable */
 import Vue from "vue";
-import { newStockTransaction } from "../store";
+import { newStockTransaction } from "../Classes/TradeStocks";
 import { TIME_SERIES_DAILY } from "@/storeModules/marketData";
+import { eventBus } from "../main";
+
 interface stock {
   name: string;
   value: number;
@@ -53,6 +55,8 @@ export default Vue.extend({
         buy: true
       };
       this.$store.dispatch("buyStock", formatedTr);
+      eventBus.$emit("fireMethod");
+
       console.log("Current stocks", this.$store.getters.getUserStocks);
     },
     // <button @click="testData">test btn</button>
