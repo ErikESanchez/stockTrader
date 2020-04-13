@@ -135,7 +135,7 @@ interface stockTransactionData {
   time: Date;
 }
 
-interface userStock {
+export interface userStock {
   name: string;
   stocksOwned: Array<stockTransactionData>;
 }
