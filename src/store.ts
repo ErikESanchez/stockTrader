@@ -93,7 +93,8 @@ export default new Vuex.Store({
         userFunds.push(userFundsData)
         state.portfolio.myStocks.push(newStock);
       }
-      console.log(state.portfolio.funds.slice(-1)[0])
+      // * Latest funds 
+      // * console.log(state.portfolio.funds.slice(-1)[0])
     },
     updateUserFunds(state) {
       let userFundsData: userPriceHistory = {
@@ -107,7 +108,6 @@ export default new Vuex.Store({
   },
   actions: {
     buyStock({ commit, getters }, transactionData: newStockTransaction) {
-      console.log(getters.getLatestUserFunds > 0)
       if (getters.ownStock(transactionData.stockName) && getters.getLatestUserFunds > 0 == true) {
         transactionData.alreadyHaveStock = true;
         commit("updateStocksBuy", transactionData);

@@ -41,7 +41,7 @@ export default Vue.extend({
     stock: Object
   },
   mounted() {
-    console.log(this.stock);
+    // console.log(this.stock);
   },
   methods: {
     buyStock(stock: stock) {

@@ -10,7 +10,7 @@
       {{ stock.name }}
       <!-- With the prop either make a for loop to loop through all the indexes, or make a function to do so, 
       probaly going to have to do it with a function-->
-      <b-card-text>Amount Of Stock Owned: {{ stock.stocksOwned[0].amount }}</b-card-text>
+      <b-card-text>Amount Of Stock Owned: {{ stockAmount }}</b-card-text>
       <b-button variant="success" @click="sellStock(stock, 1)">Sell</b-button>
       <b-row class="my-1">
         <b-col sm="3"></b-col>
@@ -31,12 +31,18 @@ interface stock {
 }
 export default Vue.extend({
   props: {
-    stock: Object
+    stock: Object,
+    stockAmount: Number
   },
   data() {
     return {
       amountToSell: 0
     };
+  },
+  methods: {
+    sellStock(stock, amount?) {
+      console.log(stock);
+    }
   },
   mounted() {
     console.log(this.stock);
