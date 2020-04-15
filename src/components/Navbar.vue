@@ -12,7 +12,7 @@
       data-toggle="dropdown"
       aria-haspopup="true"
       aria-expanded="false"
-    >Update User Funds</button> -->
+    >Update User Funds</button>-->
     <!-- <a>Funds: {{ funds }}</a> -->
 
     <b-collapse id="nav-collapse" is-nav>
@@ -28,7 +28,7 @@
           <b-form-input size="sm" class="mr-sm-2" placeholder="Search"></b-form-input>
           <b-button size="sm" class="my-2 my-sm-0" type="submit">Search</b-button>
         </b-nav-form>-->
-        <b-nav-item :key="latestUserFunds.funds">Funds: {{ latestUserFunds.funds }}</b-nav-item>
+        <b-nav-item>Funds: ${{avaibleUserFunds}}</b-nav-item>
         <b-nav-item-dropdown right>
           <template v-slot:button-content>
             <em>User</em>
@@ -44,32 +44,37 @@
 
 <script lang="ts">
 import Vue from "vue";
+import store from "@/store";
 import { userPriceHistory } from "../store";
 import { eventBus } from "../main";
 
 export default Vue.extend({
   data() {
     return {
-      latestUserFunds: Array<userPriceHistory>()
+      // latestUserFunds: Array<userPriceHistory>()
+      avaibleUserFunds: Number()
     };
   },
   created() {
-    this.$store.commit("updateUserFunds");
-    this.fundsUpdate();
-    eventBus.$on("fireMethod", () => {
-      this.fundsUpdate();
-    });
+    this.avaibleUserFunds = store.getters.getTotalFunds;
+    // this.$store.commit("updateUserFunds"); // you should pass in a parameter to this to update the store
+    // this.fundsUpdate();
+    // eventBus.$on("fireMethod", () => {
+    //   // no
+    //   this.fundsUpdate();
+    // });
     // ? How to make the navbar show the most recent form of funds, the code is here, just need to find somewhere to put it
   },
   methods: {
     fundsUpdate() {
-      this.latestUserFunds = this.$store.getters.getUserFunds.slice(-1)[0];
+      this.avaibleUserFunds = store.getters.getTotalFunds;
     },
     newPrices() {
-      this.BMW_Stock = this.$store.commit(
-        "generateStockPrices",
-        this.BMW_Stock
-      );
+      // ! BMW_Stock does not exist
+      // this.BMW_Stock = this.$store.commit(
+      //   "generateStockPrices",
+      //   this.BMW_Stock
+      // );
     }
   }
 });

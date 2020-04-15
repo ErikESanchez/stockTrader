@@ -1,42 +1,45 @@
 import { ActionTree } from "vuex";
 import { GetterTree } from "vuex";
 import { MutationTree } from "vuex";
-// Todo: updateTotalFunds
 
 const state = {
   funds: 10000,
   myStocks: Array<userStock>(),
-  historyOfTrades: Array<userStock>()
+  historyOfTrades: Array<userStock>(),
 };
 const getters: GetterTree<any, any> = {
-  getTotalFunds: state => {
-    return state.portfolio.funds;
+  getTotalFunds: (state) => {
+    return state.funds;
   },
-  getAllStocks: state => {
+  getAllStocks: (state) => {
     return state.stocks;
   },
-  getUserStocks: state => {
-    return state.portfolio.myStocks;
+  getUserStocks: (state) => {
+    return state.myStocks;
   },
-  ownStock: state => (stockName: string): boolean => {
+  ownStock: (state) => (stockName: string): boolean => {
     let doIOwnStock = false;
-    state.portfolio.myStocks.forEach(stock => {
+    state.myStocks.forEach((stock: userStock) => {
       if (stock.name === stockName) {
         doIOwnStock = true;
       }
     });
     return doIOwnStock;
-  }
+  },
 };
 const mutations: MutationTree<any> = {
+  updateFunds(state, priceDifference: number) {
+    state.funds += priceDifference;
+  },
   updateStocksBuy(state, data: newStockTransaction) {
     let newStockPurchaseData: stockTransactionData = {
       priceAtTransaction: data.stockData.priceAtTransaction,
       amount: data.stockData.amount,
-      time: data.stockData.time
+      time: data.stockData.time,
     };
+
     if (data.alreadyHaveStock) {
-      state.portfolio.myStocks.forEach(stock => {
+      state.portfolio.myStocks.forEach((stock: userStock) => {
         if (stock.name === data.stockName) {
           stock.stocksOwned.push(newStockPurchaseData);
         }
@@ -44,12 +47,13 @@ const mutations: MutationTree<any> = {
     } else {
       let newStock: userStock = {
         name: data.stockName,
-        stocksOwned: [newStockPurchaseData]
+        stocksOwned: [newStockPurchaseData],
       };
       state.portfolio.myStocks.push(newStock);
     }
+
     console.log("Update Stock with a BUY");
-  }
+  },
   // updateStocksSell(state, data: newStockTransaction) {}
 };
 const actions: ActionTree<any, any> = {
@@ -60,7 +64,11 @@ const actions: ActionTree<any, any> = {
     } else {
       commit("updateStocksBuy", transactionData);
     }
-  }
+    commit(
+      "updateFunds",
+      transactionData.stockData.amount * transactionData.stockData.priceAtTransaction
+    );
+  },
   // sellStock({ commit, getters }, transactionData: newStockTransaction) {}
 };
 
@@ -86,5 +94,5 @@ export default {
   actions,
   mutations,
   getters,
-  state
+  state,
 };

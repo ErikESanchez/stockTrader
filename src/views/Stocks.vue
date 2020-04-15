@@ -14,14 +14,15 @@ import Vue from "vue";
 import StockCard from "../components/StockCard.vue";
 import { TIME_SERIES_DAILY } from "@/storeModules/marketData";
 import { apiStockData } from "../store";
-import apikey from "../storeModules/apikey"; // apikey must be lower case
+import { apikey } from "@/apiKey"; // apikey must be lower case
 import { Stock } from "../Classes/Stock";
 export default Vue.extend({
   name: "stocksView",
   data() {
     return {
       stockData: Array<Stock>(),
-      dataReady: false
+      dataReady: false,
+      apiStockData: {}
     };
   },
   async mounted() {
@@ -34,7 +35,7 @@ export default Vue.extend({
         function: "TIME_SERIES_DAILY",
         symbol: "IBM",
         interval: "30min",
-        apikey: apikey.state.apikey,
+        apikey: apikey,
         outputsize: "compact"
       };
       await this.$store

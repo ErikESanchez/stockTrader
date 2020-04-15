@@ -40,9 +40,7 @@ export default Vue.extend({
   props: {
     stock: Object
   },
-  mounted() {
-    // console.log(this.stock);
-  },
+  mounted() {},
   methods: {
     buyStock(stock: stock) {
       let formatedTr: newStockTransaction = {

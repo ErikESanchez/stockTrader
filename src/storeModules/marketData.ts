@@ -22,7 +22,7 @@ export const actions: ActionTree<any, any> = {
         function: payload.function,
         symbol: payload.symbol,
         interval: payload.interval,
-        apikey: payload.apikey
+        apikey: apikey
       }
     });
   }
