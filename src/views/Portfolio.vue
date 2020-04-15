@@ -1,9 +1,13 @@
 <template>
   <div>
     <p>Portfolio</p>
-    <button @click="getAllUserStockData">dfsdfsdsf</button>
     <b-card-group deck v-if="dataReady">
-      <portfolio-stock-card v-for="stock in stockData" :key="stock.name" :stock="stock"></portfolio-stock-card>
+      <portfolio-stock-card
+        v-for="stock in stockData"
+        :key="stock.name"
+        :stock="stock"
+        :stockAmount="stockAmount"
+      ></portfolio-stock-card>
     </b-card-group>
   </div>
 </template>
@@ -20,7 +24,8 @@ export default Vue.extend({
   data() {
     return {
       dataReady: false,
-      stockData: Array<userStock>()
+      stockData: Array<userStock>(),
+      stockAmount: new Number()
     };
   },
   mounted() {
@@ -28,11 +33,20 @@ export default Vue.extend({
     this.dataReady = true;
   },
   methods: {
-    getAllUserStockData() {
-      console.log(this.stockData);
-    },
     initializeUserStocks() {
       this.stockData = this.$store.getters.getUserStocks;
+      let totalAmount = new Array();
+      // ! index in the forEach loop is a key!
+      Object.entries(this.stockData).forEach(stock => {
+        for (let i = 0; i < stock[1]["stocksOwned"].length; i++) {
+          let amount = Number(stock[1]["stocksOwned"][i]["amount"]);
+          totalAmount.push(amount);
+          this.stockAmount = totalAmount.reduce((a, b) => {
+            return a + b;
+          }, 0);
+          console.log(this.stockAmount);
+        }
+      });
     }
   }
 });
