@@ -1,21 +1,21 @@
 <template>
   <div>
+    <!-- Make jumbotron: add textData to props in jumbortron-->
     <p>Portfolio</p>
     <b-card-group deck v-if="dataReady">
-      <portfolio-stock-card
-        v-for="stock in stockData"
-        :key="stock.name"
-        :stock="stock"
-        :stockAmount="stockAmount"
-      ></portfolio-stock-card>
+      <portfolio-stock-card v-for="stock in myStockData" :key="stock.name" :stock="stock"></portfolio-stock-card>
     </b-card-group>
   </div>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
-import { userStock } from "../store";
 import PortfolioStockCard from "../components/PortfolioStockCard.vue";
+import { Stock } from "../Classes/Stock";
+import store from "../store";
+import { portfolioStoreSchema } from "../storeModules/portfolioStore";
+import { Portfolio, userStock } from "../Classes/Portfolio";
+
 export default Vue.extend({
   name: "portfolio",
   components: {
@@ -24,29 +24,31 @@ export default Vue.extend({
   data() {
     return {
       dataReady: false,
-      stockData: Array<userStock>(),
       stockAmount: new Number()
     };
   },
   mounted() {
-    this.initializeUserStocks();
     this.dataReady = true;
+    console.log("kek");
   },
-  methods: {
-    initializeUserStocks() {
-      this.stockData = this.$store.getters.getUserStocks;
-      let totalAmount = new Array();
-      // ! index in the forEach loop is a key!
-      Object.entries(this.stockData).forEach(stock => {
-        for (let i = 0; i < stock[1]["stocksOwned"].length; i++) {
-          let amount = Number(stock[1]["stocksOwned"][i]["amount"]);
-          totalAmount.push(amount);
-          this.stockAmount = totalAmount.reduce((a, b) => {
-            return a + b;
-          }, 0);
-          console.log(this.stockAmount);
-        }
+  methods: {},
+  computed: {
+    myStockData() {
+      let allStocks: Array<userStock> = [];
+      let stockNames: Array<string> = this.myPortfolio.getCurrentlyOwnedStocks();
+      console.log(stockNames);
+      stockNames.forEach(stockName => {
+        let stockData: userStock | undefined = this.myPortfolio.getStockData(
+          stockName
+        );
+        console.log(stockData);
+        if (stockData != undefined) allStocks.push(stockData);
       });
+      console.log(allStocks);
+      return allStocks;
+    },
+    myPortfolio(): Portfolio {
+      return store.getters[portfolioStoreSchema.getters.getMyPortfolio];
     }
   }
 });

@@ -13,7 +13,7 @@ export class Market {
   public getTotalWorthOfMarket(): number {
     let total: number = 0;
     let allStocks: Array<Stock> = this.allStocks;
-    allStocks.forEach(stock => {
+    allStocks.forEach((stock) => {
       total += stock.getTotalWorth();
     });
     return total;

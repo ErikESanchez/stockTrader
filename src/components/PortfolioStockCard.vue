@@ -1,5 +1,6 @@
 <template>
   <div>
+    {{stock.name}}
     <b-card
       border-variant="primary"
       header-bg-variant="success"
@@ -8,10 +9,8 @@
       :key="stock.name"
     >
       {{ stock.name }}
-      <!-- With the prop either make a for loop to loop through all the indexes, or make a function to do so, 
-      probaly going to have to do it with a function-->
-      <b-card-text>Amount Of Stock Owned: {{ stockAmount }}</b-card-text>
-      <b-button variant="success" @click="sellStock(stock, 1)">Sell</b-button>
+      <b-card-text>Amount Of Stock Owned: {{ stock.totalAmountShares }}</b-card-text>
+      <b-button variant="danger" @click="sellStock(stock)">Sell</b-button>
       <b-row class="my-1">
         <b-col sm="3"></b-col>
         <b-col sm="9">
@@ -23,16 +22,19 @@
 </template>
 
 <script lang="ts">
-/* eslint-disable */
 import Vue from "vue";
-interface stock {
-  name: string;
-  value: number;
-}
+import { Stock } from "../Classes/Stock";
+import { Portfolio, userStock } from "@/Classes/Portfolio";
+import { newStockTransaction } from "@/Classes/Portfolio";
+import {
+  storeTransaction,
+  portfolioStoreSchema
+} from "@/storeModules/portfolioStore";
+import store from "../store";
+
 export default Vue.extend({
   props: {
-    stock: Object,
-    stockAmount: Number
+    stock: Object //userStock
   },
   data() {
     return {
@@ -40,12 +42,21 @@ export default Vue.extend({
     };
   },
   methods: {
-    sellStock(stock, amount?) {
-      console.log(stock);
+    sellStock(stock: userStock) {
+      let formatedStoreTr: storeTransaction = {
+        portfolioId:
+          store.getters[portfolioStoreSchema.getters.getMyPortfolioId],
+        trData: {
+          stockName: stock.name,
+          stockData: {
+            priceAtTransaction: 100, // Todo: update the market in vuex and add it here || or find another way to get the time price update of data
+            amount: this.amountToSell,
+            time: new Date()
+          }
+        }
+      };
+      store.dispatch("sellStock", formatedStoreTr);
     }
-  },
-  mounted() {
-    console.log(this.stock);
   }
 });
 </script>

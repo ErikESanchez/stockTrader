@@ -8,15 +8,19 @@ export class Stock {
     this.name = name;
   }
 
-  getNumberOfShares() {
+  public getStockName() {
+    return this.name;
+  }
+
+  public getNumberOfShares() {
     return this.shares;
   }
 
-  getCurrentPrice() {
+  public getCurrentPrice() {
     return this.price;
   }
 
-  getTotalWorth() {
+  public getTotalWorth() {
     return this.price * this.shares;
   }
 

@@ -6,7 +6,7 @@
       <p class="lead">Click on: 'End Day' to begin a new day!</p>
       <hr />
       <h2 class="lead">
-        <strong>Your Funds: ${{funds}}</strong>
+        <strong>Your Funds: ${{avaibleUserFunds}}</strong>
       </h2>
     </div>
   </div>
@@ -15,16 +15,17 @@
 <script lang="ts">
 import Vue from "vue";
 import store from "@/store";
+import { portfolioStoreSchema } from "../storeModules/portfolioStore";
+
 export default Vue.extend({
   data() {
-    return {
-      funds: 0
-    };
+    return {};
   },
-  created() {
-    this.funds = store.getters.getTotalFunds;
-  },
-  methods: {}
+  computed: {
+    avaibleUserFunds: function() {
+      return store.getters[portfolioStoreSchema.getters.getAvaibleFunds];
+    }
+  }
 });
 </script>
 

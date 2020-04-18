@@ -1,6 +1,5 @@
 <template>
   <div>
-    <b-button @click="testData">getTEst data</b-button>
     <b-card-group deck v-if="dataReady">
       <stock-card v-for="stock in stockData" :key="stock.name" :stock="stock"></stock-card>
     </b-card-group>
@@ -9,51 +8,41 @@
 
 <script lang="ts">
 import Vue from "vue";
-// import store from "@/store";
-// import { TradeStocks } from "../Classes/TradeStocks";
+import store from "@/store";
 import StockCard from "../components/StockCard.vue";
-import { TIME_SERIES_DAILY } from "@/storeModules/marketData";
-import { apiStockData } from "../store";
-import { apikey } from "@/apiKey"; // apikey must be lower case
+import marketData from "@/stockData.json";
 import { Stock } from "../Classes/Stock";
+import { Portfolio } from "../Classes/Portfolio";
+import { portfolioStoreSchema } from "@/storeModules/portfolioStore";
+
 export default Vue.extend({
   name: "stocksView",
   data() {
     return {
       stockData: Array<Stock>(),
       dataReady: false,
-      apiStockData: {}
+      apiStockData: {},
+      myPortfolio: Portfolio
     };
   },
   async mounted() {
+    this.getMyData();
     this.initializeStocks();
     this.dataReady = true;
   },
   methods: {
-    async testData() {
-      let testPayload: TIME_SERIES_DAILY = {
-        function: "TIME_SERIES_DAILY",
-        symbol: "IBM",
-        interval: "30min",
-        apikey: apikey,
-        outputsize: "compact"
-      };
-      await this.$store
-        .dispatch("getStockQuote", testPayload)
-        .then(res => {
-          console.log(res);
-          let formatedApiData: apiStockData = {
-            name: res.data
-          };
-          this.apiStockData = formatedApiData;
-        })
-        .catch(err => {
-          console.log(err);
-        });
+    getMyData() {
+      this.myPortfolio =
+        store.getters[portfolioStoreSchema.getters.getMyPortfolio];
     },
     initializeStocks() {
-      // let tradeStock: TradeStocks = new TradeStocks();
-      // this.stockData = ;s
+      let formatedStocks: Array<Stock> = [];
+      marketData.stocks.forEach((stock: any) => {
+        formatedStocks.push(
+          new Stock(stock.value, stock.stockQuantity, stock.name)
+        );
+      });
+      this.stockData = formatedStocks;
     }
   },
   components: {

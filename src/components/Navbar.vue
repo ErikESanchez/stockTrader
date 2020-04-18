@@ -47,34 +47,15 @@ import Vue from "vue";
 import store from "@/store";
 import { userPriceHistory } from "../store";
 import { eventBus } from "../main";
+import { portfolioStoreSchema } from "../storeModules/portfolioStore";
 
 export default Vue.extend({
   data() {
-    return {
-      // latestUserFunds: Array<userPriceHistory>()
-      avaibleUserFunds: Number()
-    };
+    return {};
   },
-  created() {
-    this.avaibleUserFunds = store.getters.getTotalFunds;
-    // this.$store.commit("updateUserFunds"); // you should pass in a parameter to this to update the store
-    // this.fundsUpdate();
-    // eventBus.$on("fireMethod", () => {
-    //   // no
-    //   this.fundsUpdate();
-    // });
-    // ? How to make the navbar show the most recent form of funds, the code is here, just need to find somewhere to put it
-  },
-  methods: {
-    fundsUpdate() {
-      this.avaibleUserFunds = store.getters.getTotalFunds;
-    },
-    newPrices() {
-      // ! BMW_Stock does not exist
-      // this.BMW_Stock = this.$store.commit(
-      //   "generateStockPrices",
-      //   this.BMW_Stock
-      // );
+  computed: {
+    avaibleUserFunds: function() {
+      return store.getters[portfolioStoreSchema.getters.getAvaibleFunds];
     }
   }
 });
