@@ -4,7 +4,7 @@
     <b-card-group deck v-if="dataReady">
       <portfolio-stock-card
         v-for="stock in stockData"
-        :key="stock.name"
+        :key="stock"
         :stock="stock"
         :stockAmount="stockAmount"
       ></portfolio-stock-card>

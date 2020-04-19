@@ -5,13 +5,12 @@
       header-bg-variant="success"
       header-text-variant="white"
       align="center"
-      :key="stock.name"
     >
-      {{ stock.name }}
-      <b-card-text>Price: {{ stock.value }}</b-card-text>
+      {{ stock["stockData"]["name"] }}
+      <b-card-text>Price: {{ stock["stockData"]["endOfDayPrice"] }}</b-card-text>
       <b-button variant="success" @click="buyStock(stock, 1)">Buy</b-button>
       <b-row class="my-1">
-        <b-col sm="3">{{apiStockData}}</b-col>
+        <b-col sm="3"></b-col>
         <b-col sm="9">
           <b-form-input type="number" v-model="amountToBuy"></b-form-input>
         </b-col>
@@ -38,10 +37,12 @@ export default Vue.extend({
     };
   },
   props: {
-    stock: Object
+    stock: String,
+    keyProp: String
   },
   mounted() {
     // console.log(this.stock);
+    console.log(this.stock);
   },
   methods: {
     buyStock(stock: stock) {

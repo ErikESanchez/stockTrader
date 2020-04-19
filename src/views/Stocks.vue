@@ -1,8 +1,11 @@
 <template>
   <div>
-    <b-button @click="testData">getTEst data</b-button>
+    <p>Get API Data then format</p>
+    <b-button @click="APIData()">Get API Data</b-button>
+
+    <b-button @click="formatLocalData">Format Local Data</b-button>
     <b-card-group deck v-if="dataReady">
-      <stock-card v-for="stock in stockData" :key="stock.name" :stock="stock"></stock-card>
+      <stock-card v-for="(stock, key) in stockData" :key="key" :stock="stockData" :keyProp="key"></stock-card>
     </b-card-group>
   </div>
 </template>
@@ -19,19 +22,37 @@ export default Vue.extend({
   name: "stocksView",
   data() {
     return {
-      stockData: Array<Stock>(),
+      stockData: Object(),
       dataReady: false
     };
   },
   async mounted() {
-    this.initializeStocks();
+    // this.initializeStocks();
+    this.formatLocalData();
     this.dataReady = true;
+    // this.APIData("AAPL");
   },
   methods: {
-    async testData() {
+    formatLocalData() {
+      let localData = JSON.parse(localStorage.getItem("AAPL"));
+      console.log();
+
+      let formatedLocalData: stockData = {
+        stockData: {
+          name: localData.data["Meta Data"]["2. Symbol"],
+          lastRefreshed: localData.data["Meta Data"]["3. Last Refreshed"],
+          endOfDayPrice:
+            localData.data["Time Series (Daily)"]["2020-04-15"]["4. close"]
+        }
+      };
+      this.stockData = formatedLocalData;
+
+      console.log(formatedLocalData, localData);
+    },
+    async APIData() {
       let testPayload: TIME_SERIES_DAILY = {
         function: "TIME_SERIES_DAILY",
-        symbol: "IBM",
+        symbol: "AAPL",
         interval: "30min",
         apikey: apikey.state.apikey,
         outputsize: "compact"
@@ -44,6 +65,7 @@ export default Vue.extend({
             name: res.data
           };
           this.apiStockData = formatedApiData;
+          localStorage.setItem("AAPL", JSON.stringify(res));
         })
         .catch(err => {
           console.log(err);
@@ -57,4 +79,12 @@ export default Vue.extend({
     StockCard
   }
 });
+
+interface stockData {
+  stockData: {
+    name: string;
+    lastRefreshed: string;
+    endOfDayPrice: string;
+  };
+}
 </script>
