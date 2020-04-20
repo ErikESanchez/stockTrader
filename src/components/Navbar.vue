@@ -45,8 +45,6 @@
 <script lang="ts">
 import Vue from "vue";
 import store from "@/store";
-import { userPriceHistory } from "../store";
-import { eventBus } from "../main";
 import { portfolioStoreSchema } from "../storeModules/portfolioStore";
 
 export default Vue.extend({

@@ -1,7 +1,10 @@
 <template>
   <div class="jumbotron jumbotron-fluid jmb">
     <div class="container">
-      <h1 class="display-4">Trade Portfolio or View Portfolio</h1>
+      <h1 class="display-4">
+        <router-link to="/stocks" class="link">Trade Stocks</router-link> or
+        <router-link to="/portfolio" class="link">View Portfolio</router-link>
+      </h1>
       <p class="lead">You may Save & Load your Data</p>
       <p class="lead">Click on: 'End Day' to begin a new day!</p>
       <hr />
