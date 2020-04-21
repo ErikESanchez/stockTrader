@@ -36,7 +36,7 @@
           <b-dropdown-item href="#">Profile</b-dropdown-item>
           <b-dropdown-item href="#">Sign Out</b-dropdown-item>
         </b-nav-item-dropdown>
-        <b-button size="sm" class="my-2 my-sm-0" type="submit">End day</b-button>
+        <!-- <b-button size="sm" class="my-2 my-sm-0" type="submit">End day</b-button> -->
       </b-navbar-nav>
     </b-collapse>
   </b-navbar>

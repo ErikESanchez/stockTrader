@@ -1,7 +1,7 @@
 import Vue from "vue";
 import Router from "vue-router";
 import store from "./store";
-import router from "@/router/router";
+import router from "@/router";
 import BootstrapVue from "bootstrap-vue/dist/bootstrap-vue.esm";
 import App from "./App.vue";
 
@@ -12,8 +12,6 @@ Vue.use(BootstrapVue);
 Vue.use(Router);
 
 Vue.config.productionTip = true;
-
-export const eventBus = new Vue(); // added line
 
 new Vue({
   el: "#app",

@@ -1,36 +1,40 @@
 <template>
   <div>
-    <b-card
-      border-variant="primary"
-      header-bg-variant="success"
-      header-text-variant="white"
-      align="center"
-      :key="stock.name"
-    >
-      <b-card-text>{{ stock.name }}: ${{ stock.price }}</b-card-text>
-      <b-row>
-        <b-col sm="6">
-          <b-row>
-            <b-col sm="6">
-              <b-form-input type="number" v-model="amountToSell"></b-form-input>
-            </b-col>
-            <b-col sm="6">
-              <b-button variant="danger" @click="sellStock(stock, amountToSell)">Sell</b-button>
-            </b-col>
-          </b-row>
-        </b-col>
-        <b-col sm="6">
-          <b-row>
-            <b-col>
-              <b-form-input type="number" v-model="amountToBuy"></b-form-input>
-            </b-col>
-            <b-col>
-              <b-button variant="success" @click="buyStock(stock, amountToBuy)">Buy</b-button>
-            </b-col>
-          </b-row>
-        </b-col>
-      </b-row>
-    </b-card>
+    <!-- Todo: Add the symbol, make it dynamically go to route  -->
+    <!-- Todo: add json file of all symbols to look up  -->
+    <router-link :to="{ path: 'stocks', params: { stock: 'APPL' }}">
+      <b-card
+        border-variant="primary"
+        header-bg-variant="success"
+        header-text-variant="white"
+        align="center"
+        :key="stock.name"
+      >
+        <b-card-text>{{ stock.name }}: ${{ stock.price }}</b-card-text>
+        <b-row>
+          <b-col sm="6">
+            <b-row>
+              <b-col sm="6">
+                <b-form-input type="number" v-model="amountToSell"></b-form-input>
+              </b-col>
+              <b-col sm="6">
+                <b-button variant="danger" @click="sellStock(stock, amountToSell)">Sell</b-button>
+              </b-col>
+            </b-row>
+          </b-col>
+          <b-col sm="6">
+            <b-row>
+              <b-col>
+                <b-form-input type="number" v-model="amountToBuy"></b-form-input>
+              </b-col>
+              <b-col>
+                <b-button variant="success" @click="buyStock(stock, amountToBuy)">Buy</b-button>
+              </b-col>
+            </b-row>
+          </b-col>
+        </b-row>
+      </b-card>
+    </router-link>
   </div>
 </template>
 

@@ -102,6 +102,14 @@ export class Portfolio {
     }
   }
 
+  public addFunds(amountOfFunds: number) {
+    this.updateFunds(amountOfFunds);
+  }
+
+  public subtractFunds(amountOfFunds: number) {
+    this.updateFunds(amountOfFunds);
+  }
+
   // Update Functions
   private updateFunds(newAmount: number) {
     this.avaibleFunds += newAmount;
