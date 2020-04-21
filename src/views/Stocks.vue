@@ -39,7 +39,7 @@ export default Vue.extend({
       let formatedStocks: Array<Stock> = [];
       marketData.stocks.forEach((stock: any) => {
         formatedStocks.push(
-          new Stock(stock.value, stock.stockQuantity, stock.name)
+          new Stock(stock.value, stock.stockQuantity, stock.name, stock.symbol)
         );
       });
       this.stockData = formatedStocks;

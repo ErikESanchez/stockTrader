@@ -30,7 +30,7 @@ export default {
     let formatedStocks: Array<Stock> = [];
     marketData.stocks.forEach((stock: any) => {
       formatedStocks.push(
-        new Stock(stock.value, stock.stockQuantity, stock.name)
+        new Stock(stock.value, stock.stockQuantity, stock.name, stock.symbol)
       );
     });
     let market: Market = new Market(formatedStocks);

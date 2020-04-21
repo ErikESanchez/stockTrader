@@ -2,11 +2,25 @@ export class Stock {
   price: number;
   shares: number;
   name: string;
-  constructor(currentPrice: number, numberOfShares: number, name: string) {
+  symbol: string;
+  constructor(currentPrice: number, numberOfShares: number, name: string, symbol: string) {
     this.price = currentPrice;
     this.shares = numberOfShares;
     this.name = name;
+    this.symbol = symbol;
   }
+
+  // Mutaters
+
+  increaseAmountOfShares(amountToIncraeseBy: number) {
+    this.shares += amountToIncraeseBy;
+  }
+
+  reduceAmountOfShares(amountToReduceBy: number) {
+    this.shares -= amountToReduceBy;
+  }
+
+  // Getters
 
   public getStockName() {
     return this.name;
@@ -23,12 +37,7 @@ export class Stock {
   public getTotalWorth() {
     return this.price * this.shares;
   }
-
-  increaseAmountOfShares(amountToIncraeseBy: number) {
-    this.shares += amountToIncraeseBy;
-  }
-
-  reduceAmountOfShares(amountToReduceBy: number) {
-    this.shares -= amountToReduceBy;
+  public getStockSymbol() {
+    return this.symbol;
   }
 }

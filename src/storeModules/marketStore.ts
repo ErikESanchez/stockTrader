@@ -4,7 +4,7 @@ import { MutationTree } from "vuex";
 import { apikey } from "@/apiKey"; // apikey must be lower case
 import axios from "axios";
 const marketDataUrl = "https://www.alphavantage.co/query";
-// For documentation https://www.alphavantage.co/documentation/ 
+// For documentation https://www.alphavantage.co/documentation/
 const state = {
   testStockData: [],
 };
@@ -17,11 +17,13 @@ const mutations: MutationTree<any> = {
 export const actions: ActionTree<any, any> = {
   async getStockQuote({ commit }, payload: TIME_SERIES_DAILY) {
     commit("addDataToStock", payload);
+    console.log(payload);
+    console.log("Getting Stock Data For", payload.symbol, "....");
     return await axios.get(marketDataUrl, {
       params: {
         function: payload.function,
         symbol: payload.symbol,
-        apikey,
+        apikey: apikey,
       },
     });
   },

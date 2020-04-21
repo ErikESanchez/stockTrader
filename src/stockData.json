@@ -1,24 +1,22 @@
 {
   "stocks": [
     {
-      "name": "BMW",
-      "value": 200,
-      "stockQuantity": 100
-    },
-    {
       "name": "Google",
       "value": 150,
-      "stockQuantity": 599
+      "stockQuantity": 599,
+      "symbol": "GOOG"
     },
     {
       "name": "Apple",
       "value": 1000,
-      "stockQuantity": 1233
+      "stockQuantity": 1233,
+      "symbol": "AAPL"
     },
     {
       "name": "Twitter",
       "value": 100,
-      "stockQuantity": 100
+      "stockQuantity": 100,
+      "symbol": "TWTR"
     }
   ]
 }

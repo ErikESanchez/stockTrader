@@ -10,21 +10,26 @@ import {
   marketStoreSchema,
   TIME_SERIES_DAILY
 } from "@/storeModules/marketStore";
+import router from "../router";
 export default Vue.extend({
   name: "singleStock",
-  props: {
-    stockSymbol: String
-  },
   mounted() {
-    // this.getStockData();
+    this.getStockData();
   },
   methods: {
     async getStockData() {
-      let payload: TIME_SERIES_DAILY = {
-        function: "TIME_SERIES_DAILY",
-        symbol: this.stockSymbol
-      };
-      store.dispatch(marketStoreSchema.actions.getStockQuote, this.stockSymbol);
+      const stockSymbol = router.currentRoute.params.stock;
+      if (stockSymbol != undefined && stockSymbol.length > 1) {
+        let payload: TIME_SERIES_DAILY = {
+          function: "TIME_SERIES_DAILY",
+          symbol: stockSymbol
+        };
+        const result = await store.dispatch(
+          marketStoreSchema.actions.getStockQuote,
+          payload
+        );
+        console.log(result);
+      }
     }
   }
 });
