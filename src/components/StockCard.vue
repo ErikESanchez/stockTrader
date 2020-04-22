@@ -54,6 +54,7 @@ import router from "@/router";
 export default Vue.extend({
   data() {
     return {
+      // Set the default to Type of Number
       amountToBuy: 0,
       amountToSell: 0
     };
@@ -72,7 +73,7 @@ export default Vue.extend({
           stockName: stock.name,
           stockData: {
             priceAtTransaction: stock.price,
-            amount: this.amountToBuy,
+            amount: Number(this.amountToBuy),
             time: new Date()
           }
         }
@@ -88,7 +89,7 @@ export default Vue.extend({
           stockName: stock.name,
           stockData: {
             priceAtTransaction: stock.price,
-            amount: this.amountToSell,
+            amount: Number(this.amountToSell),
             time: new Date()
           }
         }
