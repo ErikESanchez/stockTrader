@@ -32,7 +32,7 @@ export interface TIME_SERIES_DAILY {
   symbol: string;
   interval: string;
   apikey: string;
-  outputsize: string;
+  outputsize?: string;
 }
 
 export default {

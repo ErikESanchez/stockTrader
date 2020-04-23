@@ -6,8 +6,9 @@
       header-text-variant="white"
       align="center"
     >
-      {{ stock["stockData"]["name"] }}
-      <b-card-text>Price: {{ stock["stockData"]["endOfDayPrice"] }}</b-card-text>
+      {{ stock[keyProp]["stockData"]["name"] }}
+      <b-card-text>Price: {{ stock[keyProp]["stockData"]["open"] }}</b-card-text>
+      <b-card-text>Date Of Data: {{ stock[keyProp]["stockData"]["lastRefreshed"]}}</b-card-text>
       <b-button variant="success" @click="buyStock(stock, 1)">Buy</b-button>
       <b-row class="my-1">
         <b-col sm="3"></b-col>
@@ -37,8 +38,8 @@ export default Vue.extend({
     };
   },
   props: {
-    stock: String,
-    keyProp: String
+    stock: Array,
+    keyProp: Number
   },
   mounted() {
     // console.log(this.stock);

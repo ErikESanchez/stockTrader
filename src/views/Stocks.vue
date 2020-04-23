@@ -1,8 +1,18 @@
 <template>
   <div>
     <p>Get API Data then format</p>
-    <b-button @click="APIData()">Get API Data</b-button>
+    <b-button
+      @click="APIData('AAPL'); APIData('GOOGL'); APIData('MSFT'); APIData('AMZN')"
+    >Get API Data</b-button>
+    <b-form-textarea
+      id="textarea"
+      v-model="text"
+      placeholder="Enter something..."
+      rows="3"
+      max-rows="6"
+    ></b-form-textarea>
 
+    <pre class="mt-3 mb-0">{{ text }}</pre>
     <b-button @click="formatLocalData">Format Local Data</b-button>
     <b-card-group deck v-if="dataReady">
       <stock-card v-for="(stock, key) in stockData" :key="key" :stock="stockData" :keyProp="key"></stock-card>
@@ -17,42 +27,66 @@ import StockCard from "../components/StockCard.vue";
 import { TIME_SERIES_DAILY } from "@/storeModules/marketData";
 import { apiStockData } from "../store";
 import apikey from "../apikey"; // apikey must be lower case
-import { Stock } from "../Classes/Stock";
+// import { Stock } from "../Classes/Stock";
 export default Vue.extend({
   name: "stocksView",
   data() {
     return {
-      stockData: Object(),
-      dataReady: false
+      text: "",
+      stockData: Array(),
+      dataReady: false,
+      moreStockData: Array(),
+      stock: null,
+      stockNameList: Array()
     };
   },
   async mounted() {
     // this.initializeStocks();
-    this.formatLocalData();
+    // this.formatLocalData();
     this.dataReady = true;
-    // this.APIData("AAPL");
+  },
+  watch: {
+    text() {
+      window.addEventListener("keydown", function(event) {
+        const key = event.key;
+        if (key == "Enter") {
+          console.log("newStockAdded");
+        }
+      });
+    }
   },
   methods: {
-    formatLocalData() {
-      let localData = JSON.parse(localStorage.getItem("AAPL"));
-      console.log();
-
-      let formatedLocalData: stockData = {
-        stockData: {
-          name: localData.data["Meta Data"]["2. Symbol"],
-          lastRefreshed: localData.data["Meta Data"]["3. Last Refreshed"],
-          endOfDayPrice:
-            localData.data["Time Series (Daily)"]["2020-04-15"]["4. close"]
-        }
+    formatLocalData(stock) {
+      let allData = {
+        stocks: []
       };
-      this.stockData = formatedLocalData;
+      allData["stocks"].push(JSON.parse(localStorage.getItem(stock)));
+      localStorage.setItem("stocks", JSON.stringify(allData["stocks"]));
+      allData["stocks"].forEach(element => {
+        let metaData = element.data["Meta Data"];
+        let priceData = element.data["Time Series (Daily)"]["2020-04-15"];
+        let formatedLocalData: stockDataFormat = {
+          stockData: {
+            name: metaData["2. Symbol"],
+            open: Number(priceData["1. open"]),
+            high: Number(priceData["2. high"]),
+            low: Number(priceData["3. low"]),
+            close: Number(priceData["4. close"]),
+            volume: Number(priceData["5. volume"]),
+            lastRefreshed: metaData["3. Last Refreshed"]
+          }
+        };
+        this.stockData.push(formatedLocalData);
+      });
+      // ! Change the Date in the price data to reflect today
+      // this.stockData = formatedLocalData;
 
-      console.log(formatedLocalData, localData);
+      console.log("stockData", this.stockData);
     },
-    async APIData() {
+    async APIData(stock) {
       let testPayload: TIME_SERIES_DAILY = {
         function: "TIME_SERIES_DAILY",
-        symbol: "AAPL",
+        symbol: stock,
         interval: "30min",
         apikey: apikey.state.apikey,
         outputsize: "compact"
@@ -64,8 +98,11 @@ export default Vue.extend({
           let formatedApiData: apiStockData = {
             name: res.data
           };
+
           this.apiStockData = formatedApiData;
-          localStorage.setItem("AAPL", JSON.stringify(res));
+          localStorage.setItem(stock, JSON.stringify(res));
+          this.formatLocalData(stock);
+          this.stockNameList.push(stock);
         })
         .catch(err => {
           console.log(err);
@@ -80,11 +117,15 @@ export default Vue.extend({
   }
 });
 
-interface stockData {
+interface stockDataFormat {
   stockData: {
     name: string;
+    open: number;
+    high: number;
+    low: number;
+    close: number;
+    volume: number;
     lastRefreshed: string;
-    endOfDayPrice: string;
   };
 }
 </script>

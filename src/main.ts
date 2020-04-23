@@ -12,6 +12,8 @@ import "bootstrap-vue/dist/bootstrap-vue.css";
 Vue.use(BootstrapVue);
 Vue.use(Router);
 
+
+
 Vue.config.productionTip = true;
 
 export const eventBus = new Vue(); // added line
