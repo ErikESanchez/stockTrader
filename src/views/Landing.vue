@@ -1,6 +1,43 @@
 <template>
   <div>
-    <div v-if="signedIn">Yo whats up you signed in</div>
+    <div v-if="signedIn">
+      <div
+        v-if="validUserData"
+      >Will show landing page with all portfolio data here {{portfolioData}}</div>
+      <div v-else class="container">
+        <div>We need to steal some more of your info, give it to us and you can start making DOLLA DOLLA BILLS.</div>
+        <form class="container" @submit.prevent="makeNewPortfolio">
+          <div class="form-group">
+            <label for="exampleInputEmail1">Name</label>
+            <input
+              type="text"
+              class="form-control"
+              id="name"
+              aria-describedby="emailHelp"
+              v-model.trim="name"
+            />
+          </div>
+          <div class="form-group">
+            <label for="exampleInputPassword1">Social Security</label>
+            <input type="text" class="form-control" id="SS" />
+          </div>
+          <div class="form-group">
+            <label for="exampleInputPassword1">Bank Account</label>
+            <input type="text" class="form-control" id="BankAccount" />
+          </div>
+          <div class="form-group">
+            <label for="exampleInputPassword1">Initial Amount To Invest</label>
+            <input
+              type="number"
+              class="form-control"
+              id="initialAmountInvest"
+              v-model="initialAmount"
+            />
+          </div>
+          <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+      </div>
+    </div>
     <div v-else>Make An actual landing page</div>
   </div>
 </template>
@@ -14,7 +51,10 @@ import router from "@/router";
 // store
 import store from "@/store";
 import { accountStoreSchema } from "@/storeModules/accountStore";
-import { portfolioStoreSchema } from "../storeModules/portfolioStore";
+import {
+  portfolioStoreSchema,
+  newPortfolioData
+} from "../storeModules/portfolioStore";
 
 // components
 import PortfolioStockCard from "@/components/PortfolioStockCard.vue";
@@ -28,7 +68,11 @@ export default Vue.extend({
   data() {
     return {
       signedIn: Boolean,
-      dataReady: Boolean
+      validUserData: false,
+      dataReady: Boolean,
+      portfolioData: Object,
+      name: "",
+      initialAmount: 0
     };
   },
   async created() {
@@ -36,14 +80,37 @@ export default Vue.extend({
     await store
       .dispatch("getMyPortfolioData")
       .then(myData => {
-        if (myData.exists) console.log(myData);
-        else alert("You do not have any data, would you like to set up data?");
+        if (myData.exists) {
+          this.validUserData = true;
+          console.log(myData.data());
+          this.portfolioData = myData.data();
+        }
       })
       .catch(err => {
         console.error(err);
       });
   },
-  methods: {},
+  methods: {
+    async makeNewPortfolio() {
+      let newPortData: newPortfolioData = {
+        id: store.getters[accountStoreSchema.getters.getMyAccont].uid,
+        name: this.name,
+        ownedStocks: [],
+        portfolioWorth: 0,
+        avaibleFunds: Number(this.initialAmount)
+      };
+      if (Number(this.initialAmount) < 20000) {
+        await store
+          .dispatch("makePortfolioInDb", newPortData)
+          .then(result => {
+            console.log(result);
+          })
+          .catch(err => {
+            console.error(err);
+          });
+      } else alert("We both know you dont got that much");
+    }
+  },
   computed: {
     myStockData() {
       let allStocks: Array<userStock> = [];

@@ -6,7 +6,7 @@
         <input
           type="email"
           class="form-control"
-          id="exampleInputEmail1"
+          id="email"
           aria-describedby="emailHelp"
           v-model.trim="email"
         />
@@ -16,7 +16,7 @@
         <input
           type="password"
           class="form-control"
-          id="exampleInputPassword1"
+          id="password"
           v-model.trim="password"
         />
       </div>

@@ -79,7 +79,7 @@ const actions: ActionTree<any, any> = {
 };
 
 export interface dbOwnedStock {
-  stockName: string;
+  stockSymbol: string;
   amountOfShares: number;
 }
 
