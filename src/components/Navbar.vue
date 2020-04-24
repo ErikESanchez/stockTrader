@@ -28,25 +28,64 @@
     </b-collapse>
   </b-navbar>
   <!-- Todo: add router links to sign in and sign up -->
-  <nav v-else>Sign In | Sign Up</nav>
+  <nav v-else>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+      <a class="navbar-brand" href="#">Dolla Dolla Bills</a>
+      <button
+        class="navbar-toggler"
+        type="button"
+        data-toggle="collapse"
+        data-target="#navbarSupportedContent"
+        aria-controls="navbarSupportedContent"
+        aria-expanded="false"
+        aria-label="Toggle navigation"
+      >
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto"></ul>
+        <button
+          @click="logInRoute"
+          class="btn btn-outline-success my-2 my-sm-0 mx-2"
+          type="submit"
+        >Log In</button>
+        <button
+          @click="signUpRoute"
+          class="btn btn-outline-success my-2 my-sm-0 mx-2"
+          type="submit"
+        >Sign Up</button>
+      </div>
+    </nav>
+  </nav>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
 import store from "@/store";
-import { portfolioStoreSchema } from "../storeModules/portfolioStore";
-import { accountStoreSchema } from "../storeModules/accountStore";
+import { portfolioStoreSchema } from "@/storeModules/portfolioStore";
+import { accountStoreSchema } from "@/storeModules/accountStore";
+import router from "@/router";
 
 export default Vue.extend({
   data() {
     return {
-      signedIn: Boolean
     };
   },
   created() {
-    this.signedIn = store.getters[accountStoreSchema.getters.getSignedInStatus];
+  },
+  methods: {
+    logInRoute() {
+      router.push("/login");
+    },
+    signUpRoute() {
+      router.push("/signUp");
+    }
   },
   computed: {
+    signedIn: function() {
+      return store.getters[accountStoreSchema.getters.getSignedInStatus]
+    },
     avaibleUserFunds: function() {
       return store.getters[portfolioStoreSchema.getters.getAvaibleFunds];
     }
