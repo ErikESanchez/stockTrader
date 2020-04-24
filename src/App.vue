@@ -1,7 +1,9 @@
 <template>
   <div id="app">
-    <navbar></navbar>
-    <router-view></router-view>
+    <div v-if="dataLoaded">
+      <navbar></navbar>
+      <router-view></router-view>
+    </div>
   </div>
 </template>
 
@@ -27,7 +29,8 @@ export default Vue.extend({
   name: "App",
   data() {
     return {
-      signedIn: false
+      signedIn: false,
+      dataLoaded: false
     };
   },
   created() {
@@ -63,11 +66,17 @@ export default Vue.extend({
       if (user) {
         this.signedIn = true;
         store.commit(accountStoreSchema.mutations.changedSignedInStatus, true);
+        store.commit(accountStoreSchema.mutations.updateAccountInfo, user);
+        console.log(store.getters[accountStoreSchema.getters.getMyAccont]);
+        // Todo: Get user Portfolio Data
+        // If user does not have account make one, but prompt the user for one first
         console.log(user);
+        this.dataLoaded = true;
       } else {
         store.commit(accountStoreSchema.mutations.changedSignedInStatus, false);
         // Todo: get rid of data from portfolio
         console.log("$$$ Sign Up to get some dolla dolla bills yall $$$");
+        this.dataLoaded = true;
       }
     });
   },

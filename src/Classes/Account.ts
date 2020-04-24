@@ -5,7 +5,7 @@ export class Account {
   constructor(authUid: string) {
     this.uid = authUid;
   }
-  public returnUid() {
+  public getMyUid() {
     return this.uid;
   }
 

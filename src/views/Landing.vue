@@ -1,8 +1,6 @@
 <template>
   <div>
-    <div v-if="signedIn">
-      
-    </div>
+    <div v-if="signedIn">Yo whats up you signed in</div>
     <div v-else>Make An actual landing page</div>
   </div>
 </template>
@@ -33,8 +31,17 @@ export default Vue.extend({
       dataReady: Boolean
     };
   },
-  created() {
+  async created() {
     this.signedIn = store.getters[accountStoreSchema.getters.getSignedInStatus];
+    await store
+      .dispatch("getMyPortfolioData")
+      .then(myData => {
+        if (myData.exists) console.log(myData);
+        else alert("You do not have any data, would you like to set up data?");
+      })
+      .catch(err => {
+        console.error(err);
+      });
   },
   methods: {},
   computed: {

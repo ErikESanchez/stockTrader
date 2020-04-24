@@ -20,6 +20,9 @@ const mutations: MutationTree<any> = {
   changedSignedInStatus(state: any, signInStatus: boolean) {
     state.signedIn = signInStatus;
   },
+  updateAccountInfo(state: any, accountData: Account) {
+    state.myAccount = new Account(accountData.uid);
+  },
 };
 export const actions: ActionTree<any, any> = {
   createAccount({ commit }, payload: newAccountCredentials) {
@@ -30,9 +33,11 @@ export const actions: ActionTree<any, any> = {
 export const accountStoreSchema = {
   getters: {
     getSignedInStatus: "getSignedInStatus",
+    getMyAccont: "getMyAccont",
   },
   mutations: {
     changedSignedInStatus: "changedSignedInStatus",
+    updateAccountInfo: "updateAccountInfo",
   },
   actions: {},
 };

@@ -1,16 +1,15 @@
 import { ActionTree } from "vuex";
 import { GetterTree } from "vuex";
 import { MutationTree } from "vuex";
-import { Portfolio, newStockTransaction } from "@/Classes/Portfolio";
+import { Portfolio, newStockTransaction, userStock } from "@/Classes/Portfolio";
+import { Stock } from "@/Classes/Stock";
+import { firebaseData } from "@/firebase";
 
 const state = {
   myPortfolioId: String,
   portfolios: Array<Portfolio>(),
 };
 const getters: GetterTree<any, any> = {
-  getMyTotalFunds: (state) => {
-    return state.funds;
-  },
   getAllMyStocks: (state) => {
     let myPortfolio: Portfolio = state.portfolios.find(
       (portfolio: Portfolio) => portfolio.getPortfolioId() === state.myPortfolioId
@@ -51,7 +50,46 @@ const actions: ActionTree<any, any> = {
       if (payload.portfolioId === portfolio.getPortfolioId()) portfolio.sellStock(payload.trData);
     });
   },
+  async getMyPortfolioData({ getters, commit }, payload) {
+    const myUid: string = getters.getMyAccont.uid;
+    return await firebaseData
+      .firestore()
+      .collection("portfolios")
+      .doc(myUid)
+      .get();
+  },
+  async makePortfolioInDb({ commit }, newPortData: newPortfolioData) {
+    return await firebaseData
+      .firestore()
+      .collection("portfolios")
+      .doc(newPortData.id)
+      .set({
+        name: newPortData.name,
+        avaibleFunds: newPortData.avaibleFunds,
+        ownedStocks: newPortData.ownedStocks,
+        portfolioWorth: newPortData.portfolioWorth,
+      });
+  },
+  // updateTransactionHistoryDb({ commit }, payload) {
+  //   firebaseData
+  //     .firestore()
+  //     .collection("portfolios")
+  //     .doc(newPortData.id)
+  // },
 };
+
+export interface dbOwnedStock {
+  stockName: string;
+  amountOfShares: number;
+}
+
+export interface newPortfolioData {
+  id: string;
+  name: string;
+  ownedStocks: Array<dbOwnedStock>;
+  portfolioWorth: number;
+  avaibleFunds: number;
+}
 
 export interface storeTransaction {
   portfolioId: string;
