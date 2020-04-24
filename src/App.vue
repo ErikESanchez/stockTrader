@@ -6,6 +6,7 @@
 </template>
 
 <script lang="ts">
+import Vue from "vue";
 // Components and Data
 import Navbar from "./components/Navbar.vue";
 import marketData from "@/stockData.json";
@@ -17,16 +18,20 @@ import { Portfolio, newStockTransaction } from "./Classes/Portfolio";
 
 // Store
 import store from "@/store";
+import { accountStoreSchema } from "@/storeModules/accountStore";
 import { portfolioStoreSchema } from "@/storeModules/portfolioStore";
-export default {
+
+// Firebase
+import { firebaseData } from "@/firebase";
+export default Vue.extend({
   name: "App",
-  components: {
-    Navbar
-  },
   data() {
-    return {};
+    return {
+      signedIn: false
+    };
   },
   created() {
+    // Todo: Add all stocks to to a collection in firebase
     let formatedStocks: Array<Stock> = [];
     marketData.stocks.forEach((stock: any) => {
       formatedStocks.push(
@@ -35,7 +40,7 @@ export default {
     });
     let market: Market = new Market(formatedStocks);
     market.startMarket();
-    let randomId = "fakeAssId";
+    let randomId = "fakeAssFirebaseId";
 
     let singleStock: newStockTransaction = {
       stockName: formatedStocks[0].getStockName(),
@@ -52,12 +57,26 @@ export default {
       newPortfolio.getPortfolioId()
     );
     store.commit(portfolioStoreSchema.mutations.addPortfolio, newPortfolio);
-    console.log(store.getters[portfolioStoreSchema.getters.getMyPortfolio]);
+  },
+  async mounted() {
+    await firebaseData.auth().onAuthStateChanged(async user => {
+      if (user) {
+        this.signedIn = true;
+        store.commit(accountStoreSchema.mutations.changedSignedInStatus, true);
+        console.log(user);
+      } else {
+        store.commit(accountStoreSchema.mutations.changedSignedInStatus, false);
+        // Todo: get rid of data from portfolio
+        console.log("$$$ Sign Up to get some dolla dolla bills yall $$$");
+      }
+    });
+  },
+  components: {
+    Navbar
   }
-};
+});
 </script>
-
- <style lang="scss">
+<style lang="scss">
 @import "~bootstrap/scss/bootstrap";
 </style>
 

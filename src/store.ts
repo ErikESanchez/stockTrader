@@ -2,6 +2,7 @@ import Vue from "vue";
 import Vuex from "vuex";
 import marketData from "@/storeModules/marketStore";
 import portfolioData from "@/storeModules/portfolioStore";
+import accountStoreData from "@/storeModules/accountStore";
 
 Vue.use(Vuex);
 
@@ -13,6 +14,7 @@ export default new Vuex.Store({
   modules: {
     marketData,
     portfolioData,
+    accountStoreData,
   },
 });
 

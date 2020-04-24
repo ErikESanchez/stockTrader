@@ -1,19 +1,11 @@
 <template>
-  <b-navbar toggleable="lg" type="dark" variant="info">
+  <!-- cash, messages, account -->
+  <b-navbar toggleable="lg" type="dark" variant="info" v-if="signedIn">
     <b-navbar-brand href="#">
       <router-link to="/" class="navbar-brand">Stock Trader</router-link>
     </b-navbar-brand>
 
     <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
-    <!-- <button
-      @click="func()"
-      type="button"
-      class="btn btn-light dropdown-toggle"
-      data-toggle="dropdown"
-      aria-haspopup="true"
-      aria-expanded="false"
-    >Update User Funds</button>-->
-    <!-- <a>Funds: {{ funds }}</a> -->
 
     <b-collapse id="nav-collapse" is-nav>
       <b-navbar-nav>
@@ -24,10 +16,6 @@
       </b-navbar-nav>
 
       <b-navbar-nav class="ml-auto">
-        <!-- <b-nav-form>
-          <b-form-input size="sm" class="mr-sm-2" placeholder="Search"></b-form-input>
-          <b-button size="sm" class="my-2 my-sm-0" type="submit">Search</b-button>
-        </b-nav-form>-->
         <b-nav-item>Funds: ${{avaibleUserFunds}}</b-nav-item>
         <b-nav-item-dropdown right>
           <template v-slot:button-content>
@@ -36,20 +24,27 @@
           <b-dropdown-item href="#">Profile</b-dropdown-item>
           <b-dropdown-item href="#">Sign Out</b-dropdown-item>
         </b-nav-item-dropdown>
-        <!-- <b-button size="sm" class="my-2 my-sm-0" type="submit">End day</b-button> -->
       </b-navbar-nav>
     </b-collapse>
   </b-navbar>
+  <!-- Todo: add router links to sign in and sign up -->
+  <nav v-else>Sign In | Sign Up</nav>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
 import store from "@/store";
 import { portfolioStoreSchema } from "../storeModules/portfolioStore";
+import { accountStoreSchema } from "../storeModules/accountStore";
 
 export default Vue.extend({
   data() {
-    return {};
+    return {
+      signedIn: Boolean
+    };
+  },
+  created() {
+    this.signedIn = store.getters[accountStoreSchema.getters.getSignedInStatus];
   },
   computed: {
     avaibleUserFunds: function() {
@@ -59,10 +54,3 @@ export default Vue.extend({
 });
 </script>
 
-<style>
-.nv {
-  position: relative;
-  top: -30px;
-  margin: 30px;
-}
-</style>

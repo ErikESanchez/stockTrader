@@ -5,8 +5,10 @@ Vue.use(Router);
 
 import Landing from "@/views/Landing.vue";
 import Stocks from "@/views/Stocks.vue";
-import Portfolio from "@/views/Portfolio.vue";
 import singleStock from "@/views/singleStock.vue";
+import signUp from "@/views/signUp.vue";
+import login from "@/views/login.vue";
+
 // Todo: Make 404 route
 
 let routerOptions: RouterOptions = {
@@ -17,6 +19,17 @@ let routerOptions: RouterOptions = {
       component: Landing,
     },
     {
+      path: "/login",
+      name: "loginPage",
+      component: login,
+    },
+    {
+      path: "/signUp",
+      name: "signUp",
+      component: signUp,
+    },
+
+    {
       path: "/stocks",
       name: "stocks",
       component: Stocks,
@@ -25,11 +38,6 @@ let routerOptions: RouterOptions = {
       path: "/stocks/:stock",
       name: "singleStock",
       component: singleStock,
-    },
-    {
-      path: "/portfolio",
-      name: "portfolio",
-      component: Portfolio,
     },
   ],
 };

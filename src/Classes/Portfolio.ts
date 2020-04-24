@@ -1,6 +1,6 @@
 export class Portfolio {
+  id: string; // id will be based off of uid made by firebase auth
   name: string;
-  id: string;
   ownedStocks: Array<userStock>;
   portfolioWorth: number;
   avaibleFunds: number;
@@ -27,37 +27,6 @@ export class Portfolio {
       });
     });
     this.updatePortfolioWorth();
-  }
-
-  // Function helpers
-  private alreadyOwnStock(stockName: string): boolean {
-    let doIOwnStock = false;
-    this.ownedStocks.forEach((stock) => {
-      if (stock.name === stockName && stock.totalAmountShares > 0) doIOwnStock = true;
-    });
-    return doIOwnStock;
-  }
-
-  private formatNewStock(newStock: newStockTransaction): formatedTransaction {
-    return {
-      stockName: newStock.stockName,
-      amount: newStock.stockData.amount,
-      transactionData: {
-        priceAtTransaction: newStock.stockData.priceAtTransaction,
-        amount: newStock.stockData.amount,
-        time: newStock.stockData.time,
-      },
-    };
-  }
-
-  private findNameIdx(stockName: string) {
-    let nameIdx = -1;
-    this.ownedStocks.forEach((stock, stockNameIdx) => {
-      if (stock.name === stockName) {
-        nameIdx = stockNameIdx;
-      }
-    });
-    return nameIdx;
   }
 
   // Mutaters
@@ -131,6 +100,37 @@ export class Portfolio {
       total += totalBought - totalSold;
     });
     this.portfolioWorth = total;
+  }
+
+  // Function helpers
+  private alreadyOwnStock(stockName: string): boolean {
+    let doIOwnStock = false;
+    this.ownedStocks.forEach((stock) => {
+      if (stock.name === stockName && stock.totalAmountShares > 0) doIOwnStock = true;
+    });
+    return doIOwnStock;
+  }
+
+  private formatNewStock(newStock: newStockTransaction): formatedTransaction {
+    return {
+      stockName: newStock.stockName,
+      amount: newStock.stockData.amount,
+      transactionData: {
+        priceAtTransaction: newStock.stockData.priceAtTransaction,
+        amount: newStock.stockData.amount,
+        time: newStock.stockData.time,
+      },
+    };
+  }
+
+  private findNameIdx(stockName: string) {
+    let nameIdx = -1;
+    this.ownedStocks.forEach((stock, stockNameIdx) => {
+      if (stock.name === stockName) {
+        nameIdx = stockNameIdx;
+      }
+    });
+    return nameIdx;
   }
 
   // Getters
