@@ -26,6 +26,7 @@ import store from "@/store";
 import StockCard from "../components/StockCard.vue";
 import { TIME_SERIES_DAILY } from "@/storeModules/marketData";
 import { apiStockData } from "../store";
+// import { firebaseData } from "@/firebase";
 import apikey from "../apikey"; // apikey must be lower case
 // import { Stock } from "../Classes/Stock";
 export default Vue.extend({
@@ -100,6 +101,7 @@ export default Vue.extend({
           };
 
           this.apiStockData = formatedApiData;
+          console.log(res);
           localStorage.setItem(stock, JSON.stringify(res));
           this.formatLocalData(stock);
           this.stockNameList.push(stock);

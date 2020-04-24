@@ -27,7 +27,11 @@
           <b-dropdown-item href="#">Profile</b-dropdown-item>
           <b-dropdown-item href="#">Sign Out</b-dropdown-item>
         </b-nav-item-dropdown>
+
         <b-button size="sm" class="my-2 my-sm-0" type="submit">End day</b-button>
+        <router-link to="/signUp" size="sm" class="my-2 my-sm-0" type="submit">
+          <b-button>Sign In</b-button>
+        </router-link>
       </b-navbar-nav>
     </b-collapse>
   </b-navbar>
