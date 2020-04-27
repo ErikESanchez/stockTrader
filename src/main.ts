@@ -16,7 +16,6 @@ Vue.use(Router);
 
 Vue.config.productionTip = true;
 
-export const eventBus = new Vue(); // added line
 
 new Vue({
   el: "#app",

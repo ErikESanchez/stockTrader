@@ -27,8 +27,6 @@
           <b-dropdown-item href="#">Profile</b-dropdown-item>
           <b-dropdown-item href="#">Sign Out</b-dropdown-item>
         </b-nav-item-dropdown>
-        {{complex.deep}}
-        {{loggedIn}} h1
         <b-button size="sm" class="my-2 my-sm-0" type="submit">End day</b-button>
         <div v-if="loggedIn == true">
           <b-button @click="logOut()">Sign Out</b-button>
@@ -49,23 +47,15 @@
 <script lang="ts">
 import Vue from "vue";
 import { userPriceHistory } from "../store";
-import { eventBus } from "../main";
 // import { mapState } from "vuex";
 export default Vue.extend({
   data() {
     return {
-      latestUserFunds: Array<userPriceHistory>(),
-      complex: Object()
+      latestUserFunds: Array<userPriceHistory>()
     };
   },
-  // Todo: Make the funds on a computued property!!
-  // ? How to make the navbar show the most recent form of funds, the code is here, just need to find somewhere to put it
   created() {
     this.$store.commit("updateUserFunds");
-    this.fundsUpdate();
-    eventBus.$on("fireMethod", () => {
-      this.fundsUpdate();
-    });
   },
   // Todo: Find a way to use mapState, can't right now because have to go through userModule
   computed: {
@@ -76,20 +66,14 @@ export default Vue.extend({
   watch: {
     loggedIn(newValue, oldValue) {
       console.log("New Value", newValue, "Old Value", oldValue);
+    },
+    fundsUpdate() {
+      this.latestUserFunds = this.$store.getters.getUserFunds.slice(-1)[0];
     }
   },
   methods: {
     logOut() {
       this.$store.dispatch("signOut");
-    },
-    fundsUpdate() {
-      this.latestUserFunds = this.$store.getters.getUserFunds.slice(-1)[0];
-    },
-    newPrices() {
-      this.BMW_Stock = this.$store.commit(
-        "generateStockPrices",
-        this.BMW_Stock
-      );
     }
   }
 });

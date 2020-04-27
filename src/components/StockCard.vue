@@ -25,7 +25,6 @@
 /* eslint-disable */
 import Vue from "vue";
 import { newStockTransaction } from "@/store";
-import { eventBus } from "../main";
 
 interface stock {
   name: string;
@@ -42,10 +41,7 @@ export default Vue.extend({
     stock: Array,
     keyProp: Number
   },
-  mounted() {
-    // console.log(this.stock);
-    console.log(this.stock);
-  },
+  mounted() {},
   methods: {
     buyStock(stock: stock) {
       let formatedTr: newStockTransaction = {
@@ -58,11 +54,9 @@ export default Vue.extend({
         buy: true
       };
       this.$store.dispatch("buyStock", formatedTr);
-      eventBus.$emit("fireMethod");
 
       console.log("Current stocks", this.$store.getters.getUserStocks);
     }
-    // <button @click="testData">test btn</button>
   }
 });
 </script>
