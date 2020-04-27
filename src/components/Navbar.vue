@@ -14,26 +14,25 @@
         <router-link to="/portfolio" class="nav-link">Portfolio</router-link>
       </b-navbar-nav>
 
-      <b-navbar-nav class="ml-auto">
+      <b-navbar-nav class="ml-auto" v-if="loggedIn == true">
         <!-- <b-nav-form>
           <b-form-input size="sm" class="mr-sm-2" placeholder="Search"></b-form-input>
           <b-button size="sm" class="my-2 my-sm-0" type="submit">Search</b-button>
         </b-nav-form>-->
-        <b-nav-item :key="latestUserFunds.funds">Funds: {{ latestUserFunds.funds }}</b-nav-item>
-        <b-nav-item-dropdown right>
-          <template v-slot:button-content>
-            <em>User</em>
-          </template>
-          <b-dropdown-item href="#">Profile</b-dropdown-item>
-          <b-dropdown-item href="#">Sign Out</b-dropdown-item>
-        </b-nav-item-dropdown>
-        <div v-if="loggedIn == true">
-          <b-navbar-nav>{{userData.email}}</b-navbar-nav>
-          <b-button @click="logOut()">Sign Out</b-button>
-          <b-button size="sm" class="my-2 my-sm-0" type="submit">End day</b-button>
+        <div>
+          <b-nav-item-dropdown right>
+            <template v-slot:button-content>
+              <em>{{userData.email}}</em>
+            </template>
+            <b-dropdown-item href="#">Profile</b-dropdown-item>
+            <b-dropdown-item @click="logOut()">Sign Out</b-dropdown-item>
+          </b-nav-item-dropdown>
+          <!-- <b-button size="sm" class="my-2 my-sm-0" type="submit">End day</b-button> -->
         </div>
-        <div v-if="loggedIn == false">
-          <router-link to="/logIn" size="sm" class="my-2 my-sm-0" type="submit">
+      </b-navbar-nav>
+      <b-navbar-nav class="ml-auto" v-if="loggedIn == false">
+        <div>
+          <router-link to="/logIn" size="sm" class="my-2 my-sm-0 log-In-Button" type="submit">
             <b-button>Log In</b-button>
           </router-link>
           <router-link to="/signUp" size="sm" class="my-2 my-sm-0" type="submit">
@@ -90,5 +89,9 @@ export default Vue.extend({
   position: relative;
   top: -30px;
   margin: 30px;
+}
+
+.log-In-Button {
+  margin-right: 10px;
 }
 </style>
