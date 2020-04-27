@@ -12,5 +12,6 @@ let firebaseConfig = {
 }
 // Initialize Firebase
 let firebaseData = firebase.initializeApp(firebaseConfig)
+let db = firebase.firestore();
 
-export { firebaseData }
+export { firebaseData, db }

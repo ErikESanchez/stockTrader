@@ -4,6 +4,7 @@
     <b-button
       @click="APIData('AAPL'); APIData('GOOGL'); APIData('MSFT'); APIData('AMZN')"
     >Get API Data</b-button>
+    <b-button @click="getDatabaseData">Get Database Data</b-button>
     <b-form-textarea
       id="textarea"
       v-model="text"
@@ -24,11 +25,6 @@
 import Vue from "vue";
 import store from "@/store";
 import StockCard from "../components/StockCard.vue";
-import { TIME_SERIES_DAILY } from "@/storeModules/marketData";
-import { apiStockData } from "../store";
-// import { firebaseData } from "@/firebase";
-import apikey from "../apikey"; // apikey must be lower case
-// import { Stock } from "../Classes/Stock";
 export default Vue.extend({
   name: "stocksView",
   data() {
@@ -42,8 +38,6 @@ export default Vue.extend({
     };
   },
   async mounted() {
-    // this.initializeStocks();
-    // this.formatLocalData();
     this.dataReady = true;
   },
   watch: {
@@ -80,35 +74,14 @@ export default Vue.extend({
         this.stockData.push(formatedLocalData);
       });
       // ! Change the Date in the price data to reflect today
-      // this.stockData = formatedLocalData;
 
       console.log("stockData", this.stockData);
     },
     async APIData(stock) {
-      let testPayload: TIME_SERIES_DAILY = {
-        function: "TIME_SERIES_DAILY",
-        symbol: stock,
-        interval: "30min",
-        apikey: apikey.state.apikey,
-        outputsize: "compact"
-      };
-      await this.$store
-        .dispatch("getStockQuote", testPayload)
-        .then(res => {
-          console.log(res);
-          let formatedApiData: apiStockData = {
-            name: res.data
-          };
-
-          this.apiStockData = formatedApiData;
-          console.log(res);
-          localStorage.setItem(stock, JSON.stringify(res));
-          this.formatLocalData(stock);
-          this.stockNameList.push(stock);
-        })
-        .catch(err => {
-          console.log(err);
-        });
+      this.$store.dispatch("getApiData", stock);
+    },
+    getDatabaseData() {
+      this.$store.dispatch("getDatabaseStockData");
     },
     initializeStocks() {
       this.stockData = store.getters.getAllStocks;

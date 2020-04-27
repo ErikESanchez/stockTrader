@@ -34,7 +34,7 @@ const mutations: MutationTree<any> = {
 }
 
 export const actions: ActionTree<any, any> = {
-    async fetchUser({ commit }) {
+    fetchUser({ commit }) {
         firebaseData.auth().onAuthStateChanged(user => {
             if (user) {
                 commit("setUser", {
