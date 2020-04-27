@@ -4,6 +4,7 @@
     <b-navbar-brand href="#">
       <router-link to="/" class="navbar-brand">Stock Trader</router-link>
     </b-navbar-brand>
+    <!-- Add a search bar to search for any stock in the database -->
 
     <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
 
@@ -11,19 +12,8 @@
       <b-navbar-nav>
         <router-link to="/stocks" class="nav-link">Stocks</router-link>
       </b-navbar-nav>
-      <b-navbar-nav>
-        <router-link to="/portfolio" class="nav-link">Portfolio</router-link>
-      </b-navbar-nav>
-
       <b-navbar-nav class="ml-auto">
         <b-nav-item>Funds: ${{avaibleUserFunds}}</b-nav-item>
-        <b-nav-item-dropdown right>
-          <template v-slot:button-content>
-            <em>User</em>
-          </template>
-          <b-dropdown-item href="#">Profile</b-dropdown-item>
-          <b-dropdown-item href="#">Sign Out</b-dropdown-item>
-        </b-nav-item-dropdown>
       </b-navbar-nav>
     </b-collapse>
   </b-navbar>
@@ -69,11 +59,9 @@ import router from "@/router";
 
 export default Vue.extend({
   data() {
-    return {
-    };
+    return {};
   },
-  created() {
-  },
+  created() {},
   methods: {
     logInRoute() {
       router.push("/login");
@@ -84,7 +72,7 @@ export default Vue.extend({
   },
   computed: {
     signedIn: function() {
-      return store.getters[accountStoreSchema.getters.getSignedInStatus]
+      return store.getters[accountStoreSchema.getters.getSignedInStatus];
     },
     avaibleUserFunds: function() {
       return store.getters[portfolioStoreSchema.getters.getAvaibleFunds];

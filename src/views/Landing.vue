@@ -1,11 +1,10 @@
 <template>
   <div>
     <div v-if="signedIn">
-      <div
-        v-if="validUserData"
-      >Will show landing page with all portfolio data here {{portfolioData}}</div>
-      <div v-else class="container">
-        <div>We need to steal some more of your info, give it to us and you can start making DOLLA DOLLA BILLS.</div>
+      <div>Will show landing page with all portfolio data here {{myPortfolio}}</div>
+      <div class="container">
+        <!-- Todo: this should be moved after the initila account is created or when the first accout is made -->
+        <!-- <div>We need to steal some more of your info, give it to us and you can start making DOLLA DOLLA BILLS.</div>
         <form class="container" @submit.prevent="makeNewPortfolio">
           <div class="form-group">
             <label for="exampleInputEmail1">Name</label>
@@ -35,7 +34,7 @@
             />
           </div>
           <button type="submit" class="btn btn-primary">Submit</button>
-        </form>
+        </form>-->
       </div>
     </div>
     <div v-else>Make An actual landing page</div>
@@ -44,53 +43,55 @@
 
 <script lang="ts">
 import Vue from "vue";
-
-//router
 import router from "@/router";
+import PortfolioStockCard from "@/components/PortfolioStockCard.vue";
 
 // store
 import store from "@/store";
 import { accountStoreSchema } from "@/storeModules/accountStore";
 import {
   portfolioStoreSchema,
-  newPortfolioData
-} from "../storeModules/portfolioStore";
-
-// components
-import PortfolioStockCard from "@/components/PortfolioStockCard.vue";
+  newPortfolioData,
+  portfolioConverter
+} from "@/storeModules/portfolioStore";
 
 // Classes
-import { Stock } from "../Classes/Stock";
-import { Portfolio, userStock } from "../Classes/Portfolio";
+import { Stock } from "@/Classes/Stock";
+import { Portfolio, userStock } from "@/Classes/Portfolio";
 
 export default Vue.extend({
   name: "landing",
   data() {
     return {
-      signedIn: Boolean,
-      validUserData: false,
-      dataReady: Boolean,
-      portfolioData: Object,
       name: "",
       initialAmount: 0
     };
   },
-  async created() {
-    this.signedIn = store.getters[accountStoreSchema.getters.getSignedInStatus];
-    await store
-      .dispatch("getMyPortfolioData")
-      .then(myData => {
-        if (myData.exists) {
-          this.validUserData = true;
-          console.log(myData.data());
-          this.portfolioData = myData.data();
-        }
-      })
-      .catch(err => {
-        console.error(err);
-      });
-  },
+
+  async created() {},
   methods: {
+    async getMyPortfolioData() {
+      await store.dispatch("getMyPortfolioData").then(myData => {
+        console.log(myData);
+        let formatedPortfolioData: newPortfolioData = portfolioConverter.fromFbPortfolioData(
+          myData.id,
+          myData.data()
+        );
+
+        let myPortfolioData: Portfolio = new Portfolio(
+          formatedPortfolioData.id,
+          formatedPortfolioData.name,
+          formatedPortfolioData.avaibleFunds,
+          [],
+          formatedPortfolioData.portfolioWorth
+        );
+        store.commit(
+          portfolioStoreSchema.mutations.addMyPortfolio,
+          myPortfolioData
+        );
+        this.portfolioData = myData.data();
+      });
+    }, // this will only be used once
     async makeNewPortfolio() {
       let newPortData: newPortfolioData = {
         id: store.getters[accountStoreSchema.getters.getMyAccont].uid,
@@ -112,6 +113,9 @@ export default Vue.extend({
     }
   },
   computed: {
+    signedIn(): boolean {
+      return store.getters[accountStoreSchema.getters.getSignedInStatus];
+    },
     myStockData() {
       let allStocks: Array<userStock> = [];
       let stockNames: Array<string> = this.myPortfolio.getCurrentlyOwnedStocks();
