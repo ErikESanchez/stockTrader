@@ -9,7 +9,7 @@
       {{ stock[keyProp]["stockData"]["name"] }}
       <b-card-text>Price: {{ stock[keyProp]["stockData"]["open"] }}</b-card-text>
       <b-card-text>Date Of Data: {{ stock[keyProp]["stockData"]["lastRefreshed"]}}</b-card-text>
-      <b-card-text>Volume; {{ stock[keyProp]["stockData"]["volume"] }}</b-card-text>
+      <b-card-text>Volume: {{ stock[keyProp]["stockData"]["volume"] }}</b-card-text>
       <b-button variant="success" @click="buyStock(stock, 1)">Buy</b-button>
       <b-row class="my-1">
         <b-col sm="3"></b-col>

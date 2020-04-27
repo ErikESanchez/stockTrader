@@ -4,17 +4,23 @@ import { MutationTree } from "vuex";
 import apikey from "../apikey"
 import { db } from "../firebase"
 import axios from "axios";
+// import { Stock } from "@/Classes/Stock";
 const marketDataUrl = "https://www.alphavantage.co/query";
 
 const state = {
   testStockData: [],
+  stocks: Array()
 };
 
-const getters: GetterTree<any, any> = {};
+const getters: GetterTree<any, any> = {
+  getStocks: state => {
+    return state.stocks;
+  }
+};
 
 const mutations: MutationTree<any> = {
   addDataToStock(state, newStock) {
-    state.testStockData.push(newStock);
+    state.stocks.push(newStock)
   }
 };
 
@@ -40,11 +46,12 @@ export const actions: ActionTree<any, any> = {
     })
   },
 
-  async getDatabaseStockData() {
+  async getDatabaseStockData({ commit }) {
     let stocksRef = db.collection("stocks");
     stocksRef.get().then(function (querySnapshot) {
       querySnapshot.forEach(function (doc) {
         console.log(doc.id, "=>", doc.data());
+        commit("addDataToStock", doc.data())
       })
     }).catch(function (error) {
       console.error("Error getting documents", error)

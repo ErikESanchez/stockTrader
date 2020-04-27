@@ -12,12 +12,11 @@
       rows="3"
       max-rows="6"
     ></b-form-textarea>
-
     <pre class="mt-3 mb-0">{{ text }}</pre>
-    <b-button @click="formatLocalData">Format Local Data</b-button>
     <b-card-group deck v-if="dataReady">
       <stock-card v-for="(stock, key) in stockData" :key="key" :stock="stockData" :keyProp="key"></stock-card>
     </b-card-group>
+    <b-button @click="formatDatabaseData">Get Stock Data veux</b-button>
   </div>
 </template>
 
@@ -51,15 +50,12 @@ export default Vue.extend({
     }
   },
   methods: {
-    formatLocalData(stock) {
-      let allData = {
-        stocks: []
-      };
-      allData["stocks"].push(JSON.parse(localStorage.getItem(stock)));
-      localStorage.setItem("stocks", JSON.stringify(allData["stocks"]));
-      allData["stocks"].forEach(element => {
-        let metaData = element.data["Meta Data"];
-        let priceData = element.data["Time Series (Daily)"]["2020-04-15"];
+    formatDatabaseData() {
+      console.log(this.$store.getters.getStocks);
+      let stocks = this.$store.getters.getStocks;
+      stocks.forEach(stock => {
+        let metaData = stock.data["Meta Data"];
+        let priceData = stock.data["Time Series (Daily)"]["2020-04-15"];
         let formatedLocalData: stockDataFormat = {
           stockData: {
             name: metaData["2. Symbol"],
@@ -73,9 +69,6 @@ export default Vue.extend({
         };
         this.stockData.push(formatedLocalData);
       });
-      // ! Change the Date in the price data to reflect today
-
-      console.log("stockData", this.stockData);
     },
     async APIData(stock) {
       this.$store.dispatch("getApiData", stock);
