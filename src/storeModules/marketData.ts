@@ -9,7 +9,8 @@ const marketDataUrl = "https://www.alphavantage.co/query";
 
 const state = {
   testStockData: [],
-  stocks: Array()
+  stocks: Array(),
+  formatedStocks: Array()
 };
 
 const getters: GetterTree<any, any> = {
@@ -21,6 +22,24 @@ const getters: GetterTree<any, any> = {
 const mutations: MutationTree<any> = {
   addDataToStock(state, newStock) {
     state.stocks.push(newStock)
+  },
+  formatDatabaseData(state, stockPayload) {
+    stockPayload.forEach(stock => {
+      let metaData: Object = stock.data["Meta Data"];
+      let priceData: Object = stock.data["Time Series (Daily)"]["2020-04-15"];
+      let formatedLocalData: stockDataFormat = {
+        stockData: {
+          name: metaData["2. Symbol"],
+          open: Number(priceData["1. open"]),
+          high: Number(priceData["2. high"]),
+          low: Number(priceData["3. low"]),
+          close: Number(priceData["4. close"]),
+          volume: Number(priceData["5. volume"]),
+          lastRefreshed: metaData["3. Last Refreshed"]
+        }
+      };
+      state.formatedStocks.push(formatedLocalData);
+    });
   }
 };
 
@@ -33,10 +52,9 @@ export const actions: ActionTree<any, any> = {
       apikey: apikey.state.apikey,
       outputsize: "compact"
     };
-    let stocksRef = db.collection("stocks")
     await dispatch("getStockQuote", payloadFormat).then(res => {
-      let symbol = res.data["Meta Data"]["2. Symbol"]
-      stocksRef.doc(symbol).set({
+      let symbol: string = res.data["Meta Data"]["2. Symbol"]
+      db.collection("stocks").doc(symbol).set({
         data: res.data
       }).then(function (symbol) {
         console.log("Document is under ID: ", symbol);
@@ -47,16 +65,15 @@ export const actions: ActionTree<any, any> = {
   },
 
   async getDatabaseStockData({ commit }) {
-    let stocksRef = db.collection("stocks");
-    stocksRef.get().then(function (querySnapshot) {
+    db.collection("stocks").get().then(function (querySnapshot) {
       querySnapshot.forEach(function (doc) {
         console.log(doc.id, "=>", doc.data());
-        commit("addDataToStock", doc.data())
+        let array: Array<Object> = [doc.data()];
+        commit("formatDatabaseData", array)
       })
     }).catch(function (error) {
       console.error("Error getting documents", error)
     });
-
   },
 
   async getStockQuote({ commit }, payload: TIME_SERIES_DAILY) {
@@ -79,6 +96,18 @@ export interface TIME_SERIES_DAILY {
   interval: string;
   apikey: string;
   outputsize?: string;
+}
+
+interface stockDataFormat {
+  stockData: {
+    name: string;
+    open: number;
+    high: number;
+    low: number;
+    close: number;
+    volume: number;
+    lastRefreshed: string;
+  };
 }
 
 export default {

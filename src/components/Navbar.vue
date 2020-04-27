@@ -27,10 +27,10 @@
           <b-dropdown-item href="#">Profile</b-dropdown-item>
           <b-dropdown-item href="#">Sign Out</b-dropdown-item>
         </b-nav-item-dropdown>
-        <b-nav-item>{{userData.email}}</b-nav-item>
-        <b-button size="sm" class="my-2 my-sm-0" type="submit">End day</b-button>
         <div v-if="loggedIn == true">
+          <b-navbar-nav>{{userData.email}}</b-navbar-nav>
           <b-button @click="logOut()">Sign Out</b-button>
+          <b-button size="sm" class="my-2 my-sm-0" type="submit">End day</b-button>
         </div>
         <div v-if="loggedIn == false">
           <router-link to="/logIn" size="sm" class="my-2 my-sm-0" type="submit">

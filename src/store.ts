@@ -10,28 +10,7 @@ export default new Vuex.Store({
     userModule
   },
   state: {
-    stocks: [
-      {
-        name: "BMW",
-        value: 200,
-        stockQuantity: 100
-      },
-      {
-        name: "Google",
-        value: 150,
-        stockQuantity: 599
-      },
-      {
-        name: "Apple",
-        value: 1000,
-        stockQuantity: 1233
-      },
-      {
-        name: "Twitter",
-        value: 100,
-        stockQuantity: 100
-      }
-    ],
+
     portfolio: {
       funds: Array<userPriceHistory>(),
       latestUserFunds: Number,
@@ -47,12 +26,6 @@ export default new Vuex.Store({
     getLatestUserFunds: state => {
       return state.portfolio.latestUserFunds
     },
-    getAllStocks: state => {
-      return state.stocks;
-    },
-    getUserStocks: state => {
-      return state.portfolio.myStocks;
-    },
     ownStock: state => (stockName: string): boolean => {
       let doIOwnStock = false;
       state.portfolio.myStocks.forEach(stock => {
@@ -64,43 +37,43 @@ export default new Vuex.Store({
     }
   },
   mutations: {
-    updateStocksBuy(state, data: newStockTransaction) {
+    // updateStocksBuy(state, data: newStockTransaction) {
 
-      let newStockPurchaseData: stockTransactionData = {
-        priceAtTransaction: data.stockData.priceAtTransaction,
-        amount: data.stockData.amount,
-        time: data.stockData.time
-      };
-      // ! Need to add a limit of how many stocks a user can buy once they hit zero.
-      let userFunds = state.portfolio.funds
-      let latestUserFunds = userFunds.slice(-1)[0]
-      state.portfolio.latestUserFunds = latestUserFunds
-      let totalCost = newStockPurchaseData.priceAtTransaction * Number(newStockPurchaseData.amount)
-      let newFundsTotal = latestUserFunds.funds - totalCost
-      latestUserFunds.funds = newFundsTotal
-      state.portfolio.latestUserFunds = newFundsTotal
-      let userFundsData: userPriceHistory = {
-        funds: newFundsTotal,
-        time: new Date()
-      }
-      if (data.alreadyHaveStock) {
-        state.portfolio.myStocks.forEach(stock => {
-          if (stock.name === data.stockName) {
-            stock.stocksOwned.push(newStockPurchaseData);
-            userFunds.push(userFundsData)
-          }
-        });
-      } else {
-        let newStock: userStock = {
-          name: data.stockName,
-          stocksOwned: [newStockPurchaseData]
-        };
-        userFunds.push(userFundsData)
-        state.portfolio.myStocks.push(newStock);
-      }
-      // * Latest funds 
-      // * console.log(state.portfolio.funds.slice(-1)[0])
-    },
+    //   let newStockPurchaseData: stockTransactionData = {
+    //     priceAtTransaction: data.stockData.priceAtTransaction,
+    //     amount: data.stockData.amount,
+    //     time: data.stockData.time
+    //   };
+    //   // ! Need to add a limit of how many stocks a user can buy once they hit zero.
+    //   let userFunds = state.portfolio.funds
+    //   let latestUserFunds = userFunds.slice(-1)[0]
+    //   state.portfolio.latestUserFunds = latestUserFunds
+    //   let totalCost = newStockPurchaseData.priceAtTransaction * Number(newStockPurchaseData.amount)
+    //   let newFundsTotal = latestUserFunds.funds - totalCost
+    //   latestUserFunds.funds = newFundsTotal
+    //   state.portfolio.latestUserFunds = newFundsTotal
+    //   let userFundsData: userPriceHistory = {
+    //     funds: newFundsTotal,
+    //     time: new Date()
+    //   }
+    //   if (data.alreadyHaveStock) {
+    //     state.portfolio.myStocks.forEach(stock => {
+    //       if (stock.name === data.stockName) {
+    //         stock.stocksOwned.push(newStockPurchaseData);
+    //         userFunds.push(userFundsData)
+    //       }
+    //     });
+    //   } else {
+    //     let newStock: userStock = {
+    //       name: data.stockName,
+    //       stocksOwned: [newStockPurchaseData]
+    //     };
+    //     userFunds.push(userFundsData)
+    //     state.portfolio.myStocks.push(newStock);
+    //   }
+    //   // * Latest funds 
+    //   // * console.log(state.portfolio.funds.slice(-1)[0])
+    // },
     updateUserFunds(state) {
       let userFundsData: userPriceHistory = {
         funds: 1000,
