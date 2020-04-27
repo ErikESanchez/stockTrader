@@ -1,13 +1,13 @@
 import { ActionTree } from "vuex";
 import { GetterTree } from "vuex";
 import { MutationTree } from "vuex";
-import { Portfolio, newStockTransaction, userStock } from "@/Classes/Portfolio";
-import { Stock } from "@/Classes/Stock";
+import { Portfolio, newStockTransaction } from "@/Classes/Portfolio";
 import { firebaseData } from "@/firebase";
 
 const state = {
+  myPortfolio: Portfolio,
   myPortfolioId: String,
-  portfolios: Array<Portfolio>(),
+  portfolios: Array<Portfolio>(), // includes all portfolios except mine
 };
 const getters: GetterTree<any, any> = {
   getAllMyStocks: (state) => {
@@ -17,23 +17,21 @@ const getters: GetterTree<any, any> = {
     return myPortfolio.getCurrentlyOwnedStocks();
   },
   getMyPortfolio: (state) => {
-    return state.portfolios.find(
-      (portfolio: Portfolio) => portfolio.getPortfolioId() === state.myPortfolioId
-    );
+    return state.myPortfolio;
   },
   getMyPortfolioId: (state) => {
     return state.myPortfolioId;
   },
   getAvaibleFunds: (state) => {
-    let myPortfolio: Portfolio = state.portfolios.find(
-      (portfolio: Portfolio) => portfolio.getPortfolioId() === state.myPortfolioId
-    );
-    return myPortfolio.getAvaibleFunds();
+    return state.myPortfolio.getAvaibleFunds();
   },
 };
 const mutations: MutationTree<any> = {
   updateMyId(state, newId: string) {
     state.myPortfolioId = newId;
+  },
+  addMyPortfolio(state, myPortfolioData: Portfolio) {
+    state.myPortfolio = myPortfolioData;
   },
   addPortfolio(state, newPortfolio: Portfolio) {
     state.portfolios.push(newPortfolio);
@@ -78,6 +76,19 @@ const actions: ActionTree<any, any> = {
   // },
 };
 
+export const portfolioConverter = {
+  fromFbPortfolioData(id: string, firebaseData: any): newPortfolioData {
+    let formatedData: newPortfolioData = {
+      id,
+      name: firebaseData.name,
+      ownedStocks: firebaseData.ownedStocks,
+      portfolioWorth: firebaseData.portfolioWorth,
+      avaibleFunds: firebaseData.avaibleFunds,
+    };
+    return formatedData;
+  },
+};
+
 export interface dbOwnedStock {
   stockSymbol: string;
   amountOfShares: number;
@@ -107,6 +118,7 @@ export const portfolioStoreSchema = {
   mutations: {
     updateMyId: "updateMyId",
     addPortfolio: "addPortfolio",
+    addMyPortfolio: "addMyPortfolio",
   },
   actions: {
     buyStock: "buyStock",

@@ -8,7 +8,8 @@ export class Portfolio {
     id: string,
     portfolioName: string,
     avaibleFunds: number,
-    initialStocks: Array<newStockTransaction>
+    initialStocks: Array<newStockTransaction>,
+    portfolioWorth?: number
   ) {
     this.name = portfolioName;
     this.avaibleFunds = avaibleFunds;
@@ -26,7 +27,8 @@ export class Portfolio {
         },
       });
     });
-    this.updatePortfolioWorth();
+    if (portfolioWorth) this.portfolioWorth = portfolioWorth;
+    else this.updatePortfolioWorth();
   }
 
   // Mutaters
