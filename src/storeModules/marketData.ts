@@ -7,7 +7,7 @@ import axios from "axios";
 const marketDataUrl = "https://www.alphavantage.co/query";
 
 const state = {
-  testStockData: []
+  testStockData: [],
 };
 
 const getters: GetterTree<any, any> = {};
@@ -41,17 +41,15 @@ export const actions: ActionTree<any, any> = {
   },
 
   async getDatabaseStockData() {
-    // Todo: Dynamically get stocks from the database using the named stocks
-    let docRef = db.collection("stocks").doc("38itB8rfPI1zmPOCa719")
-    docRef.get().then(function (doc) {
-      if (doc.exists) {
-        console.log("Document Data: ", doc.data())
-      } else {
-        console.log("Document doesn't exist!")
-      }
+    let stocksRef = db.collection("stocks");
+    stocksRef.get().then(function (querySnapshot) {
+      querySnapshot.forEach(function (doc) {
+        console.log(doc.id, "=>", doc.data());
+      })
     }).catch(function (error) {
-      console.error("Error getting document", error)
+      console.error("Error getting documents", error)
     });
+
   },
 
   async getStockQuote({ commit }, payload: TIME_SERIES_DAILY) {
