@@ -27,6 +27,7 @@
           <b-dropdown-item href="#">Profile</b-dropdown-item>
           <b-dropdown-item href="#">Sign Out</b-dropdown-item>
         </b-nav-item-dropdown>
+        <b-nav-item>{{userData.email}}</b-nav-item>
         <b-button size="sm" class="my-2 my-sm-0" type="submit">End day</b-button>
         <div v-if="loggedIn == true">
           <b-button @click="logOut()">Sign Out</b-button>
@@ -56,11 +57,16 @@ export default Vue.extend({
   },
   created() {
     this.$store.commit("updateUserFunds");
+
+    console.log(this.$store.getters.getUser);
   },
   // Todo: Find a way to use mapState, can't right now because have to go through userModule
   computed: {
     loggedIn() {
       return this.$store.state.userModule.loggedIn;
+    },
+    userData() {
+      return this.$store.getters.getUser;
     }
   },
   watch: {

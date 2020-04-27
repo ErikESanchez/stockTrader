@@ -7,7 +7,8 @@ import { MutationTree } from "vuex";
 const state = {
     loggedIn: Boolean(),
     user: {
-        data: Object(),
+        displayName: String(),
+        email: String()
     },
 }
 
@@ -16,7 +17,7 @@ const getters: GetterTree<any, any> = {
         if (state.user == null) {
             console.log("No User Data")
         }
-        return state.userAuth
+        return state.user;
     },
     getLoggedIn: (state: any) => {
         return state.loggedIn
@@ -24,8 +25,11 @@ const getters: GetterTree<any, any> = {
 }
 
 const mutations: MutationTree<any> = {
-    setUser(state: any, newData: any) {
-        state.user.data = newData;
+    setUser(state: any, userData: any) {
+        state.user = {
+            displayName: userData.displayName,
+            email: userData.email
+        }
     },
     setLogIn(state: any, userStatus: Boolean) {
         Vue.set(state, "loggedIn", userStatus)
