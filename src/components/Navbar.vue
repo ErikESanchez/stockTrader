@@ -27,11 +27,20 @@
           <b-dropdown-item href="#">Profile</b-dropdown-item>
           <b-dropdown-item href="#">Sign Out</b-dropdown-item>
         </b-nav-item-dropdown>
-
+        {{complex.deep}}
+        {{loggedIn}} h1
         <b-button size="sm" class="my-2 my-sm-0" type="submit">End day</b-button>
-        <router-link to="/signUp" size="sm" class="my-2 my-sm-0" type="submit">
-          <b-button>Sign In</b-button>
-        </router-link>
+        <div v-if="loggedIn == true">
+          <b-button @click="logOut()">Sign Out</b-button>
+        </div>
+        <div v-if="loggedIn == false">
+          <router-link to="/logIn" size="sm" class="my-2 my-sm-0" type="submit">
+            <b-button>Log In</b-button>
+          </router-link>
+          <router-link to="/signUp" size="sm" class="my-2 my-sm-0" type="submit">
+            <b-button>Sign Up</b-button>
+          </router-link>
+        </div>
       </b-navbar-nav>
     </b-collapse>
   </b-navbar>
@@ -41,22 +50,38 @@
 import Vue from "vue";
 import { userPriceHistory } from "../store";
 import { eventBus } from "../main";
-
+// import { mapState } from "vuex";
 export default Vue.extend({
   data() {
     return {
-      latestUserFunds: Array<userPriceHistory>()
+      latestUserFunds: Array<userPriceHistory>(),
+      complex: Object()
     };
   },
+  // Todo: Make the funds on a computued property!!
+  // ? How to make the navbar show the most recent form of funds, the code is here, just need to find somewhere to put it
   created() {
     this.$store.commit("updateUserFunds");
     this.fundsUpdate();
     eventBus.$on("fireMethod", () => {
       this.fundsUpdate();
     });
-    // ? How to make the navbar show the most recent form of funds, the code is here, just need to find somewhere to put it
+  },
+  // Todo: Find a way to use mapState, can't right now because have to go through userModule
+  computed: {
+    loggedIn() {
+      return this.$store.state.userModule.loggedIn;
+    }
+  },
+  watch: {
+    loggedIn(newValue, oldValue) {
+      console.log("New Value", newValue, "Old Value", oldValue);
+    }
   },
   methods: {
+    logOut() {
+      this.$store.dispatch("signOut");
+    },
     fundsUpdate() {
       this.latestUserFunds = this.$store.getters.getUserFunds.slice(-1)[0];
     },

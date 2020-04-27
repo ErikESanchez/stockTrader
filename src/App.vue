@@ -19,6 +19,7 @@ export default {
     };
   },
   created() {
+    this.$store.dispatch("fetchUser");
     this.funds = this.$store.getters.totalFunds;
   }
 };
@@ -26,6 +27,5 @@ export default {
 
  <style lang="scss">
 @import "~bootstrap/scss/bootstrap";
-
 </style>
 

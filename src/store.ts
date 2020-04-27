@@ -1,9 +1,14 @@
 import Vue from "vue";
 import Vuex from "vuex";
-import marketData from "@/storeModules/marketData";
+import marketData from "./storeModules/marketData";
+import userModule from "./storeModules/userModule";
 Vue.use(Vuex);
 
 export default new Vuex.Store({
+  modules: {
+    marketData,
+    userModule
+  },
   state: {
     stocks: [
       {
@@ -117,9 +122,7 @@ export default new Vuex.Store({
     }
     // sellStock({ commit, getters }, transactionData: newStockTransaction) {}
   },
-  modules: {
-    marketData
-  }
+
 });
 
 export interface newStockTransaction {
