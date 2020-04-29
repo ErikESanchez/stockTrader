@@ -1,5 +1,7 @@
 <template>
   <div>
+    <!-- APIData('GOOGL'); APIData('MSFT'); APIData('AMZN') -->
+    <b-button @click="APIData('AAPL'); ">Get API Data</b-button>
     <b-card-group deck v-if="dataReady">
       <stock-card v-for="(stock, key) in stockData" :key="key" :stock="stockData" :keyProp="key"></stock-card>
     </b-card-group>

@@ -5,7 +5,6 @@ import router from "./router";
 import BootstrapVue from "bootstrap-vue/dist/bootstrap-vue.esm";
 import App from "./App.vue";
 import * as moment from "moment"
-
 Vue.prototype.moment = moment
 
 // Import the styles directly. 
