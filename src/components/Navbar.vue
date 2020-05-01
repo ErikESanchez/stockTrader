@@ -56,8 +56,6 @@ export default Vue.extend({
   },
   created() {
     this.$store.commit("updateUserFunds");
-
-    console.log(this.$store.getters.getUser);
   },
   // Todo: Find a way to use mapState, can't right now because have to go through userModule
   computed: {
@@ -69,8 +67,8 @@ export default Vue.extend({
     }
   },
   watch: {
-    loggedIn(newValue, oldValue) {
-      console.log("New Value", newValue, "Old Value", oldValue);
+    loggedIn() {
+      // console.log("New Value", newValue, "Old Value", oldValue);
     },
     fundsUpdate() {
       this.latestUserFunds = this.$store.getters.getUserFunds.slice(-1)[0];

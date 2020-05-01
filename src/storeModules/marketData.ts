@@ -28,9 +28,6 @@ const mutations: MutationTree<any> = {
     // Todo: Need to make a promise to wait for stockPayload to render!
     setTimeout(() => {
       let metaData: Object = stockPayload["metaData"];
-      console.log("PLS", stockPayload)
-      console.log("Stock Payload:", Object.getOwnPropertyNames(stockPayload))
-      console.log("JSON STRINGIFY", JSON.stringify(stockPayload))
       let priceData: Object = stockPayload["timeSeriesData"];
       let formatedLocalData: stockDataFormat = {
         stockData: {
@@ -82,24 +79,24 @@ export const actions: ActionTree<any, any> = {
       }).catch(function (error) {
         console.error("Error adding document", error);
       });
-      // Todo: Object.key(priceData).length is the length of the incoming API dates,
-      // Todo: need to find a way to get the all of the dates, only have about two months worth of data
-      for (let i = 1; i < Object.keys(priceData).length; i++) {
-        let date: Object = moment().subtract(i, "day");
-        let formatedDate: string = moment(date).format("YYYY-MM-DD")
-        if (priceData[formatedDate] != undefined) {
-          if (moment(formatedDate).day() != 0 || moment(formatedDate).day() != 6) {
-            db.collection("stocks").doc(symbol).collection(`Time Series: ${symbol}`).doc(formatedDate).set({
-              data: priceData[formatedDate]
-            }).then(function () {
-              console.log("Subdocument is under ID: ", priceData[formatedDate])
-            }).catch(function (error) {
-              console.error(`Error adding subdocument`, error)
-            });
-          } else {
-            console.log("come on bruh they don't exist")
+      // ! Find a way to make this run the amount of months there are, can't use modulo or maybe who knows, find something
+      for (let i = 1; i < 5; i++) {
+        let dateOfMonth: Object = moment().subtract(i, "month");
+        let formatedDateOfMonth: string = moment(dateOfMonth).format("YYYY-MM");
+        let monthObject: Object = {}
+        Object.keys(priceData).filter(function (str) {
+          // * This returns the data of a month formated
+          if (str.includes(formatedDateOfMonth) === true) {
+            monthObject[str] = priceData[str];
           }
-        }
+        });
+        db.collection("stocks").doc(symbol).collection("Time Series").doc(formatedDateOfMonth).set({
+          priceData: monthObject
+        }).then(function () {
+          console.log("Subdocument is under ID: ", formatedDateOfMonth)
+        }).catch(function (error) {
+          console.error(`Error adding subdocument`, error)
+        });
       }
     });
   },
@@ -119,17 +116,16 @@ export const actions: ActionTree<any, any> = {
     }).catch(function (error) {
       console.error("Error getting documents", error)
     });
-    db.collection("stocks").doc("AAPL").collection(`Time Series: AAPL`).doc(formatedDate).get().then(function (doc) {
+    db.collection("stocks").doc("AAPL").collection('Time Series').doc(formatedDate).get().then(function (doc) {
       if (doc.exists) {
         console.log("Document data: ", doc.data())
         stockData["timeSeriesData"] = doc.data().data;
       } else {
-        console.log("Bruh");
+        console.log("Document doesn't exist");
       }
     }).catch(function (error) {
       console.error("Error getting document:", error);
     });
-    console.log("add stsc", stockData)
     commit("formatDatabaseData", stockData);
 
   },

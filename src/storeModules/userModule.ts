@@ -46,7 +46,7 @@ export const actions: ActionTree<any, any> = {
                     email: user.email
                 });
                 commit("setLogIn", true);
-                console.log("User", user)
+                // console.log("User", user)
             } else {
                 console.log("user", false)
                 commit("setUser", null);
