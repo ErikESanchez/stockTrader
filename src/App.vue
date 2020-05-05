@@ -92,8 +92,6 @@ export default Vue.extend({
   methods: {},
   components: {
     Navbar
-    this.$store.dispatch("fetchUser");
-    this.funds = this.$store.getters.totalFunds;
   }
 });
 </script>
