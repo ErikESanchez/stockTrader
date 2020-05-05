@@ -28,8 +28,17 @@ const mutations: MutationTree<any> = {
     state.stocks.push(newStock)
   },
   formatMonthData(state, monthPayload) {
-    console.log("monthPayload", monthPayload)
-    state.testStockData.push(monthPayload);
+    let newMonthObject: Object = {}
+    const currentMonthDates = new Array(moment("2020-04-01", "YYYY-MM-DD").daysInMonth()).fill(null).map((x, i) => moment("2020-04-01", "YYYY-MM-DD").startOf('month').add(i, 'days'));
+    currentMonthDates.forEach((data, index) => {
+      index;
+      let orderedDates = data.format('YYYY-MM-DD')
+      if (monthPayload.priceData[orderedDates] !== undefined) {
+        newMonthObject[orderedDates] = monthPayload.priceData[orderedDates]
+      }
+    });
+    console.log(newMonthObject);
+    state.testStockData.push(newMonthObject)
   },
   formatDatabaseData(state, stockPayload) {
     // Todo: Need to make a promise to wait for stockPayload to render!

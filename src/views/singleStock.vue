@@ -36,19 +36,13 @@ export default Vue.extend({
           {
             label: "MSFT",
             data: [],
-            backgroundColor: ["rgba(255, 99, 132, 0.2)"]
+            backgroundColor: ["rgb(255, 99, 132)"]
           }
         ]
       };
-
-      Object.keys(chartData["priceData"]).forEach(stockDate => {
-        dataCollection.datasets[0].data.push(
-          chartData["priceData"][stockDate]["4. close"]
-        );
+      Object.keys(chartData).forEach(stockDate => {
+        dataCollection.datasets[0].data.push(chartData[stockDate]["4. close"]);
         dataCollection.labels.push(stockDate);
-        console.log(dataCollection);
-        console.log("chartData", chartData["priceData"][stockDate]["4. close"]);
-        console.log("stockDates", stockDate);
       });
       console.log(dataCollection);
       this.stockChartData = dataCollection;
