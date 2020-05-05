@@ -1,3 +1,0 @@
-commit 138ba96c88cd083a96725041b2e580002e1f7a0a: Previuos commit, was initilizing all data in the StockCard compoent. StockCard should have a single use, 
-                                                oraganizing data for a single stock. This allows the use of the added vue-model of how many stocks you would buy for that single stock
-                                                If it was using the old commit, all the stocks would have the same amount of buyStocks, this way it is invadidually stored in the compoent. 

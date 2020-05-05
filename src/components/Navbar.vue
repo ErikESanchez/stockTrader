@@ -15,6 +15,16 @@
       <b-navbar-nav class="ml-auto">
         <b-nav-item>Funds: ${{avaibleUserFunds}}</b-nav-item>
       </b-navbar-nav>
+      <b-navbar-nav class="ml-auto" v-if="loggedIn == false">
+        <div>
+          <router-link to="/logIn" size="sm" class="my-2 my-sm-0 log-In-Button" type="submit">
+            <b-button>Log In</b-button>
+          </router-link>
+          <router-link to="/signUp" size="sm" class="my-2 my-sm-0" type="submit">
+            <b-button>Sign Up</b-button>
+          </router-link>
+        </div>
+      </b-navbar-nav>
     </b-collapse>
   </b-navbar>
   <!-- Todo: add router links to sign in and sign up -->
@@ -70,6 +80,11 @@ export default Vue.extend({
       router.push("/signUp");
     }
   },
+  methods: {
+    logOut() {
+      this.$store.dispatch("signOut");
+    }
+  },
   computed: {
     signedIn: function() {
       return store.getters[accountStoreSchema.getters.getSignedInStatus];
@@ -81,3 +96,10 @@ export default Vue.extend({
 });
 </script>
 
+<style>
+.nv {
+  position: relative;
+  top: -30px;
+  margin: 30px;
+}
+</style>

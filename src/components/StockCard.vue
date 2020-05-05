@@ -8,7 +8,6 @@
       header-bg-variant="success"
       header-text-variant="white"
       align="center"
-      :key="stock.name"
     >
       <b-card-text>
         <!-- !: Miss clicks -->
@@ -24,6 +23,15 @@
               <b-button variant="danger" @click="sellStock(stock, amountToSell)">Sell</b-button>
             </b-col>
           </b-row>
+      {{ stock[keyProp]["stockData"]["name"] }}
+      <b-card-text>Price: {{ stock[keyProp]["stockData"]["open"] }}</b-card-text>
+      <b-card-text>Date Of Data: {{ stock[keyProp]["stockData"]["lastRefreshed"]}}</b-card-text>
+      <b-card-text>Volume: {{ stock[keyProp]["stockData"]["volume"] }}</b-card-text>
+      <b-button variant="success" @click="buyStock(stock, 1)">Buy</b-button>
+      <b-row class="my-1">
+        <b-col sm="3"></b-col>
+        <b-col sm="9">
+          <b-form-input type="number" v-model="amountToBuy"></b-form-input>
         </b-col>
         <b-col sm="6">
           <b-row>
@@ -42,6 +50,7 @@
 
 <script lang="ts">
 import Vue from "vue";
+import { newStockTransaction } from "@/store";
 import { newStockTransaction } from "@/Classes/Portfolio";
 import {
   storeTransaction,
