@@ -1,10 +1,11 @@
 <template>
   <div>
     <div v-if="signedIn">
-      <div>Will show landing page with all portfolio data here {{myPortfolio}}</div>
-      <div class="container">
-        <!-- Todo: this should be moved after the initila account is created or when the first accout is made -->
-        <!-- <div>We need to steal some more of your info, give it to us and you can start making DOLLA DOLLA BILLS.</div>
+      <div
+        v-if="havePortfolioData"
+      >Will show landing page with all portfolio data here {{myPortfolio}}</div>
+      <div v-else class="container">
+        <div>We need to steal some more of your info, give it to us and you can start making DOLLA DOLLA BILLS.</div>
         <form class="container" @submit.prevent="makeNewPortfolio">
           <div class="form-group">
             <label for="exampleInputEmail1">Name</label>
@@ -34,7 +35,7 @@
             />
           </div>
           <button type="submit" class="btn btn-primary">Submit</button>
-        </form>-->
+        </form>
       </div>
     </div>
     <div v-else>Make An actual landing page</div>
@@ -67,31 +68,8 @@ export default Vue.extend({
       initialAmount: 0
     };
   },
-
-  async created() {},
   methods: {
-    async getMyPortfolioData() {
-      await store.dispatch("getMyPortfolioData").then(myData => {
-        console.log(myData);
-        let formatedPortfolioData: newPortfolioData = portfolioConverter.fromFbPortfolioData(
-          myData.id,
-          myData.data()
-        );
-
-        let myPortfolioData: Portfolio = new Portfolio(
-          formatedPortfolioData.id,
-          formatedPortfolioData.name,
-          formatedPortfolioData.avaibleFunds,
-          [],
-          formatedPortfolioData.portfolioWorth
-        );
-        store.commit(
-          portfolioStoreSchema.mutations.addMyPortfolio,
-          myPortfolioData
-        );
-        this.portfolioData = myData.data();
-      });
-    }, // this will only be used once
+    // this will only be used once if needed
     async makeNewPortfolio() {
       let newPortData: newPortfolioData = {
         id: store.getters[accountStoreSchema.getters.getMyAccont].uid,
@@ -113,6 +91,12 @@ export default Vue.extend({
     }
   },
   computed: {
+    havePortfolioData(): boolean {
+      return (
+        store.getters[portfolioStoreSchema.getters.getMyPortfolio].id ===
+        store.getters[accountStoreSchema.getters.getMyAccont].uid
+      );
+    },
     signedIn(): boolean {
       return store.getters[accountStoreSchema.getters.getSignedInStatus];
     },

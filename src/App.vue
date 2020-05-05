@@ -74,7 +74,7 @@ export default Vue.extend({
               formatedPortfolioData.portfolioWorth
             );
             store.commit("addMyPortfolio", myPortfolioData);
-            store.commit("addPortfolio", myPortfolioData);
+            // store.commit("addPortfolio", myPortfolioData);
             this.dataLoaded = true;
           })
           .catch(err => {
