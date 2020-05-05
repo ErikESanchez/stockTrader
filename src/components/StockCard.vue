@@ -36,7 +36,7 @@ export default Vue.extend({
     return {
       amountToBuy: 1,
       apiStockData: Object,
-      stockRoute: "stocks/ " + this.stock[this.keyProp]["stockData"]["name"]
+      stockRoute: "stocks/" + this.stock[this.keyProp]["stockData"]["name"]
     };
   },
   props: {
