@@ -6,7 +6,7 @@
       header-text-variant="white"
       align="center"
     >
-      {{ stock[keyProp]["stockData"]["name"] }}
+      <router-link :to="stockRoute">{{ stock[keyProp]["stockData"]["name"] }}</router-link>
       <b-card-text>Price: {{ stock[keyProp]["stockData"]["open"] }}</b-card-text>
       <b-card-text>Date Of Data: {{ stock[keyProp]["stockData"]["lastRefreshed"]}}</b-card-text>
       <b-card-text>Volume: {{ stock[keyProp]["stockData"]["volume"] }}</b-card-text>
@@ -24,6 +24,7 @@
 <script lang="ts">
 /* eslint-disable */
 import Vue from "vue";
+
 import { newStockTransaction } from "@/store";
 
 interface stock {
@@ -34,14 +35,17 @@ export default Vue.extend({
   data() {
     return {
       amountToBuy: 1,
-      apiStockData: Object
+      apiStockData: Object,
+      stockRoute: "stocks/ " + this.stock[this.keyProp]["stockData"]["name"]
     };
   },
   props: {
     stock: Array,
     keyProp: Number
   },
-  mounted() {},
+  mounted() {
+    console.log(this.stockRoute);
+  },
   methods: {
     buyStock(stock: stock) {
       let formatedTr: newStockTransaction = {

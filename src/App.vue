@@ -19,6 +19,7 @@ export default {
     };
   },
   created() {
+    console.log(this.$route.params.id);
     this.$store.dispatch("fetchUser");
     this.funds = this.$store.getters.totalFunds;
   }

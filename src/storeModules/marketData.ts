@@ -16,7 +16,10 @@ const state = {
 
 const getters: GetterTree<any, any> = {
   getStocks: state => {
-    return state.stocks;
+    return state.formatedStocks;
+  },
+  getTestData: state => {
+    return state.testStockData;
   }
 };
 
@@ -24,11 +27,18 @@ const mutations: MutationTree<any> = {
   addDataToStock(state, newStock) {
     state.stocks.push(newStock)
   },
+  formatMonthData(state, monthPayload) {
+    console.log("monthPayload", monthPayload)
+    state.testStockData.push(monthPayload);
+  },
   formatDatabaseData(state, stockPayload) {
     // Todo: Need to make a promise to wait for stockPayload to render!
+    console.log("stockPayload", stockPayload);
+    let date: Object = moment().subtract(7, "day");
+    let formatedDate: string = moment(date).format("YYYY-MM-DD");
     setTimeout(() => {
       let metaData: Object = stockPayload["metaData"];
-      let priceData: Object = stockPayload["timeSeriesData"];
+      let priceData: Object = stockPayload["timeSeriesData"][formatedDate];
       let formatedLocalData: stockDataFormat = {
         stockData: {
           name: metaData["2. Symbol"],
@@ -42,20 +52,6 @@ const mutations: MutationTree<any> = {
       }
       state.formatedStocks.push(formatedLocalData);
     }, 1000);
-    // stockPayload.forEach(stock => {
-    //   let metaData: Object = metaDataPayload["Meta Data"];
-    //   let priceData: Object = stock.data["Time Series (Daily)"]["2020-04-15"];
-    //   let formatedLocalData: stockDataFormat = {
-    //     stockData: {
-    //       name: metaData["2. Symbol"],
-    //       open: Number(priceData["1. open"]),
-    //       high: Number(priceData["2. high"]),
-    //       low: Number(priceData["3. low"]),
-    //       close: Number(priceData["4. close"]),
-    //       volume: Number(priceData["5. volume"]),
-    //       lastRefreshed: metaData["3. Last Refreshed"]
-    //     }
-    //   };
   }
 };
 
@@ -102,8 +98,7 @@ export const actions: ActionTree<any, any> = {
   },
 
   async getDatabaseStockData({ commit }) {
-    let date: Object = moment().subtract(1, "day");
-    let formatedDate: string = moment(date).format("YYYY-MM-DD");
+
     let stockData: databaseStock = {
       metaData: Object,
       timeSeriesData: Object
@@ -116,18 +111,32 @@ export const actions: ActionTree<any, any> = {
     }).catch(function (error) {
       console.error("Error getting documents", error)
     });
-    db.collection("stocks").doc("AAPL").collection('Time Series').doc(formatedDate).get().then(function (doc) {
+    let dateOfMonth: Object = moment().subtract(1, "month");
+    let formatedDateOfMonth: string = moment(dateOfMonth).format("YYYY-MM");
+    db.collection("stocks").doc("AAPL").collection('Time Series').doc(formatedDateOfMonth).get().then(function (doc) {
       if (doc.exists) {
         console.log("Document data: ", doc.data())
-        stockData["timeSeriesData"] = doc.data().data;
+        stockData["timeSeriesData"] = doc.data()["priceData"];
+        // ? Might not be the best place to put this
+        commit("formatDatabaseData", stockData);
       } else {
         console.log("Document doesn't exist");
       }
     }).catch(function (error) {
       console.error("Error getting document:", error);
     });
-    commit("formatDatabaseData", stockData);
+  },
 
+  async getMonthData({ commit }) {
+    await db.collection('stocks').doc("AAPL").collection('Time Series').doc("2020-04").get().then(res => {
+      if (res) {
+        // snapshot.docs.map(doc => doc.data())
+        console.log(res.id, "=>", res.data());
+        commit('formatMonthData', res.data())
+      }
+    }).catch(function (error) {
+      console.error(error)
+    });
   },
 
   async getStockQuote({ commit }, payload: TIME_SERIES_DAILY) {
