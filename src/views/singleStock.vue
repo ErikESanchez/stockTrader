@@ -34,7 +34,8 @@ export default Vue.extend({
         labels: [],
         datasets: [
           {
-            label: "MSFT",
+            // * Make the stock symbols dynamic
+            label: this.$router.history.current.params.stockName,
             data: [],
             backgroundColor: ["rgb(255, 99, 132)"]
           }
@@ -62,12 +63,16 @@ export default Vue.extend({
     }
   },
   async mounted() {
+    console.log("Router", this.$router.history.current.params.stockName);
     setTimeout(() => {
       this.testData = this.$store.getters.getTestData[0];
       this.renderStockChartData(this.testData);
       this.loaded = true;
     }, 1000);
-    this.$store.dispatch("getMonthData");
+    this.$store.dispatch(
+      "getMonthData",
+      this.$router.history.current.params.stockName
+    );
   }
 });
 </script>

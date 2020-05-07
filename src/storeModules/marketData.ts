@@ -5,6 +5,7 @@ import apikey from "../apikey"
 import { db } from "../firebase"
 import axios from "axios";
 import * as moment from "moment"
+// import { database } from "firebase";
 // import { Stock } from "@/Classes/Stock";
 const marketDataUrl = "https://www.alphavantage.co/query";
 
@@ -42,25 +43,33 @@ const mutations: MutationTree<any> = {
   },
   formatDatabaseData(state, stockPayload) {
     // Todo: Need to make a promise to wait for stockPayload to render!
-    console.log("stockPayload", stockPayload);
     let date: Object = moment().subtract(7, "day");
     let formatedDate: string = moment(date).format("YYYY-MM-DD");
-    setTimeout(() => {
-      let metaData: Object = stockPayload["metaData"];
-      let priceData: Object = stockPayload["timeSeriesData"][formatedDate];
-      let formatedLocalData: stockDataFormat = {
-        stockData: {
-          name: metaData["2. Symbol"],
-          open: Number(priceData["1. open"]),
-          high: Number(priceData["2. high"]),
-          low: Number(priceData["3. low"]),
-          close: Number(priceData["4. close"]),
-          volume: Number(priceData["5. volume"]),
-          lastRefreshed: metaData["3. Last Refreshed"]
+    console.log("stockPayload", stockPayload)
+    console.log(Object.keys(stockPayload))
+    // ? The functions runs fine once, but runs another four times for some reason?
+    Object.keys(stockPayload).forEach((symbol) => {
+
+      console.log("symbol", symbol)
+      setTimeout(() => {
+        let metaData: Object = stockPayload[symbol]["metaData"];
+        let priceData: Object = stockPayload[symbol]["timeSeriesData"][formatedDate];
+        let formatedLocalData: stockDataFormat = {
+          stockData: {
+            name: symbol,
+            open: Number(priceData["1. open"]),
+            high: Number(priceData["2. high"]),
+            low: Number(priceData["3. low"]),
+            close: Number(priceData["4. close"]),
+            volume: Number(priceData["5. volume"]),
+            lastRefreshed: metaData["3. Last Refreshed"]
+          }
         }
-      }
-      state.formatedStocks.push(formatedLocalData);
-    }, 1000);
+        state.formatedStocks.push(formatedLocalData);
+      }, 1000);
+    })
+
+
   }
 };
 
@@ -108,36 +117,41 @@ export const actions: ActionTree<any, any> = {
 
   async getDatabaseStockData({ commit }) {
 
-    let stockData: databaseStock = {
-      metaData: Object,
-      timeSeriesData: Object
-    };
+    let stockData: Object = {};
+    let dateOfMonth: Object = moment().subtract(1, "month");
+    let formatedDateOfMonth: string = moment(dateOfMonth).format("YYYY-MM");
     db.collection("stocks").get().then(function (querySnapshot) {
       querySnapshot.forEach(function (doc) {
-        console.log(doc.id, "=>", doc.data());
-        stockData["metaData"] = doc.data().metaData;
+        // console.log(doc.id, "=>", doc.data());
+        stockData[doc.id] = {
+          metaData: doc.data().metaData,
+        }
+        // stockData["metaData"] = doc.data().metaData;
       })
     }).catch(function (error) {
       console.error("Error getting documents", error)
     });
-    let dateOfMonth: Object = moment().subtract(1, "month");
-    let formatedDateOfMonth: string = moment(dateOfMonth).format("YYYY-MM");
-    db.collection("stocks").doc("AAPL").collection('Time Series').doc(formatedDateOfMonth).get().then(function (doc) {
-      if (doc.exists) {
-        console.log("Document data: ", doc.data())
-        stockData["timeSeriesData"] = doc.data()["priceData"];
-        // ? Might not be the best place to put this
-        commit("formatDatabaseData", stockData);
-      } else {
-        console.log("Document doesn't exist");
-      }
-    }).catch(function (error) {
-      console.error("Error getting document:", error);
-    });
+    setTimeout(() => {
+      Object.keys(stockData).forEach((symbol: string, index: Number) => {
+        console.log(symbol, index)
+        db.collection("stocks").doc(symbol).collection('Time Series').doc(formatedDateOfMonth).get().then(function (doc) {
+          if (doc.exists && stockData[symbol]['timeSeriesData'] === undefined) {
+            // console.log("Document data: ", doc.data())
+            stockData[symbol]["timeSeriesData"] = doc.data()["priceData"];
+            // ? M ight not be the best place to put this
+          } else {
+            console.log("Document doesn't exist");
+          }
+        }).catch(function (error) {
+          console.error("Error getting document:", error);
+        });
+      })
+      commit("formatDatabaseData", stockData);
+    }, 1000);
   },
 
-  async getMonthData({ commit }) {
-    await db.collection('stocks').doc("AAPL").collection('Time Series').doc("2020-04").get().then(res => {
+  async getMonthData({ commit }, symbol: string) {
+    await db.collection('stocks').doc(symbol).collection('Time Series').doc("2020-04").get().then(res => {
       if (res) {
         // snapshot.docs.map(doc => doc.data())
         console.log(res.id, "=>", res.data());
@@ -170,10 +184,10 @@ export interface TIME_SERIES_DAILY {
   outputsize?: string;
 }
 
-interface databaseStock {
-  metaData: Object,
-  timeSeriesData: Object
-}
+// interface databaseStock {
+//   metaData: Object,
+//   timeSeriesData: Object
+// }
 
 interface stockDataFormat {
   stockData: {

@@ -44,7 +44,7 @@ export default Vue.extend({
     keyProp: Number
   },
   mounted() {
-    console.log(this.stockRoute);
+    // console.log(this.stockRoute);
   },
   methods: {
     buyStock(stock: stock) {
