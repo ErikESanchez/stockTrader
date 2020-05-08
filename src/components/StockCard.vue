@@ -5,13 +5,14 @@
       header-bg-variant="success"
       header-text-variant="white"
       align="center"
-      :key="stock.name"
     >
-      {{ stock.name }}
-      <b-card-text>Price: {{ stock.value }}</b-card-text>
+      <router-link :to="stockRoute">{{ stock[keyProp]["stockData"]["name"] }}</router-link>
+      <b-card-text>Price: {{ stock[keyProp]["stockData"]["open"] }}</b-card-text>
+      <b-card-text>Date Of Data: {{ stock[keyProp]["stockData"]["lastRefreshed"]}}</b-card-text>
+      <b-card-text>Volume: {{ stock[keyProp]["stockData"]["volume"] }}</b-card-text>
       <b-button variant="success" @click="buyStock(stock, 1)">Buy</b-button>
       <b-row class="my-1">
-        <b-col sm="3">{{apiStockData}}</b-col>
+        <b-col sm="3"></b-col>
         <b-col sm="9">
           <b-form-input type="number" v-model="amountToBuy"></b-form-input>
         </b-col>
@@ -23,8 +24,8 @@
 <script lang="ts">
 /* eslint-disable */
 import Vue from "vue";
+
 import { newStockTransaction } from "@/store";
-import { eventBus } from "../main";
 
 interface stock {
   name: string;
@@ -34,11 +35,13 @@ export default Vue.extend({
   data() {
     return {
       amountToBuy: 1,
-      apiStockData: Object
+      apiStockData: Object,
+      stockRoute: "stocks/" + this.stock[this.keyProp]["stockData"]["name"]
     };
   },
   props: {
-    stock: Object
+    stock: Array,
+    keyProp: Number
   },
   mounted() {},
   methods: {
@@ -53,11 +56,9 @@ export default Vue.extend({
         buy: true
       };
       this.$store.dispatch("buyStock", formatedTr);
-      eventBus.$emit("fireMethod");
 
       console.log("Current stocks", this.$store.getters.getUserStocks);
     }
-    // <button @click="testData">test btn</button>
   }
 });
 </script>

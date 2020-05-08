@@ -1,59 +1,56 @@
 <template>
   <div>
-    <b-button @click="testData">getTEst data</b-button>
+    <!-- APIData('GOOGL'); APIData('MSFT'); APIData('AMZN') -->
+    <!-- <b-button
+      @click="APIData('AAPL'); APIData('GOOGL'); APIData('MSFT'); APIData('AMZN'); APIData('FB'); APIData('INTC'); APIData('TSLA'); APIData('NVDA'); APIData('AMD') "
+    >Get API Data</b-button>-->
     <b-card-group deck v-if="dataReady">
-      <stock-card v-for="stock in stockData" :key="stock.name" :stock="stock"></stock-card>
+      <stock-card v-for="(stock, key) in stockData" :key="key" :stock="stockData" :keyProp="key"></stock-card>
     </b-card-group>
   </div>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
-// import store from "@/store";
-// import { TradeStocks } from "../Classes/TradeStocks";
 import StockCard from "../components/StockCard.vue";
-import { TIME_SERIES_DAILY } from "@/storeModules/marketData";
-import { apiStockData } from "../store";
-import { apikey } from "@/apiKey"; // apikey must be lower case
-import { Stock } from "../Classes/Stock";
+// import * as moment from "moment";
 export default Vue.extend({
   name: "stocksView",
   data() {
     return {
-      stockData: Array<Stock>(),
+      text: "",
       dataReady: false,
-      apiStockData: {}
+      moreStockData: Array(),
+      stock: null,
+      stockNameList: Array()
     };
   },
   async mounted() {
-    this.initializeStocks();
+    this.getDatabaseData();
     this.dataReady = true;
   },
+  watch: {
+    text() {
+      window.addEventListener("keydown", function(event) {
+        const key = event.key;
+        if (key == "Enter") {
+          console.log("newStockAdded");
+        }
+      });
+    }
+  },
+  computed: {
+    stockData() {
+      console.log(this.$store.state.marketData.formatedStocks);
+      return this.$store.state.marketData.formatedStocks;
+    }
+  },
   methods: {
-    async testData() {
-      let testPayload: TIME_SERIES_DAILY = {
-        function: "TIME_SERIES_DAILY",
-        symbol: "IBM",
-        interval: "30min",
-        apikey: apikey,
-        outputsize: "compact"
-      };
-      await this.$store
-        .dispatch("getStockQuote", testPayload)
-        .then(res => {
-          console.log(res);
-          let formatedApiData: apiStockData = {
-            name: res.data
-          };
-          this.apiStockData = formatedApiData;
-        })
-        .catch(err => {
-          console.log(err);
-        });
+    async APIData(stock) {
+      this.$store.dispatch("getApiData", stock);
     },
-    initializeStocks() {
-      // let tradeStock: TradeStocks = new TradeStocks();
-      // this.stockData = ;s
+    async getDatabaseData() {
+      this.$store.dispatch("getDatabaseStockData");
     }
   },
   components: {

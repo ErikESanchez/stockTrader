@@ -19,15 +19,9 @@ export default {
     return {};
   },
   created() {
-    let formatedStocks: Array<Stock> = [];
-    marketData.stocks.forEach(stock => {
-      formatedStocks.push(
-        new Stock(stock.value, stock.stockQuantity, stock.name)
-      );
-    });
-    let market: Market = new Market(formatedStocks);
-    market.startMarket();
-    console.log(market);
+    console.log(this.$route.params.id);
+    this.$store.dispatch("fetchUser");
+    this.funds = this.$store.getters.totalFunds;
   }
 };
 </script>

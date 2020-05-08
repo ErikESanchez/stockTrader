@@ -23,20 +23,31 @@
         <router-link to="/portfolio" class="nav-link">Portfolio</router-link>
       </b-navbar-nav>
 
-      <b-navbar-nav class="ml-auto">
+      <b-navbar-nav class="ml-auto" v-if="loggedIn == true">
         <!-- <b-nav-form>
           <b-form-input size="sm" class="mr-sm-2" placeholder="Search"></b-form-input>
           <b-button size="sm" class="my-2 my-sm-0" type="submit">Search</b-button>
         </b-nav-form>-->
-        <b-nav-item>Funds: ${{avaibleUserFunds}}</b-nav-item>
-        <b-nav-item-dropdown right>
-          <template v-slot:button-content>
-            <em>User</em>
-          </template>
-          <b-dropdown-item href="#">Profile</b-dropdown-item>
-          <b-dropdown-item href="#">Sign Out</b-dropdown-item>
-        </b-nav-item-dropdown>
-        <b-button size="sm" class="my-2 my-sm-0" type="submit">End day</b-button>
+        <div>
+          <b-nav-item-dropdown right>
+            <template v-slot:button-content>
+              <em>{{userData.email}}</em>
+            </template>
+            <b-dropdown-item href="#">Profile</b-dropdown-item>
+            <b-dropdown-item @click="logOut()">Sign Out</b-dropdown-item>
+          </b-nav-item-dropdown>
+          <!-- <b-button size="sm" class="my-2 my-sm-0" type="submit">End day</b-button> -->
+        </div>
+      </b-navbar-nav>
+      <b-navbar-nav class="ml-auto" v-if="loggedIn == false">
+        <div>
+          <router-link to="/logIn" size="sm" class="my-2 my-sm-0 log-In-Button" type="submit">
+            <b-button>Log In</b-button>
+          </router-link>
+          <router-link to="/signUp" size="sm" class="my-2 my-sm-0" type="submit">
+            <b-button>Sign Up</b-button>
+          </router-link>
+        </div>
       </b-navbar-nav>
     </b-collapse>
   </b-navbar>
@@ -46,8 +57,7 @@
 import Vue from "vue";
 import store from "@/store";
 import { userPriceHistory } from "../store";
-import { eventBus } from "../main";
-
+// import { mapState } from "vuex";
 export default Vue.extend({
   data() {
     return {
@@ -56,25 +66,28 @@ export default Vue.extend({
     };
   },
   created() {
-    this.avaibleUserFunds = store.getters.getTotalFunds;
-    // this.$store.commit("updateUserFunds"); // you should pass in a parameter to this to update the store
-    // this.fundsUpdate();
-    // eventBus.$on("fireMethod", () => {
-    //   // no
-    //   this.fundsUpdate();
-    // });
-    // ? How to make the navbar show the most recent form of funds, the code is here, just need to find somewhere to put it
+    this.$store.commit("updateUserFunds");
+  },
+  // Todo: Find a way to use mapState, can't right now because have to go through userModule
+  computed: {
+    loggedIn() {
+      return this.$store.state.userModule.loggedIn;
+    },
+    userData() {
+      return this.$store.getters.getUser;
+    }
+  },
+  watch: {
+    loggedIn() {
+      // console.log("New Value", newValue, "Old Value", oldValue);
+    },
+    fundsUpdate() {
+      this.latestUserFunds = this.$store.getters.getUserFunds.slice(-1)[0];
+    }
   },
   methods: {
-    fundsUpdate() {
-      this.avaibleUserFunds = store.getters.getTotalFunds;
-    },
-    newPrices() {
-      // ! BMW_Stock does not exist
-      // this.BMW_Stock = this.$store.commit(
-      //   "generateStockPrices",
-      //   this.BMW_Stock
-      // );
+    logOut() {
+      this.$store.dispatch("signOut");
     }
   }
 });
@@ -85,5 +98,9 @@ export default Vue.extend({
   position: relative;
   top: -30px;
   margin: 30px;
+}
+
+.log-In-Button {
+  margin-right: 10px;
 }
 </style>
