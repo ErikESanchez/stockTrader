@@ -12,6 +12,8 @@
 <script lang="ts">
 import Vue from "vue";
 import LineChart from "../components/LineChart.vue";
+import store from "@/store";
+
 export default Vue.extend({
   name: "singleStock",
   components: {
@@ -51,8 +53,8 @@ export default Vue.extend({
   },
   computed: {
     stockData() {
-      console.log(this.$store.getters.getStocks);
-      return this.$store.getters.getStocks;
+      console.log(store.getters.getStocks);
+      return store.getters.getStocks;
     },
     chartOptions(): any {
       return {
@@ -65,11 +67,11 @@ export default Vue.extend({
   async mounted() {
     console.log("Router", this.$router.history.current.params.stockName);
     setTimeout(() => {
-      this.testData = this.$store.getters.getTestData[0];
+      this.testData = store.getters.getTestData[0];
       this.renderStockChartData(this.testData);
       this.loaded = true;
     }, 1000);
-    this.$store.dispatch(
+    store.dispatch(
       "getMonthData",
       this.$router.history.current.params.stockName
     );

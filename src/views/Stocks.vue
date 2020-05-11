@@ -14,6 +14,8 @@
 import Vue from "vue";
 import StockCard from "../components/StockCard.vue";
 // import * as moment from "moment";
+import store from "@/store";
+
 export default Vue.extend({
   name: "stocksView",
   data() {
@@ -41,16 +43,15 @@ export default Vue.extend({
   },
   computed: {
     stockData() {
-      console.log(this.$store.state.marketData.formatedStocks);
-      return this.$store.state.marketData.formatedStocks;
+      return store.state.marketData.formatedStocks;
     }
   },
   methods: {
     async APIData(stock) {
-      this.$store.dispatch("getApiData", stock);
+      await store.dispatch("getApiData", stock);
     },
     async getDatabaseData() {
-      this.$store.dispatch("getDatabaseStockData");
+      await store.dispatch("getDatabaseStockData");
     }
   },
   components: {

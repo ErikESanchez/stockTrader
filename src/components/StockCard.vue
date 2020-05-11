@@ -24,7 +24,7 @@
 <script lang="ts">
 /* eslint-disable */
 import Vue from "vue";
-
+import store from "@/store";
 import { newStockTransaction } from "@/store";
 
 interface stock {
@@ -55,9 +55,9 @@ export default Vue.extend({
         },
         buy: true
       };
-      this.$store.dispatch("buyStock", formatedTr);
+      store.dispatch("buyStock", formatedTr);
 
-      console.log("Current stocks", this.$store.getters.getUserStocks);
+      console.log("Current stocks", store.getters.getUserStocks);
     }
   }
 });

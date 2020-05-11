@@ -10,13 +10,15 @@ import Navbar from "./components/Navbar.vue";
 import { Market } from "@/Classes/Market";
 import { Stock } from "./Classes/Stock";
 
+import store from "@/store";
+
 export default {
   name: "App",
   components: {
     Navbar
   },
   async created() {
-    await this.$store.dispatch("fetchUser");
+    await store.dispatch("fetchUser");
   }
 };
 </script>
