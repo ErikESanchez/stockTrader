@@ -12,7 +12,9 @@
 <script lang="ts">
 import Vue from "vue";
 import LineChart from "../components/LineChart.vue";
+
 import store from "@/store";
+import router from "@/router";
 
 export default Vue.extend({
   name: "singleStock",
@@ -37,7 +39,7 @@ export default Vue.extend({
         datasets: [
           {
             // * Make the stock symbols dynamic
-            label: this.$router.history.current.params.stockName,
+            label: router.history.current.params.stockName,
             data: [],
             backgroundColor: ["rgb(255, 99, 132)"]
           }
@@ -65,16 +67,13 @@ export default Vue.extend({
     }
   },
   async mounted() {
-    console.log("Router", this.$router.history.current.params.stockName);
+    console.log("Router", router.history.current.params.stockName);
     setTimeout(() => {
       this.testData = store.getters.getTestData[0];
       this.renderStockChartData(this.testData);
       this.loaded = true;
     }, 1000);
-    store.dispatch(
-      "getMonthData",
-      this.$router.history.current.params.stockName
-    );
+    store.dispatch("getMonthData", router.history.current.params.stockName);
   }
 });
 </script>
