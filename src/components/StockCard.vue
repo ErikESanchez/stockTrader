@@ -40,7 +40,7 @@ export default Vue.extend({
     };
   },
   props: {
-    stock: Array,
+    stock: Object,
     keyProp: Number
   },
   mounted() {},

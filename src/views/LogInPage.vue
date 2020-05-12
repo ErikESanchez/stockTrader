@@ -10,13 +10,14 @@
       <b-input-group-append></b-input-group-append>
     </b-input-group>
 
-    <b-button variant="outline-success" @click="login()">Login</b-button>
+    <b-button variant="outline-success" @click="logIn()">Login</b-button>
   </div>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
 import { firebaseData } from "../firebase";
+import { User } from "../Classes/User";
 export default Vue.extend({
   data() {
     return {
@@ -27,21 +28,10 @@ export default Vue.extend({
     };
   },
   methods: {
-    login() {
-      if (this.userInput.username != "" && this.userInput.password != "") {
-        firebaseData
-          .auth()
-          .signInWithEmailAndPassword(
-            this.userInput.username,
-            this.userInput.password
-          )
-          .catch(function(error) {
-            let errorCode = error.code;
-            let errorMessage = error.message;
-            console.log(errorCode, errorMessage);
-          });
-        // TODO: Make an if statement to check if the user name isn't in the database
-      }
+    logIn() {
+      console.log("hello");
+      let user = new User();
+      user.login(this.userInput.username, this.userInput.password);
     }
   }
 });

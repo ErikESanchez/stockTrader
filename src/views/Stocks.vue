@@ -46,7 +46,7 @@ export default Vue.extend({
     }
   },
   methods: {
-    async APIData(stock) {
+    async APIData(stock: any) {
       this.$store.dispatch("getApiData", stock);
     },
     async getDatabaseData() {

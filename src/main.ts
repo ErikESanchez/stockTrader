@@ -4,8 +4,10 @@ import store from "./store";
 import router from "./router";
 import BootstrapVue from "bootstrap-vue/dist/bootstrap-vue.esm";
 import App from "./App.vue";
-import * as moment from "moment"
+import moment from "moment"
+import async from "async"
 Vue.prototype.moment = moment
+Vue.prototype.async = async
 
 // Import the styles directly. 
 import "bootstrap/dist/css/bootstrap.css";

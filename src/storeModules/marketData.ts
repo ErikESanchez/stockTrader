@@ -3,8 +3,7 @@ import { GetterTree } from "vuex";
 import { MutationTree } from "vuex";
 import apikey from "../apikey"
 import { db } from "../firebase"
-import axios from "axios";
-import * as moment from "moment"
+import moment from "moment";
 // import { database } from "firebase";
 // import { Stock } from "@/Classes/Stock";
 const marketDataUrl = "https://www.alphavantage.co/query";
@@ -12,7 +11,6 @@ const marketDataUrl = "https://www.alphavantage.co/query";
 const state = {
   testStockData: [],
   stocks: Array(),
-  formatedStocks: Array()
 };
 
 const getters: GetterTree<any, any> = {
@@ -41,36 +39,6 @@ const mutations: MutationTree<any> = {
     console.log(newMonthObject);
     state.testStockData.push(newMonthObject)
   },
-  formatDatabaseData(state, stockPayload) {
-    // Todo: Need to make a promise to wait for stockPayload to render!
-    let date: Object = moment().subtract(7, "day");
-    let formatedDate: string = moment(date).format("YYYY-MM-DD");
-    console.log("stockPayload", stockPayload)
-    console.log(Object.keys(stockPayload))
-    // ? The functions runs fine once, but runs another four times for some reason?
-    Object.keys(stockPayload).forEach((symbol) => {
-
-      console.log("symbol", symbol)
-      setTimeout(() => {
-        let metaData: Object = stockPayload[symbol]["metaData"];
-        let priceData: Object = stockPayload[symbol]["timeSeriesData"][formatedDate];
-        let formatedLocalData: stockDataFormat = {
-          stockData: {
-            name: symbol,
-            open: Number(priceData["1. open"]),
-            high: Number(priceData["2. high"]),
-            low: Number(priceData["3. low"]),
-            close: Number(priceData["4. close"]),
-            volume: Number(priceData["5. volume"]),
-            lastRefreshed: metaData["3. Last Refreshed"]
-          }
-        }
-        state.formatedStocks.push(formatedLocalData);
-      }, 1000);
-    })
-
-
-  }
 };
 
 export const actions: ActionTree<any, any> = {
@@ -162,44 +130,16 @@ export const actions: ActionTree<any, any> = {
     });
   },
 
-  async getStockQuote({ commit }, payload: TIME_SERIES_DAILY) {
-    commit("addDataToStock", payload);
-    return await axios.get(marketDataUrl, {
-      params: {
-        function: payload.function,
-        symbol: payload.symbol,
-        interval: payload.interval,
-        apikey: payload.apikey,
-        outputsize: payload.outputsize
-      }
-    });
-  }
+
 };
 
-export interface TIME_SERIES_DAILY {
-  function: "TIME_SERIES_DAILY";
-  symbol: string;
-  interval: string;
-  apikey: string;
-  outputsize?: string;
-}
 
 // interface databaseStock {
 //   metaData: Object,
 //   timeSeriesData: Object
 // }
 
-interface stockDataFormat {
-  stockData: {
-    name: string;
-    open: number;
-    high: number;
-    low: number;
-    close: number;
-    volume: number;
-    lastRefreshed: string;
-  };
-}
+
 
 export default {
   actions,

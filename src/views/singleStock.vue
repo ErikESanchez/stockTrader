@@ -12,24 +12,25 @@
 <script lang="ts">
 import Vue from "vue";
 import LineChart from "../components/LineChart.vue";
+import { any } from "async";
 export default Vue.extend({
   name: "singleStock",
   components: {
     LineChart
   },
-  // ? Might not render so use this just in case
   data() {
     return {
       loaded: false,
       testData: Object(),
-      stockChartData: () => ({
+      // Todo: I guess make an interface
+      stockChartData: (): Object => ({
         labels: Array(),
         datasets: Array()
       })
     };
   },
   methods: {
-    renderStockChartData(chartData) {
+    renderStockChartData(chartData: Object) {
       let dataCollection = {
         labels: [],
         datasets: [
@@ -41,7 +42,7 @@ export default Vue.extend({
           }
         ]
       };
-      Object.keys(chartData).forEach(stockDate => {
+      Object.keys(chartData).forEach((stockDate: string) => {
         dataCollection.datasets[0].data.push(chartData[stockDate]["4. close"]);
         dataCollection.labels.push(stockDate);
       });
@@ -76,6 +77,4 @@ export default Vue.extend({
   }
 });
 </script>
-<style lang="sass" scoped>
-
-</style>
+<style lang="sass" scoped></style>

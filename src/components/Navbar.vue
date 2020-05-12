@@ -23,7 +23,7 @@
         <router-link to="/portfolio" class="nav-link">Portfolio</router-link>
       </b-navbar-nav>
 
-      <b-navbar-nav class="ml-auto" v-if="loggedIn == true">
+      <b-navbar-nav class="ml-auto" v-if="loggedIn === true">
         <!-- <b-nav-form>
           <b-form-input size="sm" class="mr-sm-2" placeholder="Search"></b-form-input>
           <b-button size="sm" class="my-2 my-sm-0" type="submit">Search</b-button>
@@ -39,7 +39,7 @@
           <!-- <b-button size="sm" class="my-2 my-sm-0" type="submit">End day</b-button> -->
         </div>
       </b-navbar-nav>
-      <b-navbar-nav class="ml-auto" v-if="loggedIn == false">
+      <b-navbar-nav class="ml-auto" v-if="loggedIn === false">
         <div>
           <router-link to="/logIn" size="sm" class="my-2 my-sm-0 log-In-Button" type="submit">
             <b-button>Log In</b-button>
@@ -57,6 +57,7 @@
 import Vue from "vue";
 import store from "@/store";
 import { userPriceHistory } from "../store";
+import { User } from "../Classes/User";
 // import { mapState } from "vuex";
 export default Vue.extend({
   data() {
@@ -71,23 +72,21 @@ export default Vue.extend({
   // Todo: Find a way to use mapState, can't right now because have to go through userModule
   computed: {
     loggedIn() {
-      return this.$store.state.userModule.loggedIn;
+      // ? For some reason the computed property does not watch for changes
+      console.log(new User().loggedIn);
+      return new User().loggedIn;
     },
     userData() {
-      return this.$store.getters.getUser;
+      let user = new User();
+      console.log(user.userInfo);
+      return user.userInfo;
     }
   },
-  watch: {
-    loggedIn() {
-      // console.log("New Value", newValue, "Old Value", oldValue);
-    },
-    fundsUpdate() {
-      this.latestUserFunds = this.$store.getters.getUserFunds.slice(-1)[0];
-    }
-  },
+  watch: {},
   methods: {
     logOut() {
-      this.$store.dispatch("signOut");
+      let user = new User();
+      return user.signOut();
     }
   }
 });

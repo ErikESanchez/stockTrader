@@ -75,6 +75,7 @@ export class TradeStocks {
   }
 }
 
+// ? I might have to make interface here for the chart data
 export interface newStockTransaction {
   stockName: string;
   stockData: stockTransactionData;
