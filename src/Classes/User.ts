@@ -1,22 +1,16 @@
 import { firebaseData } from "../firebase";
-
+import store from '@/store'
 export class User {
     userInfo: userInfo = {
-        email: String()
+        email: String(),
     }
-    loggedIn: Boolean;
-    constructor() {
-        this.loggedIn = Boolean()
-    }
+    constructor() { }
     async fetchUser() {
         return firebaseData.auth().onAuthStateChanged((user) => {
             if (user) {
                 this.userInfo.email = user.email as string;
-                this.loggedIn = true;
-                console.log(this.loggedIn)
-                console.log(this.userInfo["email"]);
+                store.commit('setUser', this.userInfo)
             } else {
-                this.loggedIn = false;
                 console.log('user is not logged in');
             }
         });
@@ -39,7 +33,6 @@ export class User {
 
     async signOut() {
         return await firebaseData.auth().signOut().then(() => {
-            this.loggedIn = false
             console.log("Signed Out");
         }).catch(function (error) {
             console.log("Oops... an error occured", error);

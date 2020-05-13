@@ -20,10 +20,8 @@ export default {
     return {};
   },
   async created() {
-    console.log(this.$route.params.id);
     let user = new User();
     await user.fetchUser();
-    // this.funds = this.$store.getters.totalFunds;
   }
 };
 </script>

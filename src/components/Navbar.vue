@@ -23,7 +23,7 @@
         <router-link to="/portfolio" class="nav-link">Portfolio</router-link>
       </b-navbar-nav>
 
-      <b-navbar-nav class="ml-auto" v-if="loggedIn === true">
+      <b-navbar-nav class="ml-auto" v-if="userData !== undefined">
         <!-- <b-nav-form>
           <b-form-input size="sm" class="mr-sm-2" placeholder="Search"></b-form-input>
           <b-button size="sm" class="my-2 my-sm-0" type="submit">Search</b-button>
@@ -39,7 +39,7 @@
           <!-- <b-button size="sm" class="my-2 my-sm-0" type="submit">End day</b-button> -->
         </div>
       </b-navbar-nav>
-      <b-navbar-nav class="ml-auto" v-if="loggedIn === false">
+      <b-navbar-nav class="ml-auto" v-if="userData === undefined">
         <div>
           <router-link to="/logIn" size="sm" class="my-2 my-sm-0 log-In-Button" type="submit">
             <b-button>Log In</b-button>
@@ -67,19 +67,12 @@ export default Vue.extend({
     };
   },
   created() {
-    this.$store.commit("updateUserFunds");
+    // this.$store.commit("updateUserFunds");
   },
   // Todo: Find a way to use mapState, can't right now because have to go through userModule
   computed: {
-    loggedIn() {
-      // ? For some reason the computed property does not watch for changes
-      console.log(new User().loggedIn);
-      return new User().loggedIn;
-    },
     userData() {
-      let user = new User();
-      console.log(user.userInfo);
-      return user.userInfo;
+      return this.$store.state.userModule.user;
     }
   },
   watch: {},

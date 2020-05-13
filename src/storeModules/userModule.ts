@@ -6,14 +6,12 @@ import { MutationTree } from "vuex";
 
 const state = {
     loggedIn: Boolean(),
-    user: {
-        displayName: String(),
-        email: String()
-    },
+    user: {},
 }
 
 const getters: GetterTree<any, any> = {
     getUser: (state: any) => {
+        // ? Might have to change to undefined
         if (state.user == null) {
             console.log("No User Data")
         }
@@ -26,10 +24,8 @@ const getters: GetterTree<any, any> = {
 
 const mutations: MutationTree<any> = {
     setUser(state: any, userData: any) {
-        state.user = {
-            displayName: userData.displayName,
-            email: userData.email
-        }
+        console.log('userData', userData.email)
+        state.user = { email: userData.email }
     },
     setLogIn(state: any, userStatus: Boolean) {
         Vue.set(state, "loggedIn", userStatus)
@@ -37,41 +33,8 @@ const mutations: MutationTree<any> = {
 
 }
 
-export const actions: ActionTree<any, any> = {
-    fetchUser({ commit }) {
-        firebaseData.auth().onAuthStateChanged(user => {
-            if (user) {
-                commit("setUser", {
-                    displayName: user.displayName,
-                    email: user.email
-                });
-                commit("setLogIn", true);
-                // console.log("User", user)
-            } else {
-                console.log("user", false)
-                commit("setUser", null);
-                commit("setLogIn", false);
-            }
-        })
-    },
-    signOut() {
-        firebaseData
-            .auth()
-            .signOut()
-            .then(function () {
-                console.log("Signed Out");
-                state.loggedIn = false
-            })
-            .catch(function (error) {
-                console.log("Oops.. an error occurred.", error);
-                state.loggedIn = true
-            });
-    },
-}
-
 export default {
     state,
     getters,
-    actions,
     mutations
 }
