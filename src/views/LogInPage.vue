@@ -29,8 +29,7 @@ export default Vue.extend({
   },
   methods: {
     logIn() {
-      console.log("hello");
-      let user = new User();
+      let user = this.$store.getters.getUserClass;
       user.login(this.userInput.username, this.userInput.password);
     }
   }

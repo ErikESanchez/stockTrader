@@ -28,22 +28,8 @@ export default Vue.extend({
   },
   methods: {
     createNewUser() {
-      if (this.userInput.username != "" && this.userInput.password != "") {
-        // TODO:  Make an if stament to verfify no duplicate users by checking the database
-        firebaseData
-          .auth()
-          .createUserWithEmailAndPassword(
-            this.userInput.username,
-            this.userInput.password
-          )
-          .catch(function(error) {
-            let errorCode = error.code;
-            let errorMessage = error.message;
-            console.log(errorCode, errorMessage);
-          });
-      } else {
-        console.log("Please type in a valid username and password");
-      }
+      let user = this.$store.getters.getUserClass;
+      user.createNewUser(this.userInput);
     }
   }
 });

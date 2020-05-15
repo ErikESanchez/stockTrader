@@ -20,7 +20,8 @@ export default {
     return {};
   },
   async created() {
-    let user = new User();
+    this.$store.commit("setUserClass", new User());
+    let user = this.$store.getters.getUserClass;
     await user.fetchUser();
   }
 };

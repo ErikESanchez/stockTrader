@@ -23,7 +23,10 @@
         <router-link to="/portfolio" class="nav-link">Portfolio</router-link>
       </b-navbar-nav>
 
-      <b-navbar-nav class="ml-auto" v-if="userData !== undefined">
+      <b-navbar-nav
+        class="ml-auto"
+        v-if="checkIfEmptyString(userData.userInfo.email) !== undefined"
+      >
         <!-- <b-nav-form>
           <b-form-input size="sm" class="mr-sm-2" placeholder="Search"></b-form-input>
           <b-button size="sm" class="my-2 my-sm-0" type="submit">Search</b-button>
@@ -31,7 +34,7 @@
         <div>
           <b-nav-item-dropdown right>
             <template v-slot:button-content>
-              <em>{{userData.email}}</em>
+              <em>{{userData.userInfo.email}}</em>
             </template>
             <b-dropdown-item href="#">Profile</b-dropdown-item>
             <b-dropdown-item @click="logOut()">Sign Out</b-dropdown-item>
@@ -39,7 +42,7 @@
           <!-- <b-button size="sm" class="my-2 my-sm-0" type="submit">End day</b-button> -->
         </div>
       </b-navbar-nav>
-      <b-navbar-nav class="ml-auto" v-if="userData === undefined">
+      <b-navbar-nav class="ml-auto" v-else>
         <div>
           <router-link to="/logIn" size="sm" class="my-2 my-sm-0 log-In-Button" type="submit">
             <b-button>Log In</b-button>
@@ -72,13 +75,19 @@ export default Vue.extend({
   // Todo: Find a way to use mapState, can't right now because have to go through userModule
   computed: {
     userData() {
-      return this.$store.state.userModule.user;
+      return this.$store.state.userModule.userClass;
     }
   },
   watch: {},
   methods: {
+    checkIfEmptyString(payload: string) {
+      if (payload !== "") {
+        console.log("Payload: ", payload);
+        return payload;
+      }
+    },
     logOut() {
-      let user = new User();
+      let user = this.$store.getters.getUserClass;
       return user.signOut();
     }
   }
