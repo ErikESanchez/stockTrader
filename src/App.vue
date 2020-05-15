@@ -18,7 +18,9 @@ export default {
     Navbar
   },
   async created() {
-    await store.dispatch("fetchUser");
+    this.$store.commit("setUserClass", new User());
+    let user = this.$store.getters.getUserClass;
+    await user.fetchUser();
   }
 };
 </script>

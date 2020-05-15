@@ -34,12 +34,36 @@ export class User {
     async signOut() {
         return await firebaseData.auth().signOut().then(() => {
             console.log("Signed Out");
+            this.userInfo.email = ""
         }).catch(function (error) {
             console.log("Oops... an error occured", error);
         });
+    }
+    createNewUser(userInput: userInput) {
+        if (userInput.username != "" && userInput.password != "") {
+            // TODO:  Make an if stament to verfify no duplicate users by checking the database
+            firebaseData
+                .auth()
+                .createUserWithEmailAndPassword(
+                    userInput.username,
+                    userInput.password
+                )
+                .catch(function (error) {
+                    let errorCode = error.code;
+                    let errorMessage = error.message;
+                    console.log(errorCode, errorMessage);
+                });
+        } else {
+            console.log("Please type in a valid username and password");
+        }
     }
 }
 
 interface userInfo {
     email: string;
+}
+
+interface userInput {
+    username: string;
+    password: string;
 }
