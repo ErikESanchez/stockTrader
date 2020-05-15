@@ -9,7 +9,7 @@
 import Navbar from "./components/Navbar.vue";
 import { Market } from "@/Classes/Market";
 import { Stock } from "./Classes/Stock";
-
+import { User } from "@/Classes/User";
 import store from "@/store";
 
 export default {
@@ -18,8 +18,8 @@ export default {
     Navbar
   },
   async created() {
-    this.$store.commit("setUserClass", new User());
-    let user = this.$store.getters.getUserClass;
+    store.commit("setUserClass", new User());
+    let user = store.getters.getUserClass;
     await user.fetchUser();
   }
 };

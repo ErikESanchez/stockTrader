@@ -1,8 +1,8 @@
 import { ActionTree } from "vuex";
 import { GetterTree } from "vuex";
 import { MutationTree } from "vuex";
-import apikey from "../apikey"
-import { db } from "../firebase"
+import { apikey } from "@/apikey";
+import { db } from "../firebase";
 import moment from "moment";
 // import { database } from "firebase";
 // import { Stock } from "@/Classes/Stock";
@@ -160,17 +160,12 @@ export const actions: ActionTree<any, any> = {
         console.error(error);
       });
   },
-
-
 };
-
 
 // interface databaseStock {
 //   metaData: Object,
 //   timeSeriesData: Object
 // }
-
-
 
 export default {
   actions,
