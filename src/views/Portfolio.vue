@@ -14,8 +14,10 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { userStock } from "../store";
-import PortfolioStockCard from "../components/PortfolioStockCard.vue";
+import { userStock } from "@/store";
+import PortfolioStockCard from "@/components/PortfolioStockCard.vue";
+import store from "@/store";
+
 export default Vue.extend({
   name: "portfolio",
   components: {
@@ -34,7 +36,7 @@ export default Vue.extend({
   },
   methods: {
     initializeUserStocks() {
-      this.stockData = this.$store.getters.getUserStocks;
+      this.stockData = store.getters.getUserStocks;
       let totalAmount = new Array();
       // ! index in the forEach loop is a key!
       Object.entries(this.stockData).forEach(stock => {

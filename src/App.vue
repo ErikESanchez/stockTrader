@@ -8,20 +8,17 @@
 <script lang="ts">
 import Navbar from "./components/Navbar.vue";
 import { Market } from "@/Classes/Market";
-// import marketData from "@/stockData.json";
 import { Stock } from "./Classes/Stock";
-import { User } from "./Classes/User";
+
+import store from "@/store";
+
 export default {
   name: "App",
   components: {
     Navbar
   },
-  data() {
-    return {};
-  },
   async created() {
-    let user = new User();
-    await user.fetchUser();
+    await store.dispatch("fetchUser");
   }
 };
 </script>

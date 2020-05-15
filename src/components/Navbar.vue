@@ -56,8 +56,7 @@
 <script lang="ts">
 import Vue from "vue";
 import store from "@/store";
-import { userPriceHistory } from "../store";
-import { User } from "../Classes/User";
+import { userPriceHistory } from "@/store";
 // import { mapState } from "vuex";
 export default Vue.extend({
   data() {
@@ -67,19 +66,28 @@ export default Vue.extend({
     };
   },
   created() {
-    // this.$store.commit("updateUserFunds");
+    store.commit("updateUserFunds");
   },
   // Todo: Find a way to use mapState, can't right now because have to go through userModule
   computed: {
+    loggedIn() {
+      return store.state.userModule.loggedIn;
+    },
     userData() {
-      return this.$store.state.userModule.user;
+      return store.getters.getUser;
     }
   },
-  watch: {},
+  watch: {
+    loggedIn() {
+      // console.log("New Value", newValue, "Old Value", oldValue);
+    },
+    fundsUpdate() {
+      this.latestUserFunds = store.getters.getUserFunds.slice(-1)[0];
+    }
+  },
   methods: {
     logOut() {
-      let user = new User();
-      return user.signOut();
+      store.dispatch("signOut");
     }
   }
 });

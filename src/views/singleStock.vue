@@ -36,7 +36,7 @@ export default Vue.extend({
         datasets: [
           {
             // * Make the stock symbols dynamic
-            label: this.$router.history.current.params.stockName,
+            label: router.history.current.params.stockName,
             data: [],
             backgroundColor: ["rgb(255, 99, 132)"]
           }
@@ -52,8 +52,8 @@ export default Vue.extend({
   },
   computed: {
     stockData() {
-      console.log(this.$store.getters.getStocks);
-      return this.$store.getters.getStocks;
+      console.log(store.getters.getStocks);
+      return store.getters.getStocks;
     },
     chartOptions(): any {
       return {
@@ -64,16 +64,13 @@ export default Vue.extend({
     }
   },
   async mounted() {
-    console.log("Router", this.$router.history.current.params.stockName);
+    console.log("Router", router.history.current.params.stockName);
     setTimeout(() => {
-      this.testData = this.$store.getters.getTestData[0];
+      this.testData = store.getters.getTestData[0];
       this.renderStockChartData(this.testData);
       this.loaded = true;
     }, 1000);
-    this.$store.dispatch(
-      "getMonthData",
-      this.$router.history.current.params.stockName
-    );
+    store.dispatch("getMonthData", router.history.current.params.stockName);
   }
 });
 </script>
