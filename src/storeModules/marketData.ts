@@ -53,7 +53,7 @@ export const actions: ActionTree<any, any> = {
       function: "TIME_SERIES_DAILY",
       symbol: stock,
       interval: "30min",
-      apikey: apikey.state.apikey,
+      apikey: apikey,
       outputsize: "compact",
     };
     await dispatch("getStockQuote", payloadFormat).then((res) => {
@@ -107,11 +107,9 @@ export const actions: ActionTree<any, any> = {
       .get()
       .then(function(querySnapshot) {
         querySnapshot.forEach(function(doc) {
-          // console.log(doc.id, "=>", doc.data());
           stockData[doc.id] = {
             metaData: doc.data().metaData,
           };
-          // stockData["metaData"] = doc.data().metaData;
         });
       })
       .catch(function(error) {
@@ -127,7 +125,6 @@ export const actions: ActionTree<any, any> = {
           .get()
           .then(function(doc) {
             if (doc.exists && stockData[symbol]["timeSeriesData"] === undefined) {
-              // console.log("Document data: ", doc.data())
               stockData[symbol]["timeSeriesData"] = doc.data()["priceData"];
               // ? M ight not be the best place to put this
             } else {
@@ -151,7 +148,6 @@ export const actions: ActionTree<any, any> = {
       .get()
       .then((res) => {
         if (res) {
-          // snapshot.docs.map(doc => doc.data())
           console.log(res.id, "=>", res.data());
           commit("formatMonthData", res.data());
         }
@@ -161,11 +157,6 @@ export const actions: ActionTree<any, any> = {
       });
   },
 };
-
-// interface databaseStock {
-//   metaData: Object,
-//   timeSeriesData: Object
-// }
 
 export default {
   actions,
