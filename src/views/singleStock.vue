@@ -13,6 +13,8 @@
 import Vue from "vue";
 import LineChart from "../components/LineChart.vue";
 import { any } from "async";
+import router from "vue-router";
+import store from "@/store";
 export default Vue.extend({
   name: "singleStock",
   components: {
