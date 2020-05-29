@@ -23,10 +23,7 @@
         <router-link to="/portfolio" class="nav-link">Portfolio</router-link>
       </b-navbar-nav>
 
-      <b-navbar-nav
-        class="ml-auto"
-        v-if="checkIfEmptyString(userData.userInfo.email) !== undefined"
-      >
+      <b-navbar-nav class="ml-auto" v-if="checkIfEmptyString(userData.email) !== undefined">
         <!-- <b-nav-form>
           <b-form-input size="sm" class="mr-sm-2" placeholder="Search"></b-form-input>
           <b-button size="sm" class="my-2 my-sm-0" type="submit">Search</b-button>
@@ -34,7 +31,7 @@
         <div>
           <b-nav-item-dropdown right>
             <template v-slot:button-content>
-              <em>{{userData.userInfo.email}}</em>
+              <em>{{userData.email}}</em>
             </template>
             <b-dropdown-item href="#">Profile</b-dropdown-item>
             <b-dropdown-item @click="logOut()">Sign Out</b-dropdown-item>
@@ -60,16 +57,20 @@
 import Vue from "vue";
 import store from "@/store";
 import { userPriceHistory } from "@/store";
+import { Account } from "@/Classes/Account";
 // import { mapState } from "vuex";
 export default Vue.extend({
   data() {
     return {
       // latestUserFunds: Array<userPriceHistory>()
-      avaibleUserFunds: Number()
+      avaibleUserFunds: Number(),
+      userClass: Object()
     };
   },
   created() {
-    store.commit("updateUserFunds");
+    this.userClass = store.getters.getUserClass;
+    store.dispatch("login");
+    // store.commit("updateUserFunds");
   },
   // Todo: Find a way to use mapState, can't right now because have to go through userModule
   computed: {
@@ -77,7 +78,10 @@ export default Vue.extend({
       return store.state.userModule.loggedIn;
     },
     userData() {
-      return this.$store.state.userModule.userClass;
+      // console.log("User data", store.state.userModule.userClass.email);
+      // return store.state.userModule.userClass;
+      console.log("userData", store.getters.getUserClass);
+      return store.getters.getUserClass;
     }
   },
   watch: {
@@ -90,14 +94,13 @@ export default Vue.extend({
   },
   methods: {
     checkIfEmptyString(payload: string) {
-      if (payload !== "") {
+      if (payload !== "" || payload !== undefined) {
         console.log("Payload: ", payload);
         return payload;
       }
     },
     logOut() {
-      let user = this.$store.getters.getUserClass;
-      return user.signOut();
+      store.dispatch("signOut");
     }
   }
 });

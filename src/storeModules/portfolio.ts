@@ -57,7 +57,7 @@ const mutations: MutationTree<any> = {
   // updateStocksSell(state, data: newStockTransaction) {}
 };
 const actions: ActionTree<any, any> = {
-  buyStock({ commit, getters }, transactionData: newStockTransaction) {
+  buyStock({ commit, }, transactionData: newStockTransaction) {
     if (getters.ownStock(transactionData.stockName)) {
       transactionData.alreadyHaveStock = true;
       commit("updateStocksBuy", transactionData);

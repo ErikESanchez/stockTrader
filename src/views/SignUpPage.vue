@@ -17,6 +17,7 @@
 <script lang="ts">
 import Vue from "vue";
 import { firebaseData } from "../firebase";
+import store from "@/store";
 export default Vue.extend({
   data() {
     return {
@@ -28,8 +29,7 @@ export default Vue.extend({
   },
   methods: {
     createNewUser() {
-      let user = this.$store.getters.getUserClass;
-      user.createNewUser(this.userInput);
+      store.dispatch("createNewUser", this.userInput);
     }
   }
 });

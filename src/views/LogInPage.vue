@@ -10,14 +10,15 @@
       <b-input-group-append></b-input-group-append>
     </b-input-group>
 
-    <b-button variant="outline-success" @click="logIn()">Login</b-button>
+    <b-button variant="outline-success" @click="login(userInput.username, userInput.password)">Login</b-button>
   </div>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
 import { firebaseData } from "../firebase";
-import { User } from "../Classes/User";
+import { Account } from "@/Classes/Account";
+import store from "@/store";
 export default Vue.extend({
   data() {
     return {
@@ -28,9 +29,12 @@ export default Vue.extend({
     };
   },
   methods: {
-    logIn() {
-      let user = this.$store.getters.getUserClass;
-      user.login(this.userInput.username, this.userInput.password);
+    login(username: string, password: string) {
+      let userInput: Object = {
+        username: username,
+        password: password
+      };
+      store.dispatch("login", userInput);
     }
   }
 });
