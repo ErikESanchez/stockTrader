@@ -26,7 +26,7 @@
 import Vue from "vue";
 import store from "@/store";
 import { newStockTransaction } from "@/store";
-
+import { any } from "async";
 interface stock {
   name: string;
   value: number;
@@ -40,10 +40,12 @@ export default Vue.extend({
     };
   },
   props: {
-    stock: Object,
+    stock: Array,
     keyProp: Number
   },
-  mounted() {},
+  mounted() {
+    console.log(this.stock[0]);
+  },
   methods: {
     buyStock(stock: stock) {
       let formatedTr: newStockTransaction = {

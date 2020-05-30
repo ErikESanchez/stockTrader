@@ -13,8 +13,8 @@
 import Vue from "vue";
 import LineChart from "../components/LineChart.vue";
 import { any } from "async";
-import router from "vue-router";
 import store from "@/store";
+import { Chart } from "@/Classes/Chart";
 export default Vue.extend({
   name: "singleStock",
   components: {
@@ -23,8 +23,6 @@ export default Vue.extend({
   data() {
     return {
       loaded: false,
-      testData: Object(),
-      // Todo: I guess make an interface
       stockChartData: (): Object => ({
         labels: Array(),
         datasets: Array()
@@ -32,25 +30,25 @@ export default Vue.extend({
     };
   },
   methods: {
-    renderStockChartData(chartData: Object) {
-      let dataCollection = {
-        labels: [],
-        datasets: [
-          {
-            // * Make the stock symbols dynamic
-            label: router.history.current.params.stockName,
-            data: [],
-            backgroundColor: ["rgb(255, 99, 132)"]
-          }
-        ]
-      };
-      Object.keys(chartData).forEach((stockDate: string) => {
-        dataCollection.datasets[0].data.push(chartData[stockDate]["4. close"]);
-        dataCollection.labels.push(stockDate);
-      });
-      console.log(dataCollection);
-      this.stockChartData = dataCollection;
-    }
+    // renderStockChartData(chartData: Object) {
+    //   let dataCollection = {
+    //     labels: [],
+    //     datasets: [
+    //       {
+    //         // * Make the stock symbols dynamic
+    //         label: router.history.current.params.stockName,
+    //         data: [],
+    //         backgroundColor: ["rgb(255, 99, 132)"]
+    //       }
+    //     ]
+    //   };
+    //   Object.keys(chartData).forEach((stockDate: string) => {
+    //     dataCollection.datasets[0].data.push(chartData[stockDate]["4. close"]);
+    //     dataCollection.labels.push(stockDate);
+    //   });
+    //   console.log(dataCollection);
+    //   this.stockChartData = dataCollection;
+    // }
   },
   computed: {
     stockData() {
@@ -66,13 +64,26 @@ export default Vue.extend({
     }
   },
   async mounted() {
-    console.log("Router", router.history.current.params.stockName);
-    setTimeout(() => {
-      this.testData = store.getters.getTestData[0];
-      this.renderStockChartData(this.testData);
-      this.loaded = true;
-    }, 1000);
-    store.dispatch("getMonthData", router.history.current.params.stockName);
+    let chart: Chart = new Chart();
+    let symbol: string = this.$router.currentRoute.params.stockName;
+    Promise.resolve(
+      store.dispatch("getMonthData", this.$router.currentRoute.params.stockName)
+    ).then((res: any) => {
+      if (res === true) {
+        // ? It would probably be better to use a prop and pass it down from the parent component
+        let data: any = store.getters.getMonthData;
+        console.log(data);
+        Promise.resolve(chart.renderChart(data, symbol)).then(
+          (dataCollections: any) => {
+            console.log(dataCollections);
+            console.log("dataCollections", dataCollections);
+            this.stockChartData = dataCollections;
+          }
+        );
+      }
+    });
+
+    this.loaded = true;
   }
 });
 </script>

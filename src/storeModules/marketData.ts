@@ -11,7 +11,7 @@ import { any } from 'async';
 const marketDataUrl = "https://www.alphavantage.co/query";
 
 const state = {
-  testStockData: [],
+  monthStockData: [],
   stocks: Array(),
   formatedStocks: []
 };
@@ -20,8 +20,8 @@ const getters: GetterTree<any, any> = {
   getStocks: state => {
     return state.formatedStocks;
   },
-  getTestData: state => {
-    return state.testStockData;
+  getMonthData: state => {
+    return state.monthStockData;
   },
 };
 
@@ -29,20 +29,29 @@ const mutations: MutationTree<any> = {
   addDataToStock(state, newStock) {
     state.stocks.push(newStock)
   },
+  formatMonthData(state, monthPayload) {
+    let newMonthObject: Object = {}
+    const currentMonthDates = new Array(moment("2020-04-01", "YYYY-MM-DD").daysInMonth()).fill(null).map((x, i) => moment("2020-04-01", "YYYY-MM-DD").startOf('month').add(i, 'days'));
+    currentMonthDates.forEach((data, index) => {
+      index;
+      let orderedDates: string = data.format('YYYY-MM-DD')
+      if (monthPayload.priceData[orderedDates] !== undefined) {
+        newMonthObject[orderedDates] = monthPayload.priceData[orderedDates]
+      }
+    });
+    // console.log(newMonthObject);
+    state.monthStockData.push(newMonthObject)
+  },
   formatDatabaseData(state, stockPayload: any) {
-    console.log("Stock Payload", stockPayload)
+    // console.log("Stock Payload", stockPayload)
     // Todo: Need to make a promise to wait for stockPayload to render!
     let date: Object = moment().subtract(1, "day");
     let formatedDate: string = moment(date).format("YYYY-MM-DD");
     // ? The functions runs fine once, but runs another four times for some reason?
     Object.keys(stockPayload).forEach((symbol) => {
-      console.log("symbol", symbol)
       // Todo: Make interfaces for all the Objects 
       let metaData = stockPayload[symbol]["metaData"];
-      console.log("TImerSERiers", stockPayload["AAPL"]['timeSeriesData'])
-      // console.log("priceData", stockPayload[symbol]["timeSeriesData"][formatedDate])
       let priceData = stockPayload[symbol]["timeSeriesData"][formatedDate];
-
       let formatedLocalData: stockDataFormat = {
         stockData: {
           name: symbol,
@@ -60,6 +69,20 @@ const mutations: MutationTree<any> = {
 };
 
 export const actions: ActionTree<any, any> = {
+  async getMonthData({ commit }, symbol: string) {
+    let isDone: Boolean = false
+    await db.collection('stocks').doc(symbol).collection('Time Series').doc("2020-04").get().then(res => {
+      if (res) {
+        // snapshot.docs.map(doc => doc.data())
+        // console.log(res.id, "=>", res.data());
+        commit('formatMonthData', res.data());
+        return isDone = true
+      }
+    }).catch(function (error) {
+      console.error(error)
+    });
+    return isDone
+  },
   async getApiData({ dispatch }, stock) {
     let payloadFormat: TIME_SERIES_DAILY = {
       function: "TIME_SERIES_DAILY",
@@ -129,7 +152,7 @@ export const actions: ActionTree<any, any> = {
     }))
     console.log("StockData test", stockData)
     await Promise.resolve(Object.keys(stockData).forEach((symbol: string, key: number, arr: any) => {
-      console.log("Symbol", symbol, key)
+      // console.log("Symbol", symbol, key)
       return db.collection("stocks").doc(symbol).collection('Time Series').doc(formatedDateOfMonth).get().then(function (doc) {
         if (doc.exists && stockData[symbol]['timeSeriesData'] === undefined) {
           // console.log("Document data: ", doc.data())

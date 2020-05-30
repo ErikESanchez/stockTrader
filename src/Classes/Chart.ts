@@ -1,11 +1,6 @@
 export class Chart {
-    // 
-    // loaded: Boolean;
-    // constructor(loaded: Boolean) {
-    //     this.loaded = loaded
-    // }
-    renderChart(chartData: any, symbol: string) {
-        let dataCollection: chartDataInter = {
+    async renderChart(chartData: any, symbol: string) {
+        let dataCollection: chartData = {
             labels: Array(),
             datasets: [
                 {
@@ -16,11 +11,10 @@ export class Chart {
                 }
             ]
         };
-        Object.keys(chartData).forEach((stockDate: string) => {
-            dataCollection.datasets[0].data.push(chartData[stockDate]["4. close"]);
+        Object.keys(chartData[0]).forEach((stockDate: string) => {
+            dataCollection.datasets[0].data.push(chartData[0][stockDate]["4. close"]);
             dataCollection.labels.push(stockDate);
         });
-        console.log(dataCollection);
         return dataCollection
     }
     chartOptions(): any {
@@ -32,7 +26,7 @@ export class Chart {
     }
 }
 
-interface chartDataInter {
+interface chartData {
     labels: Array<any>;
     datasets: Array<any>;
 }
