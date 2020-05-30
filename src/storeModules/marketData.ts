@@ -128,21 +128,25 @@ export const actions: ActionTree<any, any> = {
       console.error("Error getting documents", error)
     }))
     console.log("StockData test", stockData)
-    await Promise.resolve(Object.keys(stockData).forEach((symbol: string, index: Number) => {
-      console.log("Symbol", symbol, index)
-      db.collection("stocks").doc(symbol).collection('Time Series').doc(formatedDateOfMonth).get().then(function (doc) {
+    await Promise.resolve(Object.keys(stockData).forEach((symbol: string, key: number, arr: any) => {
+      console.log("Symbol", symbol, key)
+      return db.collection("stocks").doc(symbol).collection('Time Series').doc(formatedDateOfMonth).get().then(function (doc) {
         if (doc.exists && stockData[symbol]['timeSeriesData'] === undefined) {
           // console.log("Document data: ", doc.data())
           stockData[symbol]["timeSeriesData"] = doc.data()["priceData"];
+          if (Object.is(arr.length - 1, key)) {
+            console.log(`Last callback call at ${key} with value ${symbol}`);
+            commit('formatDatabaseData', stockData)
+          }
           // ? M ight not be the best place to put this
         } else {
           console.log("Document doesn't exist");
         }
+        return stockData
       }).catch(function (error) {
         console.error("Error getting document:", error);
       });
     }))
-    console.log("stockData", typeof stockData)
   },
 };
 
