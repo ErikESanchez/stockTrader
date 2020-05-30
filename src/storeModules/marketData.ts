@@ -30,7 +30,7 @@ const mutations: MutationTree<any> = {
     state.stocks.push(newStock)
   },
   formatMonthData(state, monthPayload) {
-    let newMonthObject: Object = {}
+    let newMonthObject: monthData = {}
     const currentMonthDates = new Array(moment("2020-04-01", "YYYY-MM-DD").daysInMonth()).fill(null).map((x, i) => moment("2020-04-01", "YYYY-MM-DD").startOf('month').add(i, 'days'));
     currentMonthDates.forEach((data, index) => {
       index;
@@ -93,7 +93,7 @@ export const actions: ActionTree<any, any> = {
     };
     await dispatch("getStockQuote", payloadFormat).then(res => {
       let metaData: { [key: string]: string } = res.data["Meta Data"];
-      let priceData: Object = res.data["Time Series (Daily)"]
+      let priceData: any = res.data["Time Series (Daily)"]
       let symbol: string = metaData["2. Symbol"];
       db.collection("stocks").doc(symbol).set({
         metaData,
@@ -105,12 +105,13 @@ export const actions: ActionTree<any, any> = {
       // ! Find a way to make this run the amount of months there are, can't use modulo or maybe who knows, find something
       // let dateOfMonth: Object = moment().subtract(i, "month");
       let formatedDateOfMonth: string = moment(moment()).format("YYYY-MM");
-      let monthObject: Object = {}
+      let monthObject: any = {}
       Object.keys(priceData).filter(function (str) {
         // * This returns the data of a month formated
         if (str.includes(formatedDateOfMonth) === true) {
           console.log("str", str);
           monthObject[str] = priceData[str];
+          console.log("monthObject", monthObject)
         }
       });
       db.collection("stocks").doc(symbol).collection("Time Series").doc(formatedDateOfMonth).set({
@@ -175,6 +176,10 @@ export const actions: ActionTree<any, any> = {
 
 interface doc {
   [id: string]: any
+}
+
+interface monthData {
+  [date: string]: any
 }
 interface stockData {
   // I don't know why this works
