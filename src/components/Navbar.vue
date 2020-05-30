@@ -23,7 +23,7 @@
         <router-link to="/portfolio" class="nav-link">Portfolio</router-link>
       </b-navbar-nav>
 
-      <b-navbar-nav class="ml-auto" v-if="checkIfEmptyString(userData.email) !== undefined">
+      <b-navbar-nav class="ml-auto" v-if="userData.email !== undefined || ''">
         <!-- <b-nav-form>
           <b-form-input size="sm" class="mr-sm-2" placeholder="Search"></b-form-input>
           <b-button size="sm" class="my-2 my-sm-0" type="submit">Search</b-button>
@@ -67,38 +67,16 @@ export default Vue.extend({
       userClass: Object()
     };
   },
-  created() {
-    this.userClass = store.getters.getUserClass;
-    store.dispatch("login");
-    // store.commit("updateUserFunds");
-  },
   // Todo: Find a way to use mapState, can't right now because have to go through userModule
   computed: {
     loggedIn() {
       return store.state.userModule.loggedIn;
     },
     userData() {
-      // console.log("User data", store.state.userModule.userClass.email);
-      // return store.state.userModule.userClass;
-      console.log("userData", store.getters.getUserClass);
       return store.getters.getUserClass;
     }
   },
-  watch: {
-    loggedIn() {
-      // console.log("New Value", newValue, "Old Value", oldValue);
-    },
-    fundsUpdate() {
-      this.latestUserFunds = store.getters.getUserFunds.slice(-1)[0];
-    }
-  },
   methods: {
-    checkIfEmptyString(payload: string) {
-      if (payload !== "" || payload !== undefined) {
-        console.log("Payload: ", payload);
-        return payload;
-      }
-    },
     logOut() {
       store.dispatch("signOut");
     }

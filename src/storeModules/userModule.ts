@@ -1,10 +1,11 @@
 import Vue from 'vue'
 import { firebaseData } from "../firebase"
 import { ActionTree, GetterTree, MutationTree } from "vuex";
+import { any } from 'async';
 
 const state = {
     user: Object(),
-    userClass: Object(),
+    userClass: any,
 }
 
 const getters: GetterTree<any, any> = {

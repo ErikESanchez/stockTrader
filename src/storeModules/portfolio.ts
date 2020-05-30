@@ -57,18 +57,18 @@ const mutations: MutationTree<any> = {
   // updateStocksSell(state, data: newStockTransaction) {}
 };
 const actions: ActionTree<any, any> = {
-  buyStock({ commit, }, transactionData: newStockTransaction) {
-    if (getters.ownStock(transactionData.stockName)) {
-      transactionData.alreadyHaveStock = true;
-      commit("updateStocksBuy", transactionData);
-    } else {
-      commit("updateStocksBuy", transactionData);
-    }
-    commit(
-      "updateFunds",
-      transactionData.stockData.amount * transactionData.stockData.priceAtTransaction
-    );
-  },
+  // buyStock({ commit, }, transactionData: newStockTransaction) {
+  //   if (getters.ownStock(transactionData.stockName)) {
+  //     transactionData.alreadyHaveStock = true;
+  //     commit("updateStocksBuy", transactionData);
+  //   } else {
+  //     commit("updateStocksBuy", transactionData);
+  //   }
+  //   commit(
+  //     "updateFunds",
+  //     transactionData.stockData.amount * transactionData.stockData.priceAtTransaction
+  //   );
+  // },
   // sellStock({ commit, getters }, transactionData: newStockTransaction) {}
 };
 

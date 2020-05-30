@@ -1,9 +1,9 @@
 <template>
   <div>
     <!-- APIData('GOOGL'); APIData('MSFT'); APIData('AMZN') -->
-    <!-- <b-button
-      @click="APIData('AAPL'); APIData('GOOGL'); APIData('MSFT'); APIData('AMZN'); APIData('FB'); APIData('INTC'); APIData('TSLA'); APIData('NVDA'); APIData('AMD') "
-    >Get API Data</b-button>-->
+    <b-button
+      @click="APIData('AAPL'); APIData('GOOGL'); APIData('MSFT'); APIData('AMZN'); APIData('FB'); APIData('INTC');"
+    >Get API Data</b-button>
     <b-card-group deck v-if="dataReady">
       <stock-card v-for="(stock, key) in stockData" :key="key" :stock="stockData" :keyProp="key"></stock-card>
     </b-card-group>
@@ -13,8 +13,11 @@
 <script lang="ts">
 import Vue from "vue";
 import StockCard from "../components/StockCard.vue";
+import { Market } from "@/Classes/Market";
 // import * as moment from "moment";
 import store from "@/store";
+import moment from "moment";
+import { any } from "async";
 
 export default Vue.extend({
   name: "stocksView",
@@ -24,10 +27,12 @@ export default Vue.extend({
       dataReady: false,
       moreStockData: Array(),
       stock: null,
-      stockNameList: Array()
+      stockNameList: Array(),
+      randomClass: any
     };
   },
   async mounted() {
+    console.log("Moment Date", moment().format("YYYY-MM"));
     this.getDatabaseData();
     this.dataReady = true;
   },

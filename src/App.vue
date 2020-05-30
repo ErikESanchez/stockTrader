@@ -27,7 +27,6 @@ export default Vue.extend({
     };
   },
   async created() {
-    console.log("store", store.getters.getUserClass);
     await firebaseData.auth().onAuthStateChanged(async user => {
       if (user) {
         store.commit("setUserClass", user);

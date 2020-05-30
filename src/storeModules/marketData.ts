@@ -1,9 +1,11 @@
 import { ActionTree } from "vuex";
 import { GetterTree } from "vuex";
 import { MutationTree } from "vuex";
-import { apikey } from "@/apikey";
-import { db } from "../firebase";
+import apikey from "../apikey"
+import { db } from "../firebase"
 import moment from "moment";
+import axios from "axios"
+import { any } from 'async';
 // import { database } from "firebase";
 // import { Stock } from "@/Classes/Stock";
 const marketDataUrl = "https://www.alphavantage.co/query";
@@ -11,39 +13,49 @@ const marketDataUrl = "https://www.alphavantage.co/query";
 const state = {
   testStockData: [],
   stocks: Array(),
+  formatedStocks: []
 };
 
 const getters: GetterTree<any, any> = {
-  getStocks: (state) => {
+  getStocks: state => {
     return state.formatedStocks;
   },
-  getTestData: (state) => {
+  getTestData: state => {
     return state.testStockData;
   },
 };
 
 const mutations: MutationTree<any> = {
   addDataToStock(state, newStock) {
-    state.stocks.push(newStock);
+    state.stocks.push(newStock)
   },
-  formatMonthData(state, monthPayload) {
-    let newMonthObject: Object = {};
-    const currentMonthDates = new Array(moment("2020-04-01", "YYYY-MM-DD").daysInMonth())
-      .fill(null)
-      .map((x, i) =>
-        moment("2020-04-01", "YYYY-MM-DD")
-          .startOf("month")
-          .add(i, "days")
-      );
-    currentMonthDates.forEach((data, index) => {
-      index;
-      let orderedDates = data.format("YYYY-MM-DD");
-      if (monthPayload.priceData[orderedDates] !== undefined) {
-        newMonthObject[orderedDates] = monthPayload.priceData[orderedDates];
+  formatDatabaseData(state, stockPayload: any) {
+    console.log("Stock Payload", stockPayload)
+    // Todo: Need to make a promise to wait for stockPayload to render!
+    let date: Object = moment().subtract(1, "day");
+    let formatedDate: string = moment(date).format("YYYY-MM-DD");
+    // ? The functions runs fine once, but runs another four times for some reason?
+    Object.keys(stockPayload).forEach((symbol) => {
+      console.log("symbol", symbol)
+      // Todo: Make interfaces for all the Objects 
+      let metaData = stockPayload[symbol]["metaData"];
+      console.log("TImerSERiers", stockPayload["AAPL"]['timeSeriesData'])
+      // console.log("priceData", stockPayload[symbol]["timeSeriesData"][formatedDate])
+      let priceData = stockPayload[symbol]["timeSeriesData"][formatedDate];
+
+      let formatedLocalData: stockDataFormat = {
+        stockData: {
+          name: symbol,
+          open: Number(priceData["1. open"]),
+          high: Number(priceData["2. high"]),
+          low: Number(priceData["3. low"]),
+          close: Number(priceData["4. close"]),
+          volume: Number(priceData["5. volume"]),
+          lastRefreshed: metaData["3. Last Refreshed"]
+        }
       }
-    });
-    console.log(newMonthObject);
-    state.testStockData.push(newMonthObject);
+      state.formatedStocks.push(formatedLocalData);
+    })
   },
 };
 
@@ -53,114 +65,119 @@ export const actions: ActionTree<any, any> = {
       function: "TIME_SERIES_DAILY",
       symbol: stock,
       interval: "30min",
-      apikey: apikey,
-      outputsize: "compact",
+      apikey: apikey.state.apikey,
+      outputsize: "compact"
     };
-    await dispatch("getStockQuote", payloadFormat).then((res) => {
-      let metaData: string = res.data["Meta Data"];
-      let priceData: Object = res.data["Time Series (Daily)"];
+    await dispatch("getStockQuote", payloadFormat).then(res => {
+      let metaData: { [key: string]: string } = res.data["Meta Data"];
+      let priceData: Object = res.data["Time Series (Daily)"]
       let symbol: string = metaData["2. Symbol"];
-      db.collection("stocks")
-        .doc(symbol)
-        .set({
-          metaData,
-        })
-        .then(function() {
-          console.log("Document is under ID: ", symbol);
-        })
-        .catch(function(error) {
-          console.error("Error adding document", error);
-        });
+      db.collection("stocks").doc(symbol).set({
+        metaData,
+      }).then(function () {
+        console.log("Document is under ID: ", symbol);
+      }).catch(function (error) {
+        console.error("Error adding document", error);
+      });
       // ! Find a way to make this run the amount of months there are, can't use modulo or maybe who knows, find something
-      for (let i = 1; i < 5; i++) {
-        let dateOfMonth: Object = moment().subtract(i, "month");
-        let formatedDateOfMonth: string = moment(dateOfMonth).format("YYYY-MM");
-        let monthObject: Object = {};
-        Object.keys(priceData).filter(function(str) {
-          // * This returns the data of a month formated
-          if (str.includes(formatedDateOfMonth) === true) {
-            monthObject[str] = priceData[str];
-          }
-        });
-        db.collection("stocks")
-          .doc(symbol)
-          .collection("Time Series")
-          .doc(formatedDateOfMonth)
-          .set({
-            priceData: monthObject,
-          })
-          .then(function() {
-            console.log("Subdocument is under ID: ", formatedDateOfMonth);
-          })
-          .catch(function(error) {
-            console.error(`Error adding subdocument`, error);
-          });
+      // let dateOfMonth: Object = moment().subtract(i, "month");
+      let formatedDateOfMonth: string = moment(moment()).format("YYYY-MM");
+      let monthObject: Object = {}
+      Object.keys(priceData).filter(function (str) {
+        // * This returns the data of a month formated
+        if (str.includes(formatedDateOfMonth) === true) {
+          console.log("str", str);
+          monthObject[str] = priceData[str];
+        }
+      });
+      db.collection("stocks").doc(symbol).collection("Time Series").doc(formatedDateOfMonth).set({
+        priceData: monthObject
+      }).then(function () {
+        console.log("Subdocument is under ID: ", formatedDateOfMonth)
+      }).catch(function (error) {
+        console.error(`Error adding subdocument`, error)
+      });
+    });
+  },
+  async getStockQuote({ commit }, payload: TIME_SERIES_DAILY) {
+    return await axios.get(marketDataUrl, {
+      params: {
+        function: payload.function,
+        symbol: payload.symbol,
+        interval: payload.interval,
+        apikey: payload.apikey,
+        outputsize: payload.outputsize
       }
     });
   },
-
   async getDatabaseStockData({ commit }) {
-    let stockData: Object = {};
-    let dateOfMonth: Object = moment().subtract(1, "month");
-    let formatedDateOfMonth: string = moment(dateOfMonth).format("YYYY-MM");
-    db.collection("stocks")
-      .get()
-      .then(function(querySnapshot) {
-        querySnapshot.forEach(function(doc) {
-          stockData[doc.id] = {
-            metaData: doc.data().metaData,
-          };
-        });
-      })
-      .catch(function(error) {
-        console.error("Error getting documents", error);
-      });
-    setTimeout(() => {
-      Object.keys(stockData).forEach((symbol: string, index: Number) => {
-        console.log(symbol, index);
-        db.collection("stocks")
-          .doc(symbol)
-          .collection("Time Series")
-          .doc(formatedDateOfMonth)
-          .get()
-          .then(function(doc) {
-            if (doc.exists && stockData[symbol]["timeSeriesData"] === undefined) {
-              stockData[symbol]["timeSeriesData"] = doc.data()["priceData"];
-              // ? M ight not be the best place to put this
-            } else {
-              console.log("Document doesn't exist");
-            }
-          })
-          .catch(function(error) {
-            console.error("Error getting document:", error);
-          });
-      });
-      commit("formatDatabaseData", stockData);
-    }, 1000);
-  },
-
-  async getMonthData({ commit }, symbol: string) {
-    await db
-      .collection("stocks")
-      .doc(symbol)
-      .collection("Time Series")
-      .doc("2020-04")
-      .get()
-      .then((res) => {
-        if (res) {
-          console.log(res.id, "=>", res.data());
-          commit("formatMonthData", res.data());
+    // TODO: Figure out how to use an interface and to be able dynamically name a variable
+    let stockData: stockData = Object();
+    // let dateOfMonth: Object = moment().subtract(1, "month");
+    let formatedDateOfMonth: string = moment(moment()).format("YYYY-MM");
+    // * Bruh, this is all I had to do, to wait
+    await Promise.resolve(db.collection("stocks").get().then(function (querySnapshot) {
+      querySnapshot.forEach((doc: doc) => {
+        // console.log(doc.id, "=>", doc.data());
+        stockData[doc.id] = {
+          metaData: doc.data().metaData,
         }
+        return stockData
       })
-      .catch(function(error) {
-        console.error(error);
+    }).catch(function (error) {
+      console.error("Error getting documents", error)
+    }))
+    console.log("StockData test", stockData)
+    await Promise.resolve(Object.keys(stockData).forEach((symbol: string, index: Number) => {
+      console.log("Symbol", symbol, index)
+      db.collection("stocks").doc(symbol).collection('Time Series').doc(formatedDateOfMonth).get().then(function (doc) {
+        if (doc.exists && stockData[symbol]['timeSeriesData'] === undefined) {
+          // console.log("Document data: ", doc.data())
+          stockData[symbol]["timeSeriesData"] = doc.data()["priceData"];
+          // ? M ight not be the best place to put this
+        } else {
+          console.log("Document doesn't exist");
+        }
+      }).catch(function (error) {
+        console.error("Error getting document:", error);
       });
+    }))
+    console.log("stockData", typeof stockData)
   },
 };
+
+interface doc {
+  [id: string]: any
+}
+interface stockData {
+  // I don't know why this works
+  [metaData: string]: any
+  timeSeriesData: Object
+}
+
+export interface TIME_SERIES_DAILY {
+  function: "TIME_SERIES_DAILY";
+  symbol: string;
+  interval: string;
+  apikey: string;
+  outputsize?: string;
+}
+
+interface stockDataFormat {
+  stockData: {
+    name: string;
+    open: number;
+    high: number;
+    low: number;
+    close: number;
+    volume: number;
+    lastRefreshed: string;
+  };
+}
 
 export default {
   actions,
   mutations,
   getters,
-  state,
+  state
 };

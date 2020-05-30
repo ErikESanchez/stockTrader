@@ -1,4 +1,5 @@
 import { Stock } from "./Stock";
+import moment from "moment"
 export class Market {
   allStocks: Array<Stock>;
   totalStockWorth: number;
@@ -9,6 +10,9 @@ export class Market {
     this.totalStockWorth = 0;
     this.marketOpen = false;
   }
+
+
+
 
   public getTotalWorthOfMarket(): number {
     let total: number = 0;
