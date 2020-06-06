@@ -13,6 +13,7 @@ import Navbar from "./components/Navbar.vue";
 import { Portfolio } from "@/Classes/Portfolio";
 import { firebaseData } from "@/firebase";
 import store from "@/store";
+import moment from "moment";
 import { any } from "async";
 
 export default Vue.extend({
@@ -26,6 +27,7 @@ export default Vue.extend({
       dataLoaded: false
     };
   },
+  methods: {},
   async created() {
     await firebaseData.auth().onAuthStateChanged(async user => {
       if (user) {
@@ -48,4 +50,5 @@ export default Vue.extend({
  <style lang="scss">
 @import "~bootstrap/scss/bootstrap";
 </style>
+
 

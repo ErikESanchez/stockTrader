@@ -1,11 +1,10 @@
-import { ActionTree } from "vuex";
-import { GetterTree } from "vuex";
-import { MutationTree } from "vuex";
+import Vue from "vue"
+import { ActionTree, GetterTree, MutationTree } from "vuex";
 import apikey from "../apikey"
 import { db } from "../firebase"
 import moment from "moment";
 import axios from "axios"
-import { any } from 'async';
+// import { any } from 'async';
 // import { database } from "firebase";
 // import { Stock } from "@/Classes/Stock";
 const marketDataUrl = "https://www.alphavantage.co/query";
@@ -13,7 +12,8 @@ const marketDataUrl = "https://www.alphavantage.co/query";
 const state = {
   monthStockData: [],
   stocks: Array(),
-  formatedStocks: []
+  formatedStocks: [],
+  lastRefreshed: String(),
 };
 
 const getters: GetterTree<any, any> = {
@@ -23,6 +23,10 @@ const getters: GetterTree<any, any> = {
   getMonthData: state => {
     return state.monthStockData;
   },
+  getLastRefreshed: state => {
+    console.log(state.lastRefreshed)
+    return state.lastRefreshed
+  }
 };
 
 const mutations: MutationTree<any> = {
@@ -43,15 +47,31 @@ const mutations: MutationTree<any> = {
     state.monthStockData.push(newMonthObject)
   },
   formatDatabaseData(state, stockPayload: any) {
-    // console.log("Stock Payload", stockPayload)
-    // Todo: Need to make a promise to wait for stockPayload to render!
-    let date: Object = moment().subtract(1, "day");
-    let formatedDate: string = moment(date).format("YYYY-MM-DD");
+    // let date: Object = moment().subtract(6, "day");
+    let formatedDate: string;
+    let dayOfWeek: Object = moment().weekday();
+    if (dayOfWeek === 6) {
+      console.log("Saturday")
+      let yesterday: Object = moment().subtract(1, "day")
+      formatedDate = moment(yesterday).format("YYYY-MM-DD")
+    } else if (dayOfWeek === 0) {
+      console.log("Sunday")
+      let twoDaysAgo: Object = moment().subtract(1, "day");
+      formatedDate = moment(twoDaysAgo).format("YYYY-MM-DD")
+    }
     // ? The functions runs fine once, but runs another four times for some reason?
     Object.keys(stockPayload).forEach((symbol) => {
       // Todo: Make interfaces for all the Objects 
+      // ? Write an if statement to make sure that the data 
+      console.log(stockPayload[symbol].timeSeriesData)
+      if (state.isWeekend) {
+        console.log("Bruh need new dates")
+      } else {
+        console.log("bruh, figure this out")
+      }
       let metaData = stockPayload[symbol]["metaData"];
       let priceData = stockPayload[symbol]["timeSeriesData"][formatedDate];
+      console.log("Price Data", priceData)
       let formatedLocalData: stockDataFormat = {
         stockData: {
           name: symbol,
@@ -93,7 +113,7 @@ export const actions: ActionTree<any, any> = {
     };
     await dispatch("getStockQuote", payloadFormat).then(res => {
       let metaData: { [key: string]: string } = res.data["Meta Data"];
-      let priceData: any = res.data["Time Series (Daily)"]
+      let priceData: any = res.data["Time Series (Daily)"];
       let symbol: string = metaData["2. Symbol"];
       db.collection("stocks").doc(symbol).set({
         metaData,
@@ -137,7 +157,7 @@ export const actions: ActionTree<any, any> = {
   async getDatabaseStockData({ commit }) {
     // TODO: Figure out how to use an interface and to be able dynamically name a variable
     let stockData: stockData = Object();
-    // let dateOfMonth: Object = moment().subtract(1, "month");
+    let dateOfMonth: Object = moment().subtract(1, "month");
     let formatedDateOfMonth: string = moment(moment()).format("YYYY-MM");
     // * Bruh, this is all I had to do, to wait
     await Promise.resolve(db.collection("stocks").get().then(function (querySnapshot) {
@@ -151,16 +171,14 @@ export const actions: ActionTree<any, any> = {
     }).catch(function (error) {
       console.error("Error getting documents", error)
     }))
-    console.log("StockData test", stockData)
     await Promise.resolve(Object.keys(stockData).forEach((symbol: string, key: number, arr: any) => {
       // console.log("Symbol", symbol, key)
       return db.collection("stocks").doc(symbol).collection('Time Series').doc(formatedDateOfMonth).get().then(function (doc) {
         if (doc.exists && stockData[symbol]['timeSeriesData'] === undefined) {
-          // console.log("Document data: ", doc.data())
           stockData[symbol]["timeSeriesData"] = doc.data()["priceData"];
           if (Object.is(arr.length - 1, key)) {
             console.log(`Last callback call at ${key} with value ${symbol}`);
-            commit('formatDatabaseData', stockData)
+            commit('formatDatabaseData', stockData);
           }
           // ? M ight not be the best place to put this
         } else {
