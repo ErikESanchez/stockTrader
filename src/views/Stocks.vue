@@ -26,13 +26,10 @@ export default Vue.extend({
       dataReady: false,
       moreStockData: Array(),
       stock: null,
-      stockNameList: Array(),
-      randomClass: any
+      stockNameList: Array()
     };
   },
   async mounted() {
-    console.log("New York", moment().format("HH: mm: ss"));
-    this.checkForData();
     if (this.checkForData() === false) {
       console.log("Called API");
       let stockList: Array<string> = [
@@ -44,14 +41,13 @@ export default Vue.extend({
         "INTC"
       ];
       await stockList.forEach(async (symbol: string) => {
-        this.$store.dispatch("getApiData", symbol);
+        this.$store.dispatch("getApiDaily", symbol);
       });
-      this.getDatabaseData();
+      this.getDatabaseDailyData();
     } else {
       console.log("Didn't call the API");
-      this.getDatabaseData();
+      this.getDatabaseDailyData();
     }
-    console.log("Moment Date", moment().format("YYYY-MM"));
     this.dataReady = true;
   },
   watch: {
@@ -75,11 +71,11 @@ export default Vue.extend({
       let isWeekend: boolean = dayOfWeek === 6 || dayOfWeek === 0;
       let timeInHours: string = moment().format("HH: mm: ss");
       console.log(moment().format("HH: mm: ss"));
+      // ! Make this check for data in db as well
       if (isWeekend === true) {
         console.log(
-          "Bruh, the market ain't open. Wall Street doing bad things right now."
+          "Bruh, the market ain't open. Wall Street doing the dirty right now."
         );
-        console.log(store.state.marketData.isWeekend);
         return true;
         // ! Make this account for holidays, no clue how I'm going to do it but I have to
       } else if (isWeekend === false || moment().isSameOrAfter(timeInHours)) {
@@ -88,10 +84,10 @@ export default Vue.extend({
       }
     },
     async APIData(stock: any) {
-      this.$store.dispatch("getApiData", stock);
+      this.$store.dispatch("getApiDaily", stock);
     },
-    async getDatabaseData() {
-      await store.dispatch("getDatabaseStockData");
+    async getDatabaseDailyData() {
+      await store.dispatch("getDatabaseDailyData");
     }
   },
   components: {

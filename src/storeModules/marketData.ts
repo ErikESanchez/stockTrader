@@ -4,6 +4,7 @@ import apikey from "../apikey"
 import { db } from "../firebase"
 import moment from "moment";
 import axios from "axios"
+import { reduce } from 'async';
 // import { any } from 'async';
 // import { database } from "firebase";
 // import { Stock } from "@/Classes/Stock";
@@ -56,22 +57,15 @@ const mutations: MutationTree<any> = {
       formatedDate = moment(yesterday).format("YYYY-MM-DD")
     } else if (dayOfWeek === 0) {
       console.log("Sunday")
-      let twoDaysAgo: Object = moment().subtract(1, "day");
+      let twoDaysAgo: Object = moment().subtract(2, "day");
       formatedDate = moment(twoDaysAgo).format("YYYY-MM-DD")
     }
     // ? The functions runs fine once, but runs another four times for some reason?
     Object.keys(stockPayload).forEach((symbol) => {
       // Todo: Make interfaces for all the Objects 
       // ? Write an if statement to make sure that the data 
-      console.log(stockPayload[symbol].timeSeriesData)
-      if (state.isWeekend) {
-        console.log("Bruh need new dates")
-      } else {
-        console.log("bruh, figure this out")
-      }
-      let metaData = stockPayload[symbol]["metaData"];
+      let metaData = stockPayload[symbol]["metaData(Daily)"];
       let priceData = stockPayload[symbol]["timeSeriesData"][formatedDate];
-      console.log("Price Data", priceData)
       let formatedLocalData: stockDataFormat = {
         stockData: {
           name: symbol,
@@ -91,7 +85,7 @@ const mutations: MutationTree<any> = {
 export const actions: ActionTree<any, any> = {
   async getMonthData({ commit }, symbol: string) {
     let isDone: Boolean = false
-    await db.collection('stocks').doc(symbol).collection('Time Series').doc("2020-04").get().then(res => {
+    await db.collection('stocks').doc(symbol).collection('Time Series(Daily)').doc("2020-04").get().then(res => {
       if (res) {
         // snapshot.docs.map(doc => doc.data())
         // console.log(res.id, "=>", res.data());
@@ -103,47 +97,61 @@ export const actions: ActionTree<any, any> = {
     });
     return isDone
   },
-  async getApiData({ dispatch }, stock) {
-    let payloadFormat: TIME_SERIES_DAILY = {
+  async getApiIntraday({ dispatch }, stock) {
+    let payloadFormat: TIME_SERIES = {
+      function: 'TIME_SERIES_INTRADAY',
+      symbol: stock,
+      interval: "1min",
+      apikey: apikey.state.apikey,
+      // outputsize: full || compact
+    };
+    await dispatch("getStockQuote", payloadFormat).then(IntradayData => {
+      console.log("Intraday Response", IntradayData)
+      let metaData: any = IntradayData.data["Meta Data"]
+      let priceData: any = IntradayData.data["Time Series (1min)"]
+      let symbol: string = metaData["2. Symbol"]
+      // Send this to the database
+      db.collection("stocks").doc(symbol).set({
+        "metaData(Intraday)": metaData
+      })
+    })
+  },
+  async getApiDaily({ dispatch }, stock) {
+    let payloadFormat: TIME_SERIES = {
       function: "TIME_SERIES_DAILY",
       symbol: stock,
       interval: "30min",
       apikey: apikey.state.apikey,
       outputsize: "compact"
     };
-    await dispatch("getStockQuote", payloadFormat).then(res => {
-      let metaData: { [key: string]: string } = res.data["Meta Data"];
-      let priceData: any = res.data["Time Series (Daily)"];
+    await dispatch("getStockQuote", payloadFormat).then(DailyData => {
+      let metaData: { [key: string]: string } = DailyData.data["Meta Data"];
+      let priceData: any = DailyData.data["Time Series (Daily)"];
       let symbol: string = metaData["2. Symbol"];
       db.collection("stocks").doc(symbol).set({
-        metaData,
+        "metaData(Daily)": metaData,
       }).then(function () {
         console.log("Document is under ID: ", symbol);
       }).catch(function (error) {
         console.error("Error adding document", error);
       });
-      // ! Find a way to make this run the amount of months there are, can't use modulo or maybe who knows, find something
-      // let dateOfMonth: Object = moment().subtract(i, "month");
-      let formatedDateOfMonth: string = moment(moment()).format("YYYY-MM");
+      // Todo: Make an interface for the object
       let monthObject: any = {}
+      // ! Need to make this set files in the database by month
       Object.keys(priceData).filter(function (str) {
-        // * This returns the data of a month formated
-        if (str.includes(formatedDateOfMonth) === true) {
-          console.log("str", str);
+        let monthDate: string = moment(str).format("YYYY-MM");
+        if (monthDate) {
           monthObject[str] = priceData[str];
-          console.log("monthObject", monthObject)
+          db.collection("stocks").doc(symbol).collection("Time Series(Daily)").doc(monthDate).set({
+            priceData: monthObject
+          }).catch((error) => {
+            console.error(`Error adding subdocument`, error)
+          });
         }
-      });
-      db.collection("stocks").doc(symbol).collection("Time Series").doc(formatedDateOfMonth).set({
-        priceData: monthObject
-      }).then(function () {
-        console.log("Subdocument is under ID: ", formatedDateOfMonth)
-      }).catch(function (error) {
-        console.error(`Error adding subdocument`, error)
       });
     });
   },
-  async getStockQuote({ commit }, payload: TIME_SERIES_DAILY) {
+  async getStockQuote({ commit }, payload: TIME_SERIES) {
     return await axios.get(marketDataUrl, {
       params: {
         function: payload.function,
@@ -154,7 +162,7 @@ export const actions: ActionTree<any, any> = {
       }
     });
   },
-  async getDatabaseStockData({ commit }) {
+  async getDatabaseDailyData({ commit }) {
     // TODO: Figure out how to use an interface and to be able dynamically name a variable
     let stockData: stockData = Object();
     let dateOfMonth: Object = moment().subtract(1, "month");
@@ -164,7 +172,7 @@ export const actions: ActionTree<any, any> = {
       querySnapshot.forEach((doc: doc) => {
         // console.log(doc.id, "=>", doc.data());
         stockData[doc.id] = {
-          metaData: doc.data().metaData,
+          "metaData(Daily)": doc.data()['metaData(Daily)'],
         }
         return stockData
       })
@@ -173,7 +181,7 @@ export const actions: ActionTree<any, any> = {
     }))
     await Promise.resolve(Object.keys(stockData).forEach((symbol: string, key: number, arr: any) => {
       // console.log("Symbol", symbol, key)
-      return db.collection("stocks").doc(symbol).collection('Time Series').doc(formatedDateOfMonth).get().then(function (doc) {
+      return db.collection("stocks").doc(symbol).collection('Time Series(Daily)').doc(formatedDateOfMonth).get().then(function (doc) {
         if (doc.exists && stockData[symbol]['timeSeriesData'] === undefined) {
           stockData[symbol]["timeSeriesData"] = doc.data()["priceData"];
           if (Object.is(arr.length - 1, key)) {
@@ -205,8 +213,9 @@ interface stockData {
   timeSeriesData: Object
 }
 
-export interface TIME_SERIES_DAILY {
-  function: "TIME_SERIES_DAILY";
+
+export interface TIME_SERIES {
+  function: string;
   symbol: string;
   interval: string;
   apikey: string;

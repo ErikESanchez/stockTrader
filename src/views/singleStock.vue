@@ -29,27 +29,7 @@ export default Vue.extend({
       })
     };
   },
-  methods: {
-    // renderStockChartData(chartData: Object) {
-    //   let dataCollection = {
-    //     labels: [],
-    //     datasets: [
-    //       {
-    //         // * Make the stock symbols dynamic
-    //         label: router.history.current.params.stockName,
-    //         data: [],
-    //         backgroundColor: ["rgb(255, 99, 132)"]
-    //       }
-    //     ]
-    //   };
-    //   Object.keys(chartData).forEach((stockDate: string) => {
-    //     dataCollection.datasets[0].data.push(chartData[stockDate]["4. close"]);
-    //     dataCollection.labels.push(stockDate);
-    //   });
-    //   console.log(dataCollection);
-    //   this.stockChartData = dataCollection;
-    // }
-  },
+  methods: {},
   computed: {
     stockData() {
       console.log(store.getters.getStocks);
@@ -64,6 +44,7 @@ export default Vue.extend({
     }
   },
   async mounted() {
+    store.dispatch("getApiIntraday", "AAPL");
     let chart: Chart = new Chart();
     let symbol: string = this.$router.currentRoute.params.stockName;
     Promise.resolve(
