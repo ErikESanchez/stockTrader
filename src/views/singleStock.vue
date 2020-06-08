@@ -12,9 +12,8 @@
 <script lang="ts">
 import Vue from "vue";
 import LineChart from "../components/LineChart.vue";
-import { any } from "async";
 import store from "@/store";
-import { Chart } from "@/Classes/Chart";
+import { Chart, chartData } from "@/Classes/Chart";
 export default Vue.extend({
   name: "singleStock",
   components: {
@@ -44,7 +43,7 @@ export default Vue.extend({
     }
   },
   async mounted() {
-    store.dispatch("getApiIntraday", "AAPL");
+    // store.dispatch("getApiIntraday", "AAPL");
     let chart: Chart = new Chart();
     let symbol: string = this.$router.currentRoute.params.stockName;
     Promise.resolve(

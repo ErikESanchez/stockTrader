@@ -13,10 +13,8 @@
 import Vue from "vue";
 import StockCard from "../components/StockCard.vue";
 import { Market } from "@/Classes/Market";
-// import * as moment from "moment";
 import store from "@/store";
 import moment from "moment";
-import { any } from "async";
 
 export default Vue.extend({
   name: "stocksView",

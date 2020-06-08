@@ -95,7 +95,7 @@ export const actions: ActionTree<any, any> = {
         // snapshot.docs.map(doc => doc.data())
         // console.log(res.id, "=>", res.data());
         commit('formatMonthData', res.data());
-        return isDone = true
+        isDone = true
       }
     }).catch(function (error) {
       console.error(error)

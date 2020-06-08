@@ -26,7 +26,7 @@ export class Chart {
     }
 }
 
-interface chartData {
+export interface chartData {
     labels: Array<any>;
     datasets: Array<any>;
 }

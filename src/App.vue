@@ -14,7 +14,6 @@ import { Portfolio } from "@/Classes/Portfolio";
 import { firebaseData } from "@/firebase";
 import store from "@/store";
 import moment from "moment";
-import { any } from "async";
 
 export default Vue.extend({
   name: "App",
