@@ -40,9 +40,9 @@ export default Vue.extend({
     };
   },
   methods: {
-    sellStock(stock, amount?) {
-      console.log(stock);
-    }
+    // sellStock(stock, amount?) {
+    //   console.log(stock);
+    // }
   },
   mounted() {
     console.log(this.stock);
