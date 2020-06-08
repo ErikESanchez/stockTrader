@@ -76,11 +76,11 @@ export default Vue.extend({
         console.log(
           "Bruh, the market ain't open. Wall Street doing the dirty right now."
         );
-        return true;
+        return false;
         // ! Make this account for holidays, no clue how I'm going to do it but I have to
       } else if (isWeekend === false || moment().isSameOrAfter(timeInHours)) {
         console.log("Bruh, you need new data.");
-        return false;
+        return true;
       }
     },
     async APIData(stock: any) {

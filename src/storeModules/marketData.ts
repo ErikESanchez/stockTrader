@@ -59,11 +59,16 @@ const mutations: MutationTree<any> = {
       console.log("Sunday")
       let twoDaysAgo: Object = moment().subtract(2, "day");
       formatedDate = moment(twoDaysAgo).format("YYYY-MM-DD")
+    } else {
+      formatedDate = moment().format("YYYY-MM-DD")
     }
     // ? The functions runs fine once, but runs another four times for some reason?
     Object.keys(stockPayload).forEach((symbol) => {
       // Todo: Make interfaces for all the Objects 
-      // ? Write an if statement to make sure that the data 
+      let dates: Array<string> = Object.getOwnPropertyNames(stockPayload[symbol]["timeSeriesData"])
+      let formatedDate: string = dates.reduce((a: string, b: string) => {
+        return new Date(a) > new Date(b) ? a : b;
+      })
       let metaData = stockPayload[symbol]["metaData(Daily)"];
       let priceData = stockPayload[symbol]["timeSeriesData"][formatedDate];
       let formatedLocalData: stockDataFormat = {
@@ -103,16 +108,34 @@ export const actions: ActionTree<any, any> = {
       symbol: stock,
       interval: "1min",
       apikey: apikey.state.apikey,
-      // outputsize: full || compact
+      outputsize: "full"
     };
     await dispatch("getStockQuote", payloadFormat).then(IntradayData => {
       console.log("Intraday Response", IntradayData)
       let metaData: any = IntradayData.data["Meta Data"]
       let priceData: any = IntradayData.data["Time Series (1min)"]
+      console.log(priceData)
       let symbol: string = metaData["2. Symbol"]
       // Send this to the database
-      db.collection("stocks").doc(symbol).set({
-        "metaData(Intraday)": metaData
+      // db.collection("stocks").doc(symbol).update({
+      //   "metaData(Intraday)": metaData
+      // }).catch(err => {
+      //   console.error("Error adding document", err)
+      // })
+      let hourObject: any = {}
+      Object.keys(priceData).filter((time: string) => {
+        let formatedHour: string = moment(time).format("HH")
+        if (formatedHour) {
+          let formatedTime: string = moment(time).format("HH:mm:ss")
+          hourObject[time] = priceData[time]
+          db.collection("stocks").doc(symbol).collection("Time Series(Intraday)").doc(formatedHour).set({
+            priceData: hourObject
+          }).catch(error => {
+            console.error(error);
+          })
+          console.log(formatedHour, formatedTime)
+        }
+        // Todo: store the minute time, by hour for easy access
       })
     })
   },
@@ -130,18 +153,16 @@ export const actions: ActionTree<any, any> = {
       let symbol: string = metaData["2. Symbol"];
       db.collection("stocks").doc(symbol).set({
         "metaData(Daily)": metaData,
-      }).then(function () {
-        console.log("Document is under ID: ", symbol);
       }).catch(function (error) {
         console.error("Error adding document", error);
       });
       // Todo: Make an interface for the object
       let monthObject: any = {}
       // ! Need to make this set files in the database by month
-      Object.keys(priceData).filter(function (str) {
-        let monthDate: string = moment(str).format("YYYY-MM");
+      Object.keys(priceData).filter((date) => {
+        let monthDate: string = moment(date).format("YYYY-MM");
         if (monthDate) {
-          monthObject[str] = priceData[str];
+          monthObject[date] = priceData[date];
           db.collection("stocks").doc(symbol).collection("Time Series(Daily)").doc(monthDate).set({
             priceData: monthObject
           }).catch((error) => {
@@ -180,15 +201,14 @@ export const actions: ActionTree<any, any> = {
       console.error("Error getting documents", error)
     }))
     await Promise.resolve(Object.keys(stockData).forEach((symbol: string, key: number, arr: any) => {
-      // console.log("Symbol", symbol, key)
-      return db.collection("stocks").doc(symbol).collection('Time Series(Daily)').doc(formatedDateOfMonth).get().then(function (doc) {
+      return db.collection("stocks").doc(symbol).collection('Time Series(Daily)').doc(formatedDateOfMonth).get().then(function (doc: doc) {
         if (doc.exists && stockData[symbol]['timeSeriesData'] === undefined) {
-          stockData[symbol]["timeSeriesData"] = doc.data()["priceData"];
+          stockData[symbol]["timeSeriesData"] = doc.data().priceData;
           if (Object.is(arr.length - 1, key)) {
             console.log(`Last callback call at ${key} with value ${symbol}`);
             commit('formatDatabaseData', stockData);
           }
-          // ? M ight not be the best place to put this
+          // ? Might not be the best place to put this
         } else {
           console.log("Document doesn't exist");
         }
@@ -204,6 +224,9 @@ interface doc {
   [id: string]: any
 }
 
+interface time {
+  [time: string]: number
+}
 interface monthData {
   [date: string]: any
 }
