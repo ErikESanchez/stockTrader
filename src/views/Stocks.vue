@@ -28,7 +28,8 @@ export default Vue.extend({
     };
   },
   async mounted() {
-    if (this.checkForData() === false) {
+    console.log(this.checkForData());
+    if (this.checkForData() !== false) {
       console.log("Called API");
       let stockList: Array<string> = [
         "AAPL",
@@ -74,12 +75,11 @@ export default Vue.extend({
         console.log(
           "Bruh, the market ain't open. Wall Street doing the dirty right now."
         );
-        return false;
         // ! Make this account for holidays, no clue how I'm going to do it but I have to
       } else if (isWeekend === false || moment().isSameOrAfter(timeInHours)) {
         console.log("Bruh, you need new data.");
-        return true;
       }
+      return isWeekend;
     },
     async APIData(stock: any) {
       this.$store.dispatch("getApiDaily", stock);
