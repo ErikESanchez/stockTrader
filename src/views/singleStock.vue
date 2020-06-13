@@ -17,7 +17,7 @@ import { Chart, chartData } from "@/Classes/Chart";
 export default Vue.extend({
   name: "singleStock",
   components: {
-    LineChart
+    LineChart,
   },
   data() {
     return {
@@ -25,8 +25,8 @@ export default Vue.extend({
       loaded: false,
       stockChartData: (): Object => ({
         labels: Array(),
-        datasets: Array()
-      })
+        datasets: Array(),
+      }),
     };
   },
   methods: {
@@ -73,7 +73,7 @@ export default Vue.extend({
         }
       );
       this.loaded = true;
-    }
+    },
   },
   computed: {
     stockData() {
@@ -83,14 +83,14 @@ export default Vue.extend({
       return {
         responsive: true,
         // Keep it false so it stays as a rectangle
-        maintainAspectRatio: false
+        maintainAspectRatio: false,
       };
-    }
+    },
   },
   async mounted() {
     // this.monthChart();
-    this.dayChart();
-  }
+    this.monthChart();
+  },
 });
 </script>
 <style lang="sass" scoped></style>
