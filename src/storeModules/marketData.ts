@@ -1,7 +1,7 @@
 import Vue from "vue";
 import { ActionTree, GetterTree, MutationTree } from "vuex";
 import { apikey } from "../apikey";
-import { db } from "../firebase";
+import { firebaseData } from "../firebase";
 import moment from "moment";
 import axios from "axios";
 import { any } from "async";
@@ -82,7 +82,8 @@ const mutations: MutationTree<any> = {
 export const actions: ActionTree<any, any> = {
   async getMonthData({ commit }, symbol: string) {
     let monthData: any;
-    await db
+    await firebase
+      .firestore()
       .collection("stocks")
       .doc(symbol)
       .collection("Time Series(Daily)")
@@ -151,7 +152,9 @@ export const actions: ActionTree<any, any> = {
       let priceData: any = DailyData.data["Time Series (Daily)"];
       console.log(metaData);
       let symbol: string = metaData["2. Symbol"];
-      db.collection("stocks")
+      firebaseData
+        .firestore()
+        .collection("stocks")
         .doc(symbol)
         .set({
           "metaData(Daily)": metaData,
@@ -166,7 +169,9 @@ export const actions: ActionTree<any, any> = {
         let monthDate: string = moment(date).format("YYYY-MM");
         if (monthDate) {
           monthObject[date] = priceData[date];
-          db.collection("stocks")
+          firebaseData
+            .firestore()
+            .collection("stocks")
             .doc(symbol)
             .collection("Time Series(Daily)")
             .doc(monthDate)
@@ -199,7 +204,8 @@ export const actions: ActionTree<any, any> = {
     let isDone: Boolean;
     // * Bruh, this is all I had to do, to wait
     await Promise.resolve(
-      db
+      firebaseData
+        .firestore()
         .collection("stocks")
         .get()
         .then(function(querySnapshot) {
@@ -218,7 +224,8 @@ export const actions: ActionTree<any, any> = {
     await Promise.resolve(
       Object.keys(stockData).forEach(
         (symbol: string, key: number, arr: any) => {
-          return db
+          return firebaseData
+            .firestore()
             .collection("stocks")
             .doc(symbol)
             .collection("Time Series(Daily)")
