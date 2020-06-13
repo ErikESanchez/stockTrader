@@ -14,6 +14,7 @@
       <b-row class="my-1">
         <b-col sm="3"></b-col>
         <b-col sm="9">
+          <!-- Todo: Don't let the amount go below 0, or more than the volume of stocks -->
           <b-form-input type="number" v-model="amountToBuy"></b-form-input>
         </b-col>
       </b-row>

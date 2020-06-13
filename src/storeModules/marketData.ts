@@ -4,6 +4,7 @@ import { apikey } from "../apikey";
 import { db } from "../firebase";
 import moment from "moment";
 import axios from "axios";
+import { any } from "async";
 const marketDataUrl = "https://www.alphavantage.co/query";
 
 const state = {
@@ -80,7 +81,7 @@ const mutations: MutationTree<any> = {
 
 export const actions: ActionTree<any, any> = {
   async getMonthData({ commit }, symbol: string) {
-    let isDone: Boolean = false;
+    let monthData: any;
     await db
       .collection("stocks")
       .doc(symbol)
@@ -90,13 +91,13 @@ export const actions: ActionTree<any, any> = {
       .then((res) => {
         if (res) {
           commit("formatMonthData", res.data());
-          isDone = true;
+          monthData = res;
         }
       })
       .catch(function(error) {
         console.error(error);
       });
-    return isDone;
+    return monthData;
   },
   async getApiIntraday({ dispatch }, stock) {
     let payloadFormat: TIME_SERIES = {
@@ -106,33 +107,36 @@ export const actions: ActionTree<any, any> = {
       apikey: apikey,
       outputsize: "full",
     };
+    let dayData: any;
     await dispatch("getStockQuote", payloadFormat).then((IntradayData) => {
-      console.log("Intraday Response", IntradayData);
-      let metaData: any = IntradayData.data["Meta Data"];
-      let priceData: any = IntradayData.data["Time Series (1min)"];
-      let symbol: string = metaData["2. Symbol"];
-      // Send this to the database
-      // db.collection("stocks").doc(symbol).update({
-      //   "metaData(Intraday)": metaData
-      // }).catch(err => {
-      //   console.error("Error adding document", err)
-      // })
-      let timesArr: Array<string> = Object.getOwnPropertyNames(priceData);
-      let latestDate: string = timesArr.reduce((a: string, b: string) => {
-        return new Date(a) > new Date(b) ? a : b;
-      });
-      let formatedDate: string = moment(latestDate).format("YYYY-MM-DD");
-      timesArr.forEach((res, key, arr) => {
-        if (formatedDate) {
-          console.log("Time");
-        }
-      });
-      //  db.collection("stocks").doc(symbol).collection("Time Series(Intraday)").doc(formatedHour).set({
-      //     priceData: hourObject
-      //   }).catch(error => {
-      //     console.error(error);
-      //   })
+      dayData = IntradayData;
+      //   console.log("Intraday Response", IntradayData);
+      //   let metaData: any = IntradayData.data["Meta Data"];
+      //   let priceData: any = IntradayData.data["Time Series (1min)"];
+      //   let symbol: string = metaData["2. Symbol"];
+      //   // Send this to the database
+      //   // db.collection("stocks").doc(symbol).update({
+      //   //   "metaData(Intraday)": metaData
+      //   // }).catch(err => {
+      //   //   console.error("Error adding document", err)
+      //   // })
+      //   let timesArr: Array<string> = Object.getOwnPropertyNames(priceData);
+      //   let latestDate: string = timesArr.reduce((a: string, b: string) => {
+      //     return new Date(a) > new Date(b) ? a : b;
+      //   });
+      //   let formatedDate: string = moment(latestDate).format("YYYY-MM-DD");
+      //   timesArr.forEach((res, key, arr) => {
+      //     if (formatedDate) {
+      //       console.log("Time");
+      //     }
+      //   });
+      //   //  db.collection("stocks").doc(symbol).collection("Time Series(Intraday)").doc(formatedHour).set({
+      //   //     priceData: hourObject
+      //   //   }).catch(error => {
+      //   //     console.error(error);
+      //   //   })
     });
+    return dayData;
   },
   async getApiDaily({ dispatch }, stock) {
     let payloadFormat: TIME_SERIES = {
@@ -145,6 +149,7 @@ export const actions: ActionTree<any, any> = {
     await dispatch("getStockQuote", payloadFormat).then((DailyData) => {
       let metaData: { [key: string]: string } = DailyData.data["Meta Data"];
       let priceData: any = DailyData.data["Time Series (Daily)"];
+      console.log(metaData);
       let symbol: string = metaData["2. Symbol"];
       db.collection("stocks")
         .doc(symbol)
@@ -191,6 +196,7 @@ export const actions: ActionTree<any, any> = {
     let stockData: stockData = Object();
     let dateOfMonth: Object = moment().subtract(1, "month");
     let formatedDateOfMonth: string = moment(moment()).format("YYYY-MM");
+    let isDone: Boolean;
     // * Bruh, this is all I had to do, to wait
     await Promise.resolve(
       db
@@ -234,7 +240,6 @@ export const actions: ActionTree<any, any> = {
               } else {
                 console.log("Document doesn't exist");
               }
-              return stockData;
             })
             .catch(function(error) {
               console.error("Error getting document:", error);
