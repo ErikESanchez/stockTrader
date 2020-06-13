@@ -11,11 +11,7 @@ export class Chart {
         },
       ],
     };
-    console.log("Bruh");
-    console.log("bruh", dataCollection);
-    console.log(chartData[0]);
     Object.keys(chartData[0]).forEach((stockDate: string) => {
-      console.log(stockDate);
       dataCollection.datasets[0].data.push(chartData[0][stockDate]["4. close"]);
       dataCollection.labels.push(stockDate);
     });

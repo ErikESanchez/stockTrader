@@ -4,7 +4,6 @@ import { apikey } from "../apikey";
 import { firebaseData } from "../firebase";
 import moment from "moment";
 import axios from "axios";
-import { any } from "async";
 const marketDataUrl = "https://www.alphavantage.co/query";
 
 const state = {
