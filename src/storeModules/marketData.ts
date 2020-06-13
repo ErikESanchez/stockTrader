@@ -82,7 +82,7 @@ const mutations: MutationTree<any> = {
 export const actions: ActionTree<any, any> = {
   async getMonthData({ commit }, symbol: string) {
     let monthData: any;
-    await firebase
+    await firebaseData
       .firestore()
       .collection("stocks")
       .doc(symbol)
