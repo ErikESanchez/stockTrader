@@ -52,8 +52,8 @@ export default Vue.extend({
   computed: {
     stockData() {
       let stocks: Array<Object> = store.state.marketData.formatedStocks;
-      if (stocks[0] !== undefined && this.checkData(stocks) === false) {
-        console.log("Need to call API");
+      if (stocks[0] !== undefined) {
+        this.checkData(stocks);
       } else {
         // console.log("Data is new");
       }
@@ -86,7 +86,8 @@ export default Vue.extend({
       console.log("It called");
       // this.getDatabaseDailyData();
     },
-    checkData: (stocks: { [k: string]: any }): boolean => {
+    // ? For some reason if you typecast a function you can't use any global functions and variables
+    checkData(stocks: { [k: string]: any }) {
       let dayOfWeek: Object = moment().weekday();
       let dateAndHour: string = "YYYY-MM-DD HH:mm:ss";
       let isWeekend: boolean = dayOfWeek === 6 || dayOfWeek === 0;
@@ -103,28 +104,34 @@ export default Vue.extend({
       let dataIsUpToDate: boolean = Boolean();
       // ! Make this check for data in db as well
       //  Todo: moment(moment().format(dateAndHour)).isSameOrAfter(timeInHours)
-      console.log(
-        moment(moment().format(dateAndHour)).isSameOrAfter(timeInHours)
-      );
-      console.log(stocks);
-      Object.keys(stocks).forEach((stock: string) => {
+      for (let stock of Object.keys(stocks)) {
         let lastRefreshed: string = stocks[stock]["stockData"]["lastRefreshed"];
-        if (
-          isWeekend === false &&
-          moment(moment().format(dateAndHour)).isSameOrAfter(timeInHours)
-        ) {
-          console.log("It's the weekend");
+        let checkIfAfterHours: boolean = moment(
+          moment().format(dateAndHour)
+        ).isSameOrAfter(timeInHours);
+        if (isWeekend === false && checkIfAfterHours === true) {
+          console.log("It's not the weekend");
           console.log(`Need to call API it's after ${timeInHours}`);
+          // this.callAPI();
+          // Todo: Check If I need this break, I'm pretty sure it's need
+          break;
         } else if (dayOfWeek === 6 && lastRefreshed !== yesterday) {
           console.log(`Need to call API for data from ${yesterday}`);
+          // this.callAPI();
+          dataIsUpToDate = true;
+          break;
         } else if (dayOfWeek === 0 && lastRefreshed !== twoDaysAgo) {
           console.log(`Need to call API for data from ${twoDaysAgo}`);
+          break;
         }
-      });
+      }
+      // Object.keys(stocks).forEach((stock: string) => {
+
+      // });
       if (isWeekend === true) {
         console.log("Market's closed, Wall Street is doing the dirty");
       }
-      return true;
+      return dataIsUpToDate;
     },
     async APIData(stock: any) {
       this.$store.dispatch("getApiDaily", stock);
