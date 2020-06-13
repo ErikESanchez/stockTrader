@@ -21,6 +21,7 @@ export default Vue.extend({
   },
   data() {
     return {
+      chart: new Chart(),
       loaded: false,
       stockChartData: (): Object => ({
         labels: Array(),
@@ -28,10 +29,54 @@ export default Vue.extend({
       })
     };
   },
-  methods: {},
+  methods: {
+    dayChart(): void {
+      let chart: Chart = this.chart;
+      let symbol: string = this.$router.currentRoute.params.stockName;
+      Promise.resolve(
+        store.dispatch("getApiIntraday", symbol).then((dayData: any) => {
+          if (dayData) {
+            let metaData: any = dayData["data"]["Meta Data"];
+            let priceData: any = dayData["data"]["Time Series (1min)"];
+            console.log(metaData, priceData);
+            // Todo: I have to figure out a way to store the data in a reasonable manner, or get better at calling the api.
+            Promise.resolve(
+              chart
+                .renderChart(priceData, symbol)
+                .then((dataCollections: any) => {
+                  console.log("Data Collection", dataCollections);
+                  this.stockChartData = dataCollections;
+                })
+            );
+          } else {
+            console.log("Data did not reach chart");
+          }
+        })
+      );
+    },
+    monthChart(): void {
+      let chart: Chart = this.chart;
+      let symbol: string = this.$router.currentRoute.params.stockName;
+      Promise.resolve(store.dispatch("getMonthData", symbol)).then(
+        (monthData: Object) => {
+          if (monthData) {
+            // ? It would probably be better to use a prop and pass it down from the parent component
+            let data: any = store.getters.getMonthData;
+            console.log(data);
+            Promise.resolve(chart.renderChart(data, symbol)).then(
+              (dataCollections: any) => {
+                console.log(dataCollections);
+                this.stockChartData = dataCollections;
+              }
+            );
+          }
+        }
+      );
+      this.loaded = true;
+    }
+  },
   computed: {
     stockData() {
-      console.log(store.getters.getStocks);
       return store.getters.getStocks;
     },
     chartOptions(): any {
@@ -43,27 +88,8 @@ export default Vue.extend({
     }
   },
   async mounted() {
-    // store.dispatch("getApiIntraday", "AAPL");
-    let chart: Chart = new Chart();
-    let symbol: string = this.$router.currentRoute.params.stockName;
-    Promise.resolve(
-      store.dispatch("getMonthData", this.$router.currentRoute.params.stockName)
-    ).then((res: any) => {
-      if (res === true) {
-        // ? It would probably be better to use a prop and pass it down from the parent component
-        let data: any = store.getters.getMonthData;
-        console.log(data);
-        Promise.resolve(chart.renderChart(data, symbol)).then(
-          (dataCollections: any) => {
-            console.log(dataCollections);
-            console.log("dataCollections", dataCollections);
-            this.stockChartData = dataCollections;
-          }
-        );
-      }
-    });
-
-    this.loaded = true;
+    // this.monthChart();
+    this.dayChart();
   }
 });
 </script>

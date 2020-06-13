@@ -4,7 +4,12 @@
       @click="APIData('AAPL'); APIData('GOOGL'); APIData('MSFT'); APIData('AMZN'); APIData('FB'); APIData('INTC');"
     >Get API Data</b-button>-->
     <b-card-group deck v-if="dataReady">
-      <stock-card v-for="(stock, key) in stockData" :key="key" :stock="stockData" :keyProp="key"></stock-card>
+      <stock-card
+        v-for="(stock, key) in stockData"
+        :key="key"
+        :stock="stockData"
+        :keyProp="key"
+      ></stock-card>
     </b-card-group>
   </div>
 </template>
@@ -24,7 +29,7 @@ export default Vue.extend({
       dataReady: false,
       moreStockData: Array(),
       stock: null,
-      stockNameList: Array()
+      stockNameList: Array(),
     };
   },
   async mounted() {
@@ -32,7 +37,6 @@ export default Vue.extend({
     if (this.stockData[0] === undefined) {
       await this.getDatabaseDailyData();
     }
-    console.log("bruh");
     this.dataReady = true;
   },
   watch: {
@@ -43,7 +47,7 @@ export default Vue.extend({
           console.log("newStockAdded");
         }
       });
-    }
+    },
   },
   computed: {
     stockData() {
@@ -51,7 +55,7 @@ export default Vue.extend({
       if (stocks[0] !== undefined && this.checkData(stocks) === false) {
         console.log("Need to call API");
       } else {
-        console.log("Data is new");
+        // console.log("Data is new");
       }
       // let yesterdaysDate: string = moment(moment().subtract(1, "day")).format(
       //   "YYYY-MM-DD"
@@ -64,7 +68,7 @@ export default Vue.extend({
       // console.log("Bruh, we need new API data");
       // });
       return stocks;
-    }
+    },
   },
   methods: {
     async callAPI() {
@@ -74,14 +78,15 @@ export default Vue.extend({
         "MSFT",
         "AMZN",
         "FB",
-        "INTC"
+        "INTC",
       ];
       await stockList.forEach(async (symbol: string) => {
         store.dispatch("getApiDaily", symbol);
       });
+      console.log("It called");
       // this.getDatabaseDailyData();
     },
-    checkData: (stocks: Object): boolean => {
+    checkData: (stocks: { [k: string]: any }): boolean => {
       let dayOfWeek: Object = moment().weekday();
       let dateAndHour: string = "YYYY-MM-DD HH:mm:ss";
       let isWeekend: boolean = dayOfWeek === 6 || dayOfWeek === 0;
@@ -89,36 +94,47 @@ export default Vue.extend({
       let yesterday: string = moment(moment().subtract(1, "day")).format(
         "YYYY-MM-DD"
       );
+      let twoDaysAgo: string = moment(moment().subtract(2, "day")).format(
+        "YYYY-MM-DD"
+      );
       let timeInHours: string = moment(`${today} 15:00:00`, dateAndHour).format(
         dateAndHour
       );
-      let newData: boolean = Boolean();
-      console.log(newData);
-      // moment(moment().format(dateAndHour)).isSameOrAfter(timeInHours);
+      let dataIsUpToDate: boolean = Boolean();
       // ! Make this check for data in db as well
-      if (isWeekend === false) {
-        // if(m)
-        // console.log("burh");
-        // if(moment())
-        return false;
-      } else if (isWeekend === true) {
-        // console.log("Market's closed, Wall Street is doing the dirty");
+      //  Todo: moment(moment().format(dateAndHour)).isSameOrAfter(timeInHours)
+      console.log(
+        moment(moment().format(dateAndHour)).isSameOrAfter(timeInHours)
+      );
+      console.log(stocks);
+      Object.keys(stocks).forEach((stock: string) => {
+        let lastRefreshed: string = stocks[stock]["stockData"]["lastRefreshed"];
+        if (
+          isWeekend === false &&
+          moment(moment().format(dateAndHour)).isSameOrAfter(timeInHours)
+        ) {
+          console.log("It's the weekend");
+          console.log(`Need to call API it's after ${timeInHours}`);
+        } else if (dayOfWeek === 6 && lastRefreshed !== yesterday) {
+          console.log(`Need to call API for data from ${yesterday}`);
+        } else if (dayOfWeek === 0 && lastRefreshed !== twoDaysAgo) {
+          console.log(`Need to call API for data from ${twoDaysAgo}`);
+        }
+      });
+      if (isWeekend === true) {
+        console.log("Market's closed, Wall Street is doing the dirty");
       }
-      // if (isWeekend === true) {
-      //   // ! Make this account for holidays, no clue how I'm going to do it but I have to
-      // } else if (isWeekend === false && moment().isSameOrAfter(timeInHours)) {
-      //   console.log("Bruh, you need new data.");
-      // }
+      return true;
     },
     async APIData(stock: any) {
       this.$store.dispatch("getApiDaily", stock);
     },
     async getDatabaseDailyData() {
       await store.dispatch("getDatabaseDailyData");
-    }
+    },
   },
   components: {
-    StockCard
-  }
+    StockCard,
+  },
 });
 </script>
