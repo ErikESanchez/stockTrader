@@ -1,10 +1,12 @@
 import Vue from "vue";
 import { firebaseData } from "../firebase";
+import { Account, userInput, userChanges } from "@/Classes/Account";
 import { ActionTree, GetterTree, MutationTree } from "vuex";
 
 const state = {
   user: Object(),
   userClass: Object(),
+  account: Account,
 };
 
 const getters: GetterTree<any, any> = {
@@ -31,6 +33,9 @@ const mutations: MutationTree<any> = {
   setUserClass(state: any, userClass: Object) {
     Vue.set(state, "userClass", userClass);
   },
+  setAccount(state: any, user: any) {
+    Vue.set(state, "account", user);
+  },
 };
 
 const actions: ActionTree<any, any> = {
@@ -48,53 +53,21 @@ const actions: ActionTree<any, any> = {
     });
   },
   // ? For some reasone it doesn't allow me to typecast the parameters(to string), need to figure out why
-  login({ commit }, userInput: any) {
-    console.log(userInput);
-    if (userInput.username != "" && userInput.password != "") {
-      firebaseData
-        .auth()
-        .signInWithEmailAndPassword(userInput.username, userInput.password)
-        .catch(function(error) {
-          let errorCode = error.code;
-          let errorMessage = error.message;
-          console.log(errorCode, errorMessage);
-        });
-    }
+
+  login({ state }, userInput: userInput) {
+    state.account.login(userInput);
   },
-  async signOut({ commit }) {
-    return await firebaseData
-      .auth()
-      .signOut()
-      .then(() => {
-        console.log("Signed Out");
-        commit("setUserClass", Object());
-      })
-      .catch(function(error) {
-        console.log("Oops... an error occured", error);
-      });
+  async signOut({ state }) {
+    state.account.signOut();
   },
   // ? Doesn't let me use an interface to typecasting
-  createNewUser({ commit }, userInput: any) {
-    if (userInput.username != "" && userInput.password != "") {
-      // TODO:  Make an if stament to verfify no duplicate users by checking the database
-      firebaseData
-        .auth()
-        .createUserWithEmailAndPassword(userInput.username, userInput.password)
-        .catch(function(error) {
-          let errorCode = error.code;
-          let errorMessage = error.message;
-          console.log(errorCode, errorMessage);
-        });
-    } else {
-      console.log("Please type in a valid username and password");
-    }
+  createNewUser({ state }, userInput: userInput) {
+    state.account.createNewUser(userInput);
+  },
+  saveProfileChanges({ state }, userChanges: string) {
+    state.account.changeUserProfile(userChanges);
   },
 };
-
-interface userInput {
-  username: any;
-  password: any;
-}
 
 export default {
   state,

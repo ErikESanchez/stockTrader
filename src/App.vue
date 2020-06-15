@@ -11,6 +11,7 @@ import Vue from "vue";
 // Todo: add a footer if you want
 import Navbar from "./components/Navbar.vue";
 import { Portfolio } from "@/Classes/Portfolio";
+import { Account } from "@/Classes/Account";
 import { firebaseData } from "@/firebase";
 import store from "@/store";
 import moment from "moment";
@@ -34,12 +35,16 @@ export default Vue.extend({
         // Todo: If user has stock(s), put them into the parameters
         console.log(user.uid);
         let portfolio: Portfolio = new Portfolio(user.email!);
+        let account: Account = new Account(user);
+        store.commit("setAccount", account as Account);
         store.commit("setPortfolio", portfolio as Portfolio);
         this.signedIn = true as boolean;
         // Todo: Get user Portfolio Data
         // If user does not have account make one, but prompt the user for one first
         this.dataLoaded = true;
       } else {
+        let account: Account = new Account();
+        store.commit("setAccount", account as Account);
         // Todo: get rid of data from portfolio
         store.commit("changedSignedInStatus", false);
         console.log("$$$ Sign Up to get some dolla dolla bills yall $$$");

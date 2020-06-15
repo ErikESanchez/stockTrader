@@ -9,6 +9,7 @@
 
 <script lang="ts">
 import Vue from "vue";
+import store from "@/store";
 export default Vue.extend({
   data() {
     return {
@@ -18,18 +19,7 @@ export default Vue.extend({
   methods: {
     //   Todo: Whenever this function is called, make sure to set a timer to stop too many changes
     saveProfileChanges() {
-      console.log(this.text);
-      //   user
-      //     .updateProfile({
-      //       displayName: "TastyMango",
-      //       // photoURL: "https://example.com/jane-q-user/profile.jpg",
-      //     })
-      //     .then(function() {
-      //       // Update successful.
-      //     })
-      //     .catch(function(error) {
-      //       // An error happened.
-      //     });
+      store.dispatch("saveProfileChanges", this.text as string);
     },
   },
 });
