@@ -6,8 +6,9 @@ import Landing from "./views/Landing.vue";
 import Stocks from "./views/Stocks.vue";
 import Portfolio from "./views/Portfolio.vue";
 import singleStock from "./views/singleStock.vue";
-import SignUpPage from "./views/SignUpPage.vue"
-import LogInPage from "./views/LogInPage.vue"
+import SignUpPage from "./views/SignUpPage.vue";
+import LogInPage from "./views/LogInPage.vue";
+import Profile from "./views/Profile.vue";
 
 export default new Router({
   routes: [
@@ -34,14 +35,18 @@ export default new Router({
     {
       path: "/signUp",
       name: "signUp",
-      component: SignUpPage
+      component: SignUpPage,
     },
     {
       path: "/logIn",
       name: "logIn",
-      component: LogInPage
-    }
-
+      component: LogInPage,
+    },
+    {
+      path: "/profile",
+      name: "profile",
+      component: Profile,
+    },
   ],
   mode: "history",
 });

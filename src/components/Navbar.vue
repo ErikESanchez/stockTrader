@@ -31,9 +31,11 @@
         <div>
           <b-nav-item-dropdown right>
             <template v-slot:button-content>
-              <em>{{userData.email}}</em>
+              <em>{{ userData.displayName }}</em>
             </template>
-            <b-dropdown-item href="#">Profile</b-dropdown-item>
+            <b-dropdown-item>
+              <router-link to="/profile">Profile</router-link>
+            </b-dropdown-item>
             <b-dropdown-item @click="logOut()">Sign Out</b-dropdown-item>
           </b-nav-item-dropdown>
           <!-- <b-button size="sm" class="my-2 my-sm-0" type="submit">End day</b-button> -->
@@ -41,10 +43,20 @@
       </b-navbar-nav>
       <b-navbar-nav class="ml-auto" v-else>
         <div>
-          <router-link to="/logIn" size="sm" class="my-2 my-sm-0 log-In-Button" type="submit">
+          <router-link
+            to="/logIn"
+            size="sm"
+            class="my-2 my-sm-0 log-In-Button"
+            type="submit"
+          >
             <b-button>Log In</b-button>
           </router-link>
-          <router-link to="/signUp" size="sm" class="my-2 my-sm-0" type="submit">
+          <router-link
+            to="/signUp"
+            size="sm"
+            class="my-2 my-sm-0"
+            type="submit"
+          >
             <b-button>Sign Up</b-button>
           </router-link>
         </div>
@@ -64,7 +76,7 @@ export default Vue.extend({
     return {
       // latestUserFunds: Array<userPriceHistory>()
       avaibleUserFunds: Number(),
-      userClass: Object()
+      userClass: Object(),
     };
   },
   // Todo: Find a way to use mapState, can't right now because have to go through userModule
@@ -74,13 +86,13 @@ export default Vue.extend({
     },
     userData() {
       return store.getters.getUserClass;
-    }
+    },
   },
   methods: {
     logOut() {
       store.dispatch("signOut");
-    }
-  }
+    },
+  },
 });
 </script>
 
