@@ -7,7 +7,7 @@ import moment from "moment";
 // * Need to make the logic for the user stroring stocks i think,
 export class Portfolio {
   name: string;
-  ownedStocks: Array<Stock>;
+  ownedStocks: Array<Stock> | undefined;
   // ? Initialize this somehow
   stocks: any;
   formatedStocks!: [];
@@ -17,11 +17,11 @@ export class Portfolio {
     myStocks: Array<userStock>;
     historyOfTrades: Array<userStock>;
   };
-  marketDataUrl = "https://www.alphavantage.co/query";
+  // marketDataUrl = "https://www.alphavantage.co/query";
 
   //   portfolioWorth: number;
-  constructor(portfolioName: string, initialStocks: Array<Stock>) {
-    this.name = portfolioName;
+  constructor(portfolioName: string, initialStocks?: Array<Stock>) {
+    this.name = portfolioName as string;
     this.ownedStocks = initialStocks;
     this.stocks = Array();
     // this.portfolioWorth;

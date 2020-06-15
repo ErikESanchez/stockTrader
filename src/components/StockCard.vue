@@ -53,9 +53,7 @@ export default Vue.extend({
     stock: Array,
     keyProp: Number,
   },
-  mounted() {
-    console.log(this.stock);
-  },
+  mounted() {},
   methods: {
     buyStock(stock: stock) {
       let formatedTr: newStockTransaction = {

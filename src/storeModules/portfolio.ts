@@ -1,11 +1,12 @@
-import { ActionTree } from "vuex";
-import { GetterTree } from "vuex";
-import { MutationTree } from "vuex";
+import Vue from "vue";
+import { ActionTree, GetterTree, MutationTree } from "vuex";
+import { Portfolio } from "@/Classes/Portfolio";
 
 const state = {
   funds: 10000,
   myStocks: Array<userStock>(),
   historyOfTrades: Array<userStock>(),
+  portfolio: Portfolio,
 };
 const getters: GetterTree<any, any> = {
   getTotalFunds: (state) => {
@@ -28,6 +29,9 @@ const getters: GetterTree<any, any> = {
   },
 };
 const mutations: MutationTree<any> = {
+  setPortfolio(state, portfolio: Portfolio) {
+    Vue.set(state, "portfolio", portfolio);
+  },
   updateFunds(state, priceDifference: number) {
     state.funds += priceDifference;
   },

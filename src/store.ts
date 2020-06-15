@@ -2,32 +2,28 @@ import Vue from "vue";
 import Vuex from "vuex";
 import marketData from "./storeModules/marketData";
 import userModule from "./storeModules/userModule";
+import portfolio from "./storeModules/portfolio";
 Vue.use(Vuex);
 
 export default new Vuex.Store({
   modules: {
     marketData,
-    userModule
+    userModule,
+    portfolio,
   },
   state: {
     user: {},
-    portfolio: {
-      funds: Array<userPriceHistory>(),
-      latestUserFunds: Number,
-      myStocks: Array<userStock>(),
-      historyOfTrades: Array<userStock>()
-    }
+    // portfolio: {
+    //   funds: Array<userPriceHistory>(),
+    //   latestUserFunds: Number,
+    //   myStocks: Array<userStock>(),
+    //   historyOfTrades: Array<userStock>()
+    // }
   },
 
-  getters: {
-
-  },
-  mutations: {
-
-  },
-  actions: {
-  },
-
+  getters: {},
+  mutations: {},
+  actions: {},
 });
 
 export interface newStockTransaction {

@@ -52,11 +52,11 @@ export default Vue.extend({
   computed: {
     stockData() {
       let stocks: Array<Object> = store.state.marketData.formatedStocks;
-      if (stocks[0] !== undefined) {
-        this.checkData(stocks);
-      } else {
-        // console.log("Data is new");
+      if (stocks[0] !== undefined && this.checkData(stocks) === true) {
+        console.log("bruh");
       }
+      return stocks;
+
       // let yesterdaysDate: string = moment(moment().subtract(1, "day")).format(
       //   "YYYY-MM-DD"
       // );
@@ -67,19 +67,11 @@ export default Vue.extend({
       // if (this.checkData() !== true && yesterdaysDate !== dateOfStock)
       // console.log("Bruh, we need new API data");
       // });
-      return stocks;
     },
   },
   methods: {
     async callAPI() {
-      let stockList: Array<string> = [
-        "AAPL",
-        "GOOGL",
-        "MSFT",
-        "AMZN",
-        "FB",
-        "INTC",
-      ];
+      let stockList: Array<string> = ["AAPL", "GOOGL", "MSFT", "AMZN", "FB"];
       await stockList.forEach(async (symbol: string) => {
         store.dispatch("getApiDaily", symbol);
       });
@@ -113,6 +105,8 @@ export default Vue.extend({
           console.log("It's not the weekend");
           console.log(`Need to call API it's after ${timeInHours}`);
           // this.callAPI();
+
+          dataIsUpToDate = true;
           // Todo: Check If I need this break, I'm pretty sure it's need
           break;
         } else if (dayOfWeek === 6 && lastRefreshed !== yesterday) {
@@ -122,15 +116,15 @@ export default Vue.extend({
           break;
         } else if (dayOfWeek === 0 && lastRefreshed !== twoDaysAgo) {
           console.log(`Need to call API for data from ${twoDaysAgo}`);
+          dataIsUpToDate = true;
+          // this.callAPI();
           break;
         }
       }
-      // Object.keys(stocks).forEach((stock: string) => {
-
-      // });
       if (isWeekend === true) {
         console.log("Market's closed, Wall Street is doing the dirty");
       }
+      console.log(dataIsUpToDate);
       return dataIsUpToDate;
     },
     async APIData(stock: any) {
