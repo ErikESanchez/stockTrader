@@ -24,7 +24,7 @@ export class Account {
       .signOut()
       .then(() => {
         console.log("Signed Out");
-        store.commit("setUserClass", Object());
+        store.commit("setUser", Object());
       })
       .catch(function(error) {
         console.log("Oops... an error occured", error);
