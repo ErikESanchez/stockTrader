@@ -34,7 +34,7 @@ export default Vue.extend({
   },
   async mounted() {
     if (this.stockData[0] === undefined) {
-      this.getDatabaseDailyData();
+      await this.getDatabaseDailyData();
     }
     this.dataReady = true;
   },
@@ -51,26 +51,10 @@ export default Vue.extend({
   computed: {
     stockData() {
       let stocks: Array<Object> = store.state.marketData.formatedStocks;
-      // if (stocks[0] !== undefined && this.checkData(stocks) === true) {
-      //   console.log("bruh");
-      // }
       return stocks;
-
-      // let yesterdaysDate: string = moment(moment().subtract(1, "day")).format(
-      //   "YYYY-MM-DD"
-      // );
-      // stocks.forEach((stock: any) => {
-      // let dateOfStock: string = stock["stockData"]["lastRefreshed"];
-      // Todo: Make this account for weekends
-      // console.log(dateOfStock);
-      // if (this.checkData() !== true && yesterdaysDate !== dateOfStock)
-      // console.log("Bruh, we need new API data");
-      // });
     },
   },
   methods: {
-    buyStock() {},
-
     async callAPI() {
       let stockList: Array<string> = ["AAPL", "GOOGL", "MSFT", "AMZN", "FB"];
       await stockList.forEach(async (symbol: string) => {

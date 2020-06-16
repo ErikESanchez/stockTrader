@@ -26,13 +26,6 @@ export default new Vuex.Store({
   actions: {},
 });
 
-export interface newStockTransaction {
-  stockName: string;
-  stockData: stockTransactionData;
-  buy: boolean; // if false it is sell
-  alreadyHaveStock?: boolean;
-}
-
 export interface stockTransactionData {
   priceAtTransaction: number;
   amount: number;

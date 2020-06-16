@@ -1,14 +1,17 @@
 import Vue from "vue";
 import { ActionTree, GetterTree, MutationTree } from "vuex";
-import { Portfolio } from "@/Classes/Portfolio";
+import { Portfolio, newStockTransaction } from "@/Classes/Portfolio";
 
 const state = {
   funds: 10000,
   myStocks: Array<userStock>(),
   historyOfTrades: Array<userStock>(),
-  portfolio: Portfolio,
+  portfolioClass: Portfolio,
 };
 const getters: GetterTree<any, any> = {
+  getPortfolioClass(state: any) {
+    return state.portfolioClass;
+  },
   getTotalFunds: (state) => {
     return state.funds;
   },
@@ -29,8 +32,8 @@ const getters: GetterTree<any, any> = {
   },
 };
 const mutations: MutationTree<any> = {
-  setPortfolio(state, portfolio: Portfolio) {
-    Vue.set(state, "portfolio", portfolio);
+  setPortfolioClass(state, portfolio: Portfolio) {
+    Vue.set(state, "portfolioClass", portfolio);
   },
   updateFunds(state, priceDifference: number) {
     state.funds += priceDifference;
@@ -61,6 +64,10 @@ const mutations: MutationTree<any> = {
   // updateStocksSell(state, data: newStockTransaction) {}
 };
 const actions: ActionTree<any, any> = {
+  buyStock({ state }, stockTransaction: newStockTransaction) {
+    console.log(state.portfolioClass.buyStock(stockTransaction));
+    // console.log(stockTransaction);
+  },
   // buyStock({ commit, }, transactionData: newStockTransaction) {
   //   if (getters.ownStock(transactionData.stockName)) {
   //     transactionData.alreadyHaveStock = true;
@@ -75,13 +82,6 @@ const actions: ActionTree<any, any> = {
   // },
   // sellStock({ commit, getters }, transactionData: newStockTransaction) {}
 };
-
-export interface newStockTransaction {
-  stockName: string;
-  stockData: stockTransactionData;
-  buy: boolean; // if false it is sell
-  alreadyHaveStock?: boolean;
-}
 
 interface stockTransactionData {
   priceAtTransaction: number;

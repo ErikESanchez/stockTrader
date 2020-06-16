@@ -19,7 +19,9 @@
       <b-card-text
         >Volume: {{ stock[keyProp]["stockData"]["volume"] }}</b-card-text
       >
-      <b-button variant="success" @click="buyStock(stock, 1)">Buy</b-button>
+      <b-button variant="success" @click="buyStock(stock[keyProp], 1)"
+        >Buy</b-button
+      >
       <b-row class="my-1">
         <b-col sm="3"></b-col>
         <b-col sm="9">
@@ -35,7 +37,7 @@
 /* eslint-disable */
 import Vue from "vue";
 import store from "@/store";
-import { newStockTransaction } from "@/store";
+import { newStockTransaction } from "@/Classes/Portfolio";
 interface stock {
   [key: string]: any;
   name: string;
@@ -56,16 +58,16 @@ export default Vue.extend({
   mounted() {},
   methods: {
     buyStock(stock: stock) {
-      let formatedTr: newStockTransaction = {
-        stockName: stock.name,
+      let stockTransaction: newStockTransaction = {
+        stockName: stock.stockData.name,
         stockData: {
-          priceAtTransaction: stock.value,
+          priceAtTransaction: stock.stockData.high,
           amount: this.amountToBuy,
           time: new Date(),
         },
         buy: true,
       };
-      store.dispatch("buyStock", formatedTr);
+      store.dispatch("buyStock", stockTransaction);
 
       console.log("Current stocks", store.getters.getUserStocks);
     },

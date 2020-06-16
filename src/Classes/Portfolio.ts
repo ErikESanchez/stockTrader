@@ -1,4 +1,5 @@
 import { Stock } from "./Stock";
+import { firebaseData } from "@/firebase";
 // import { newStockTransaction } from '@/store';
 import axios from "axios";
 import { apikey } from "../apikey";
