@@ -22,8 +22,7 @@
       <b-navbar-nav>
         <router-link to="/portfolio" class="nav-link">Portfolio</router-link>
       </b-navbar-nav>
-
-      <b-navbar-nav class="ml-auto" v-if="userData.email !== undefined || ''">
+      <b-navbar-nav class="ml-auto" v-if="userData !== undefined || ''">
         <!-- <b-nav-form>
           <b-form-input size="sm" class="mr-sm-2" placeholder="Search"></b-form-input>
           <b-button size="sm" class="my-2 my-sm-0" type="submit">Search</b-button>
@@ -31,7 +30,7 @@
         <div>
           <b-nav-item-dropdown right>
             <template v-slot:button-content>
-              <em>{{ userData.displayName }}</em>
+              <em>{{ userData.user.displayName }}</em>
             </template>
             <b-dropdown-item>
               <router-link to="/profile">Profile</router-link>
@@ -85,7 +84,9 @@ export default Vue.extend({
       return store.state.userModule.loggedIn;
     },
     userData() {
-      return store.getters.getUserClass;
+      return store.getters.getAccount.user !== undefined
+        ? store.getters.getAccount
+        : undefined;
     },
   },
   methods: {

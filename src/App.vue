@@ -31,13 +31,11 @@ export default Vue.extend({
   async created() {
     await firebaseData.auth().onAuthStateChanged(async (user) => {
       if (user) {
-        store.commit("setUserClass", user);
         // Todo: If user has stock(s), put them into the parameters
-        console.log(user.uid);
-        let portfolio: Portfolio = new Portfolio(user.email!);
+        let portfolio: Portfolio = new Portfolio(user.uid);
         let account: Account = new Account(user);
         store.commit("setAccount", account as Account);
-        store.commit("setPortfolio", portfolio as Portfolio);
+        store.commit("setPortfolioClass", portfolio as Portfolio);
         this.signedIn = true as boolean;
         // Todo: Get user Portfolio Data
         // If user does not have account make one, but prompt the user for one first
@@ -51,6 +49,11 @@ export default Vue.extend({
         this.dataLoaded = true as boolean;
       }
     });
+  },
+  watch: {
+    dataLoaded() {
+      store.commit("setUserFetched", this.dataLoaded as boolean);
+    },
   },
 });
 </script>
