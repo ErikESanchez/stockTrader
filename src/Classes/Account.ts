@@ -4,7 +4,7 @@ export class Account {
   user: any;
   constructor(user?: any) {
     this.user = user;
-    // console.log(this.signOut());
+    // console.log(thi  s.signOut());
   }
   login(userInput: userInput) {
     if (userInput.username != "" && userInput.password != "") {
@@ -37,9 +37,7 @@ export class Account {
         .auth()
         .createUserWithEmailAndPassword(userInput.username, userInput.password)
         .catch(function(error) {
-          let errorCode = error.code;
-          let errorMessage = error.message;
-          console.log(errorCode, errorMessage);
+          console.error(error.code, error.message);
         });
     } else {
       console.log("Please type in a valid username and password");
