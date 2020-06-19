@@ -12,18 +12,11 @@ const getters: GetterTree<any, any> = {
   getAccount: (state: state) => {
     return state.account;
   },
-  getUserFetched: (state: state) => {
-    return state.userFetched;
-  },
 };
 
 const mutations: MutationTree<any> = {
   setAccount(state: state, user: any) {
     Vue.set(state, "account", user);
-  },
-  setUserFetched(state: state, fetched: Boolean) {
-    console.log(fetched);
-    Vue.set(state, "userFetched", fetched as boolean);
   },
 };
 

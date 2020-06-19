@@ -1,72 +1,108 @@
 import { Stock } from "./Stock";
 import { firebaseData } from "@/firebase";
+import store from "@/store";
 // import { newStockTransaction } from '@/store';
 import axios from "axios";
 import { apikey } from "../apikey";
 import moment from "moment";
+import portfolio from "@/storeModules/portfolio";
+import { firestore } from "firebase";
 
 // * Need to make the logic for the user stroring stocks i think,
 export class Portfolio {
   name: string;
-  ownedStocks: Array<Stock> | undefined;
-  // ? Initialize this somehow
+  ownedStocks: stockTransactionData | undefined;
   stocks: any;
   formatedStocks!: [];
-  portfolio!: {
-    funds: Array<userPriceHistory>;
-    latestUserFunds: Number;
-    myStocks: Array<userStock>;
-    historyOfTrades: Array<userStock>;
-  };
-  // marketDataUrl = "https://www.alphavantage.co/query";
-
-  //   portfolioWorth: number;
-  constructor(portfolioName: string, initialStocks?: Array<Stock>) {
+  portfolio: portfolio | undefined;
+  constructor(portfolioName: string) {
     this.name = portfolioName as string;
-    this.ownedStocks = initialStocks;
+    // this.ownedStocks = initialStocks;
     this.stocks = Array();
     // this.portfolioWorth;
   }
-  addDataToStock(newStock: any) {
-    this.stocks.push(newStock);
-  }
-  buyStock(transactionData: newStockTransaction) {
-    if (this.ownStock(transactionData.stockName)) {
-      transactionData.alreadyHaveStock = true;
-      this.updateStocksBuy(transactionData);
-    } else {
-      this.updateStocksBuy(transactionData);
+  buyStock(stocks: newStockTransaction) {
+    if (this.portfolio) {
+      this.addUserFirebaseStocks(stocks);
+    } else if (this.portfolio === undefined) {
+      this.setNewUserDatabasePortfolio();
+      console.log("bruh");
     }
   }
-  ownStock(stockName: string) {
-    let doIOwnStock = false;
-    this.portfolio.myStocks.forEach((stock) => {
-      if (stock.name === stockName) {
-        doIOwnStock = true;
-      }
-    });
-    return doIOwnStock;
-  }
-  updateStocksBuy(data: newStockTransaction) {
-    let newStockPurchaseData: stockTransactionData = {
-      priceAtTransaction: data.stockData.priceAtTransaction,
-      amount: data.stockData.amount,
-      time: data.stockData.time,
-    };
-    if (data.alreadyHaveStock) {
-      this.portfolio.myStocks.forEach((stock) => {
-        stock.stocksOwned.push(newStockPurchaseData);
+  getUserFirebaseStocks() {
+    firebaseData
+      .firestore()
+      .collection("portfolios")
+      .doc(this.name as string)
+      .get()
+      .then((doc) => {
+        // console.log(`Document Data`, doc.data());
+        if (doc.data()) {
+          this.portfolio = doc.data() as portfolio;
+          // console.log("Owned Stocks", this.portfolio);
+        } else {
+          this.portfolio = undefined;
+        }
+      })
+      .catch((error) => {
+        console.error(error);
       });
-    } else {
-      let newStock: userStock = {
-        name: data.stockName,
-        stocksOwned: [newStockPurchaseData],
-      };
-      this.portfolio.myStocks.push(newStock);
+  }
+  addUserFirebaseStocks(stocks: newStockTransaction) {
+    if (this.portfolio) {
+      let user: any = store.getters.getAccount.user;
+      // let newOwnedStocks: any = ;
+      let availableFunds: number = this.portfolio.availableFunds;
+      let amountOfStocks: number = stocks.stockData.amount;
+      let priceAtTransaction: number = stocks.stockData.priceAtTransaction;
+      let symbol: string = stocks.stockName;
+      let stockClass: Stock = new Stock(
+        priceAtTransaction,
+        amountOfStocks,
+        symbol
+      );
+      let totalCost: number = stockClass.getTotalWorth();
+      firebaseData
+        .firestore()
+        .collection("portfolios")
+        .doc(this.name as string)
+        .update({
+          availableFunds: availableFunds - totalCost,
+          name: user.displayName || user.email,
+          ownedStocks: firestore.FieldValue.arrayUnion(stocks),
+          portfolioWorth: totalCost,
+        });
     }
+  }
+  setNewUserDatabasePortfolio() {
+    let accountClass: any = store.getters.getAccount.user;
+    firebaseData
+      .firestore()
+      .collection("portfolios")
+      .doc(this.name as string)
+      .set({
+        availableFunds: 10000,
+        name:
+          (accountClass.displayName as string) ||
+          (accountClass.email as string),
+        ownedStocks: Array(),
+        portfolioWorth: 0,
+      })
+      .then(() => {
+        console.log("Document Succesfully Written");
+      })
+      .catch((error: any) => {
+        console.error(error);
+      });
   }
 }
 
+interface portfolio {
+  availableFunds: number;
+  name: String;
+  ownedStocks: newStockTransaction;
+  portfolioWorth: Number;
+}
 export interface TIME_SERIES_DAILY {
   function: "TIME_SERIES_DAILY";
   symbol: string;
@@ -78,8 +114,6 @@ export interface TIME_SERIES_DAILY {
 export interface newStockTransaction {
   stockName: string;
   stockData: stockTransactionData;
-  buy: boolean; // if false it is sell
-  alreadyHaveStock?: boolean;
 }
 
 interface stockTransactionData {
@@ -104,13 +138,3 @@ export let storeSchema = {
     buyMoreStock: "buyMoreStock",
   },
 };
-
-// Todo: learn how to type cast functions
-// let userStocks = new Portfolio("Erik", )
-//  ?Problem is what if he buys the same stock
-//   public updatePortfolioWorth(): number {
-//     let totalWorth: number = 0
-//     this.ownedStocks.forEach(stock => {
-//         totalWorth.
-//     });
-//   }

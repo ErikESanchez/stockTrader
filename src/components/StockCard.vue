@@ -65,11 +65,8 @@ export default Vue.extend({
           amount: this.amountToBuy,
           time: new Date(),
         },
-        buy: true,
       };
       store.dispatch("buyStock", stockTransaction);
-
-      console.log("Current stocks", store.getters.getUserStocks);
     },
   },
 });

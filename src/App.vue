@@ -47,11 +47,6 @@ export default Vue.extend({
       }
     });
   },
-  watch: {
-    dataLoaded() {
-      store.commit("setUserFetched", this.dataLoaded as boolean);
-    },
-  },
 });
 </script>
 

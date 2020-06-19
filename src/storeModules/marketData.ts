@@ -237,9 +237,9 @@ export const actions: ActionTree<any, any> = {
               ) {
                 stockData[symbol]["timeSeriesData"] = doc.data().priceData;
                 if (Object.is(arr.length - 1, key)) {
-                  console.log(
-                    `Last callback call at ${key} with value ${symbol}`
-                  );
+                  // console.log(
+                  //   `Last callback call at ${key} with value ${symbol}`
+                  // );
                   commit("formatDatabaseData", stockData);
                 }
                 // ? Might not be the best place to put this

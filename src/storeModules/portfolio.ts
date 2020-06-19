@@ -1,6 +1,7 @@
 import Vue from "vue";
 import { ActionTree, GetterTree, MutationTree } from "vuex";
 import { Portfolio, newStockTransaction } from "@/Classes/Portfolio";
+import { firebaseData } from "@/firebase";
 
 const state = {
   funds: 10000,
@@ -38,35 +39,38 @@ const mutations: MutationTree<any> = {
   updateFunds(state, priceDifference: number) {
     state.funds += priceDifference;
   },
-  updateStocksBuy(state, data: newStockTransaction) {
-    let newStockPurchaseData: stockTransactionData = {
-      priceAtTransaction: data.stockData.priceAtTransaction,
-      amount: data.stockData.amount,
-      time: data.stockData.time,
-    };
+  // updateStocksBuy(state, data: newStockTransaction) {
+  //   let newStockPurchaseData: stockTransactionData = {
+  //     priceAtTransaction: data.stockData.priceAtTransaction,
+  //     amount: data.stockData.amount,
+  //     time: data.stockData.time,
+  //   };
 
-    if (data.alreadyHaveStock) {
-      state.portfolio.myStocks.forEach((stock: userStock) => {
-        if (stock.name === data.stockName) {
-          stock.stocksOwned.push(newStockPurchaseData);
-        }
-      });
-    } else {
-      let newStock: userStock = {
-        name: data.stockName,
-        stocksOwned: [newStockPurchaseData],
-      };
-      state.portfolio.myStocks.push(newStock);
-    }
+  //   if (data.alreadyHaveStock) {
+  //     state.portfolio.myStocks.forEach((stock: userStock) => {
+  //       if (stock.name === data.stockName) {
+  //         stock.stocksOwned.push(newStockPurchaseData);
+  //       }
+  //     });
+  //   } else {
+  //     let newStock: userStock = {
+  //       name: data.stockName,
+  //       stocksOwned: [newStockPurchaseData],
+  //     };
+  //     state.portfolio.myStocks.push(newStock);
+  //   }
 
-    console.log("Update Stock with a BUY");
-  },
+  //   console.log("Update Stock with a BUY");
+  // },
   // updateStocksSell(state, data: newStockTransaction) {}
 };
 const actions: ActionTree<any, any> = {
   buyStock({ state }, stockTransaction: newStockTransaction) {
-    console.log(state.portfolioClass.buyStock(stockTransaction));
+    state.portfolioClass.buyStock(stockTransaction);
     // console.log(stockTransaction);
+  },
+  getUserFirebaseStocks({ state }) {
+    state.portfolioClass.getUserFirebaseStocks();
   },
   // buyStock({ commit, }, transactionData: newStockTransaction) {
   //   if (getters.ownStock(transactionData.stockName)) {

@@ -30,7 +30,7 @@
         <div>
           <b-nav-item-dropdown right>
             <template v-slot:button-content>
-              <em>{{ userData.user.displayName }}</em>
+              <em>{{ userData.user.displayName || userData.user.email }}</em>
             </template>
             <b-dropdown-item>
               <router-link to="/profile">Profile</router-link>

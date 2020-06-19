@@ -36,17 +36,8 @@ export default Vue.extend({
     if (this.stockData[0] === undefined) {
       await this.getDatabaseDailyData();
     }
+    store.dispatch("getUserFirebaseStocks");
     this.dataReady = true;
-  },
-  watch: {
-    text() {
-      window.addEventListener("keydown", function(event) {
-        const key = event.key;
-        if (key == "Enter") {
-          console.log("newStockAdded");
-        }
-      });
-    },
   },
   computed: {
     stockData() {
