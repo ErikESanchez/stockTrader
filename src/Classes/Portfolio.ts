@@ -22,6 +22,7 @@ export class Portfolio {
     // this.portfolioWorth;
   }
   buyStock(stocks: newStockTransaction) {
+    // Todo: Check if user has enough money
     if (this.portfolio) {
       this.addUserFirebaseStocks(stocks);
     } else if (this.portfolio === undefined) {

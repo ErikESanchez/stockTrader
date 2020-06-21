@@ -1,7 +1,6 @@
 import Vue from "vue";
 import { ActionTree, GetterTree, MutationTree } from "vuex";
 import { Portfolio, newStockTransaction } from "@/Classes/Portfolio";
-import { firebaseData } from "@/firebase";
 
 const state = {
   funds: 10000,
@@ -70,6 +69,7 @@ const actions: ActionTree<any, any> = {
     // console.log(stockTransaction);
   },
   getUserFirebaseStocks({ state }) {
+    console.log(state.portfolioClass);
     state.portfolioClass.getUserFirebaseStocks();
   },
   // buyStock({ commit, }, transactionData: newStockTransaction) {

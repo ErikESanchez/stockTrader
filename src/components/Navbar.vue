@@ -13,7 +13,6 @@
       aria-haspopup="true"
       aria-expanded="false"
     >Update User Funds</button>-->
-    <!-- <a>Funds: {{ funds }}</a> -->
 
     <b-collapse id="nav-collapse" is-nav>
       <b-navbar-nav>
@@ -27,10 +26,11 @@
           <b-form-input size="sm" class="mr-sm-2" placeholder="Search"></b-form-input>
           <b-button size="sm" class="my-2 my-sm-0" type="submit">Search</b-button>
         </b-nav-form>-->
+        <b-navbar-nav class="nav-link">{{ funds }}</b-navbar-nav>
         <div>
           <b-nav-item-dropdown right>
             <template v-slot:button-content>
-              <em>{{ userData.user.displayName || userData.user.email }}</em>
+              <em>{{ userData.displayName || userData.email }}</em>
             </template>
             <b-dropdown-item>
               <router-link to="/profile">Profile</router-link>
@@ -74,19 +74,40 @@ export default Vue.extend({
   data() {
     return {
       // latestUserFunds: Array<userPriceHistory>()
-      avaibleUserFunds: Number(),
       userClass: Object(),
     };
   },
+
   // Todo: Find a way to use mapState, can't right now because have to go through userModule
   computed: {
     loggedIn() {
       return store.state.userModule.loggedIn;
     },
     userData() {
-      return store.getters.getAccount.user !== undefined
-        ? store.getters.getAccount
+      return store.getters.getAccount !== undefined
+        ? store.getters.getAccount.user
         : undefined;
+    },
+    funds() {
+      // let roundedNumber: number = NaN;
+      // if (store.state.getPortfolioClass) {
+      //   roundedNumber =
+      //     ((store.getters.getPortfolioClass.portfolio.availableFunds +
+      //       Number.EPSILON) *
+      //       100) /
+      //     100;
+      //   return roundedNumber;
+      // }
+      // Todo: Get funds working
+      // console.log(store.getters.getPortfolioClass.portfolio);
+      // return store.getters.getPortfolioClass.portfolio !== undefined
+      //   ? Math.round(
+      //       (store.state.portfolio.portfolioClass.portfolio.availableFunds +
+      //         Number.EPSILON) *
+      //         100
+      //     ) / 100
+      //   : NaN;
+      return "bruh";
     },
   },
   methods: {
