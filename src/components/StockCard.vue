@@ -48,14 +48,11 @@ export default Vue.extend({
     return {
       amountToBuy: 1,
       apiStockData: Object,
-      stockRoute: "stocks/" + this.stock[this.keyProp]["stockData"]["name"],
+      stockRoute: ("stocks/" +
+        this.stock[this.keyProp]["stockData"]["name"]) as string,
     };
   },
-  props: {
-    stock: Array,
-    keyProp: Number,
-  },
-  mounted() {},
+  props: ["stock", "keyProp"],
   methods: {
     buyStock(stock: stock) {
       let stockTransaction: newStockTransaction = {

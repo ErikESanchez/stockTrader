@@ -96,18 +96,18 @@ export class Portfolio {
       });
     console.log(stock.stockName);
   }
-  setNewStockCollection() {
-    console.log("New Stock Collection")
-    firebaseData
-      .firestore()
-      .collection("portfolios")
-      .doc(this.name)
-      .collection(stock.stockName)
-      .doc("metaData")
-      .set({
-        amount: stock.stockData.amount,
-      });
-  }
+  // setNewStockCollection() {
+  //   console.log("New Stock Collection")
+  //   firebaseData
+  //     .firestore()
+  //     .collection("portfolios")
+  //     .doc(this.name)
+  //     .collection(stock.stockName)
+  //     .doc("metaData")
+  //     .set({
+  //       amount: stock.stockData.amount,
+  //     });
+  // }
 }
 
 interface portfolio {

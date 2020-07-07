@@ -2,13 +2,13 @@ import Vue from "vue";
 import Router from "vue-router";
 import store from "@/store";
 import router from "@/router";
-import BootstrapVue from "bootstrap-vue/dist/bootstrap-vue.esm";
+import BootstrapVue from "bootstrap-vue";
 import App from "./App.vue";
-import moment from "moment"
-import async from "async"
-Vue.prototype.moment = moment
-Vue.prototype.async = async
-
+import moment from "moment";
+import async from "async";
+Vue.prototype.moment = moment;
+Vue.prototype.async = async;
+// const BootstrapVue = require("bootstrap-vue/dist/bootstrap-vue.esm");
 // Import the styles directly.
 import "bootstrap/dist/css/bootstrap.css";
 import "bootstrap-vue/dist/bootstrap-vue.css";
