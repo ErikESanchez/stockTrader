@@ -34,14 +34,14 @@ export default Vue.extend({
         // Todo: If user has stock(s), put them into the parameters
         let portfolio: Portfolio = new Portfolio(user.uid);
         let account: Account = new Account(user);
-        store.commit("setAccount", account as Account);
-        store.commit("setPortfolioClass", portfolio as Portfolio);
+        store.commit("userModule/setAccount", account as Account);
+        store.commit("portfolio/setPortfolioClass", portfolio as Portfolio);
         this.signedIn = true as boolean;
         this.dataLoaded = true;
       } else {
         let account: Account = new Account();
-        store.commit("setAccount", account as Account);
-        store.commit("changedSignedInStatus", false);
+        store.commit("userModule/setAccount", account as Account);
+        // store.commit("changedSignedInStatus", false);
         console.log("$$$ Sign Up to get some dolla dolla bills yall $$$");
         this.dataLoaded = true as boolean;
       }

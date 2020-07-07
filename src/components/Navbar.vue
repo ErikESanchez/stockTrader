@@ -21,7 +21,7 @@
       <b-navbar-nav>
         <router-link to="/portfolio" class="nav-link">Portfolio</router-link>
       </b-navbar-nav>
-      <b-navbar-nav class="ml-auto" v-if="account !== undefined || ''">
+      <b-navbar-nav class="ml-auto" v-if="account.user !== undefined || ''">
         <!-- <b-nav-form>
           <b-form-input size="sm" class="mr-sm-2" placeholder="Search"></b-form-input>
           <b-button size="sm" class="my-2 my-sm-0" type="submit">Search</b-button>
@@ -30,7 +30,7 @@
         <div>
           <b-nav-item-dropdown right>
             <template v-slot:button-content>
-              <em>{{ account.displayName || account.email }}</em>
+              <em>{{ account.user.displayName || account.user.email }}</em>
             </template>
             <b-dropdown-item>
               <router-link to="/profile">Profile</router-link>
@@ -70,38 +70,20 @@ import store from "@/store";
 import { userPriceHistory } from "@/store";
 import { Account } from "@/Classes/Account";
 import { mapState } from "vuex";
-// import { mapState } from "vuex";
 export default Vue.extend({
   data() {
     return {
-      // latestUserFunds: Array<userPriceHistory>()
-      userClass: Object(),
+      latestUserFunds: Array<userPriceHistory>(),
     };
   },
 
   // Todo: Find a way to use mapState, can't right now because have to go through userModule
-  computed: mapState("userModule", ["loggedIn", "account"]),
-
-  // computed: {
-  //   loggedIn() {
-  //     return store.state.userModule.loggedIn;
-  //   },
-  //   userData() {
-  //     return store.getters.getAccount !== undefined
-  //       ? store.getters.getAccount.user
-  //       : undefined;
-  //   },
-  // funds() {
-  // let roundedNumber: number = NaN;
-  // if (store.state.getPortfolioClass) {
-  //   roundedNumber =
-  //     ((store.getters.getPortfolioClass.portfolio.availableFunds +
-  //       Number.EPSILON) *
-  //       100) /
-  //     100;
-  //   return roundedNumber;
-  // }
-  // Todo: Get funds working
+  computed: {
+    ...mapState("userModule", ["loggedIn", "account"]),
+    funds() {
+      return 10000;
+    },
+  },
   // console.log(store.getters.getPortfolioClass.portfolio);
   // return store.getters.getPortfolioClass.portfolio !== undefined
   //   ? Math.round(

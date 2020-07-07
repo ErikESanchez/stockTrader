@@ -99,6 +99,7 @@ interface userStock {
 }
 
 export default {
+  namespaced: true,
   actions,
   mutations,
   getters,
