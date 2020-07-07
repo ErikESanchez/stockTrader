@@ -5,9 +5,9 @@
     >Get API Data</b-button>-->
     <b-card-group deck v-if="dataReady">
       <stock-card
-        v-for="(stock, key) in stockData"
+        v-for="(stock, key) in formatedStocks"
         :key="key"
-        :stock="stockData"
+        :stock="formatedStocks"
         :keyProp="key"
       ></stock-card>
     </b-card-group>
@@ -19,6 +19,7 @@ import Vue from "vue";
 import StockCard from "../components/StockCard.vue";
 import { Market } from "@/Classes/Market";
 import store from "@/store";
+import { mapState } from "vuex";
 import moment from "moment";
 
 export default Vue.extend({
@@ -33,18 +34,16 @@ export default Vue.extend({
     };
   },
   async mounted() {
-    if (this.stockData[0] === undefined) {
+    if (this.formatedStocks[0] === undefined) {
       await this.getDatabaseDailyData();
     }
-    store.dispatch("getUserFirebaseStocks");
     this.dataReady = true;
   },
-  computed: {
-    stockData() {
-      let stocks: Array<Object> = store.state.marketData.formatedStocks;
-      return stocks;
-    },
-  },
+  computed: mapState("marketData", ["formatedStocks"]),
+  // stockData() {
+  //   let stocks: Array<Object> = store.state.marketData.formatedStocks;
+  //   return stocks;
+  // },
   methods: {
     async callAPI() {
       let stockList: Array<string> = ["AAPL", "GOOGL", "MSFT", "AMZN", "FB"];

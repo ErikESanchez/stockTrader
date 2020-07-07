@@ -11,16 +11,7 @@ export default new Vuex.Store({
     userModule,
     portfolio,
   },
-  state: {
-    user: {},
-    // portfolio: {
-    //   funds: Array<userPriceHistory>(),
-    //   latestUserFunds: Number,
-    //   myStocks: Array<userStock>(),
-    //   historyOfTrades: Array<userStock>()
-    // }
-  },
-
+  state: {},
   getters: {},
   mutations: {},
   actions: {},

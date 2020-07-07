@@ -26,7 +26,7 @@ export class Portfolio {
     if (this.portfolio) {
       this.addUserFirebaseStocks(stocks);
     } else if (this.portfolio === undefined) {
-      this.setNewUserDatabasePortfolio();
+      this.setNewUserDatabasePortfolio(stocks);
       console.log("bruh");
     }
   }
@@ -49,14 +49,14 @@ export class Portfolio {
         console.error(error);
       });
   }
-  addUserFirebaseStocks(stocks: newStockTransaction) {
+  addUserFirebaseStocks(stock: newStockTransaction) {
     if (this.portfolio) {
       let user: any = store.getters.getAccount.user;
       // let newOwnedStocks: any = ;
       let availableFunds: number = this.portfolio.availableFunds;
-      let amountOfStocks: number = stocks.stockData.amount;
-      let priceAtTransaction: number = stocks.stockData.priceAtTransaction;
-      let symbol: string = stocks.stockName;
+      let amountOfStocks: number = stock.stockData.amount;
+      let priceAtTransaction: number = stock.stockData.priceAtTransaction;
+      let symbol: string = stock.stockName;
       let stockClass: Stock = new Stock(
         priceAtTransaction,
         amountOfStocks,
@@ -70,12 +70,12 @@ export class Portfolio {
         .update({
           availableFunds: availableFunds - totalCost,
           name: user.displayName || user.email,
-          ownedStocks: firestore.FieldValue.arrayUnion(stocks),
+          ownedStocks: firestore.FieldValue.arrayUnion(stock),
           portfolioWorth: totalCost,
         });
     }
   }
-  setNewUserDatabasePortfolio() {
+  setNewUserDatabasePortfolio(stock: newStockTransaction) {
     let accountClass: any = store.getters.getAccount.user;
     firebaseData
       .firestore()
@@ -86,7 +86,6 @@ export class Portfolio {
         name:
           (accountClass.displayName as string) ||
           (accountClass.email as string),
-        ownedStocks: Array(),
         portfolioWorth: 0,
       })
       .then(() => {
@@ -94,6 +93,19 @@ export class Portfolio {
       })
       .catch((error: any) => {
         console.error(error);
+      });
+    console.log(stock.stockName);
+  }
+  setNewStockCollection() {
+    console.log("New Stock Collection")
+    firebaseData
+      .firestore()
+      .collection("portfolios")
+      .doc(this.name)
+      .collection(stock.stockName)
+      .doc("metaData")
+      .set({
+        amount: stock.stockData.amount,
       });
   }
 }

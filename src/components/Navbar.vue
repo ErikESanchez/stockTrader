@@ -21,7 +21,7 @@
       <b-navbar-nav>
         <router-link to="/portfolio" class="nav-link">Portfolio</router-link>
       </b-navbar-nav>
-      <b-navbar-nav class="ml-auto" v-if="userData !== undefined || ''">
+      <b-navbar-nav class="ml-auto" v-if="account !== undefined || ''">
         <!-- <b-nav-form>
           <b-form-input size="sm" class="mr-sm-2" placeholder="Search"></b-form-input>
           <b-button size="sm" class="my-2 my-sm-0" type="submit">Search</b-button>
@@ -30,7 +30,7 @@
         <div>
           <b-nav-item-dropdown right>
             <template v-slot:button-content>
-              <em>{{ userData.displayName || userData.email }}</em>
+              <em>{{ account.displayName || account.email }}</em>
             </template>
             <b-dropdown-item>
               <router-link to="/profile">Profile</router-link>
@@ -69,6 +69,7 @@ import Vue from "vue";
 import store from "@/store";
 import { userPriceHistory } from "@/store";
 import { Account } from "@/Classes/Account";
+import { mapState } from "vuex";
 // import { mapState } from "vuex";
 export default Vue.extend({
   data() {
@@ -79,37 +80,38 @@ export default Vue.extend({
   },
 
   // Todo: Find a way to use mapState, can't right now because have to go through userModule
-  computed: {
-    loggedIn() {
-      return store.state.userModule.loggedIn;
-    },
-    userData() {
-      return store.getters.getAccount !== undefined
-        ? store.getters.getAccount.user
-        : undefined;
-    },
-    funds() {
-      // let roundedNumber: number = NaN;
-      // if (store.state.getPortfolioClass) {
-      //   roundedNumber =
-      //     ((store.getters.getPortfolioClass.portfolio.availableFunds +
-      //       Number.EPSILON) *
-      //       100) /
-      //     100;
-      //   return roundedNumber;
-      // }
-      // Todo: Get funds working
-      // console.log(store.getters.getPortfolioClass.portfolio);
-      // return store.getters.getPortfolioClass.portfolio !== undefined
-      //   ? Math.round(
-      //       (store.state.portfolio.portfolioClass.portfolio.availableFunds +
-      //         Number.EPSILON) *
-      //         100
-      //     ) / 100
-      //   : NaN;
-      return "bruh";
-    },
-  },
+  computed: mapState("userModule", ["loggedIn", "account"]),
+
+  // computed: {
+  //   loggedIn() {
+  //     return store.state.userModule.loggedIn;
+  //   },
+  //   userData() {
+  //     return store.getters.getAccount !== undefined
+  //       ? store.getters.getAccount.user
+  //       : undefined;
+  //   },
+  // funds() {
+  // let roundedNumber: number = NaN;
+  // if (store.state.getPortfolioClass) {
+  //   roundedNumber =
+  //     ((store.getters.getPortfolioClass.portfolio.availableFunds +
+  //       Number.EPSILON) *
+  //       100) /
+  //     100;
+  //   return roundedNumber;
+  // }
+  // Todo: Get funds working
+  // console.log(store.getters.getPortfolioClass.portfolio);
+  // return store.getters.getPortfolioClass.portfolio !== undefined
+  //   ? Math.round(
+  //       (store.state.portfolio.portfolioClass.portfolio.availableFunds +
+  //         Number.EPSILON) *
+  //         100
+  //     ) / 100
+  //   : NaN;
+  //   return "bruh";
+  // },
   methods: {
     logOut() {
       store.dispatch("signOut");

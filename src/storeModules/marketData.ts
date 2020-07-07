@@ -293,6 +293,7 @@ interface stockDataFormat {
 }
 
 export default {
+  namespaced: true,
   actions,
   mutations,
   getters,
