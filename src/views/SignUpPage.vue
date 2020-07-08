@@ -10,7 +10,9 @@
       <b-input-group-append></b-input-group-append>
     </b-input-group>
 
-    <b-button variant="outline-success" @click="createNewUser()">Sign Up</b-button>
+    <b-button variant="outline-success" @click="createNewUser()"
+      >Sign Up</b-button
+    >
   </div>
 </template>
 
@@ -23,17 +25,16 @@ export default Vue.extend({
     return {
       userInput: {
         username: String(),
-        password: String()
-      }
+        password: String(),
+      },
     };
   },
   methods: {
     createNewUser() {
-      store.dispatch("createNewUser", this.userInput);
-    }
-  }
+      store.dispatch("userModule/createNewUser", this.userInput);
+    },
+  },
 });
 </script>
 
-<style>
-</style>
+<style></style>

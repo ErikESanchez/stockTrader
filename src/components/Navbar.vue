@@ -86,7 +86,7 @@ export default Vue.extend({
   },
   methods: {
     logOut() {
-      store.dispatch("signOut");
+      store.dispatch("userModule/signOut");
     },
   },
 });

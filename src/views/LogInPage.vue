@@ -10,7 +10,11 @@
       <b-input-group-append></b-input-group-append>
     </b-input-group>
 
-    <b-button variant="outline-success" @click="login(userInput.username, userInput.password)">Login</b-button>
+    <b-button
+      variant="outline-success"
+      @click="login(userInput.username, userInput.password)"
+      >Login</b-button
+    >
   </div>
 </template>
 
@@ -24,21 +28,20 @@ export default Vue.extend({
     return {
       userInput: {
         username: String(),
-        password: String()
-      }
+        password: String(),
+      },
     };
   },
   methods: {
     login(username: string, password: string) {
       let userInput: Object = {
         username: username,
-        password: password
+        password: password,
       };
-      store.dispatch("login", userInput);
-    }
-  }
+      store.dispatch("userModule/login", userInput);
+    },
+  },
 });
 </script>
 
-<style>
-</style>
+<style></style>

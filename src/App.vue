@@ -16,16 +16,16 @@ import store from "@/store";
 export default Vue.extend({
   name: "App",
   components: {
-    Navbar
+    Navbar,
   },
   data() {
     return {
       signedIn: false,
-      dataLoaded: false
+      dataLoaded: false,
     };
   },
   async created() {
-    await firebaseData.auth().onAuthStateChanged(async user => {
+    await firebaseData.auth().onAuthStateChanged(async (user) => {
       if (user) {
         let account: Account = new Account(user);
         store.commit("userModule/setAccount", account as Account);
@@ -39,7 +39,7 @@ export default Vue.extend({
         this.dataLoaded = true as boolean;
       }
     });
-  }
+  },
 });
 </script>
 
