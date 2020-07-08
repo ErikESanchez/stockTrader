@@ -45,7 +45,7 @@ const actions: ActionTree<any, any> = {
       .update({
         availableFunds:
           state.portfolio.availableFunds - stockClass.getTotalWorth(),
-        ownedStock: firestore.FieldValue.arrayUnion(stockTransaction),
+        ownedStocks: firestore.FieldValue.arrayUnion(stockTransaction),
         portfolio: state.portfolio.portfolioWorth + stockClass.getTotalWorth(),
       });
   },
