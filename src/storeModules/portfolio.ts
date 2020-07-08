@@ -1,8 +1,8 @@
 import Vue from "vue";
 import { ActionTree, GetterTree, MutationTree } from "vuex";
-import { newStockTransaction } from "@/Classes/Portfolio";
+import { newStockTransaction, UserPortfolio } from "@/Classes/Portfolio";
 import { firebaseData } from "@/firebase";
-import { firestore } from "firebase";
+import { firestore, User } from "firebase";
 import { Stock } from "@/Classes/Stock";
 
 const state: State = {
@@ -32,43 +32,61 @@ const actions: ActionTree<any, any> = {
         state.portfolio = doc.data() as UserPortfolio;
       });
   },
-  buyStock({ state }, stockTransaction: newStockTransaction) {
+  async buyStock({ state, dispatch }, stockTransaction: newStockTransaction) {
     let stockClass: Stock = new Stock(
       stockTransaction.stockData.priceAtTransaction,
       stockTransaction.stockData.amount,
       stockTransaction.stockName
     );
-    firebaseData
-      .firestore()
-      .collection("portfolios")
-      .doc(state.uid as string)
-      .update({
-        availableFunds:
-          state.portfolio.availableFunds - stockClass.getTotalWorth(),
-        ownedStocks: firestore.FieldValue.arrayUnion(stockTransaction),
-        portfolio: state.portfolio.portfolioWorth + stockClass.getTotalWorth(),
-      });
+    let portfolio: UserPortfolio = state.portfolio;
+
+    if (
+      Object.keys(portfolio.ownedStocks).length === 0 &&
+      portfolio.ownedStocks.constructor === Object
+    ) {
+      await firebaseData
+        .firestore()
+        .collection("portfolios")
+        .doc(state.uid as string)
+        .set({
+          // availableFunds: portfolio.availableFunds - stockClass.getTotalWorth(),
+          // ownedStock:
+        });
+      console.log("bruh");
+    }
+    // if ()
+    // await firebaseData
+    //   .firestore()
+    //   .collection("portfolios")
+    //   .doc(state.uid as string)
+    //   .set({
+    //     availableFunds: portfolio.availableFunds - stockClass.getTotalWorth(),
+    //     ownedStocks: {
+    //       [stockTransaction.stockName]: {
+    //         amountOwned:
+    //           stockTransaction.stockData.amount +
+    //           state.portfolio.ownedStocks[stockTransaction.stockName]
+    //             .stocksOwned,
+    //       },
+    //     },
+    //     ownedStocksData: firestore.FieldValue.arrayUnion(stockTransaction),
+    //     portfolioWorth: portfolio.portfolioWorth + stockClass.getTotalWorth(),
+    //   });
+    // dispatch("getPortfolio", state.uid);
   },
 };
-
-interface stockTransactionData {
-  priceAtTransaction: number;
-  amount: number;
-  time: Date;
-}
 
 interface State {
   funds: number;
   portfolio: UserPortfolio;
   uid: string;
 }
-interface UserPortfolio {
-  availableFunds: number;
-  name: string;
-  stocksOwned: Array<stockTransactionData>;
-  portfolioWorth: number;
-}
 
+interface TotalUserStocks {
+  [name: string]: {
+    stocksOwned: number;
+  };
+}
 interface doc {
   [id: string]: any;
 }

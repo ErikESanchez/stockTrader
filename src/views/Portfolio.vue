@@ -2,6 +2,7 @@
   <div>
     <p>Portfolio</p>
     <b-card-group deck>
+      {{ portfolio.ownedStocks }}
       <portfolio-stock-card
         v-for="(stock, index) in portfolio.ownedStocks"
         :stock="stock"
@@ -13,7 +14,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { userStock } from "@/store";
+import { UserStock } from "@/store";
 import PortfolioStockCard from "@/components/PortfolioStockCard.vue";
 import store from "@/store";
 import { mapState } from "vuex";
@@ -26,7 +27,7 @@ export default Vue.extend({
   data() {
     return {
       dataReady: false,
-      stockData: Array<userStock>(),
+      stockData: Array<UserStock>(),
       stockAmount: new Number(),
     };
   },
