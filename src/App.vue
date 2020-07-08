@@ -32,7 +32,7 @@ export default Vue.extend({
     await firebaseData.auth().onAuthStateChanged(async (user) => {
       if (user) {
         // Todo: If user has stock(s), put them into the parameters
-        let portfolio: Portfolio = new Portfolio(user.uid);
+        // let portfolio: Portfolio = new Portfolio(user.uid);
         let account: Account = new Account(user);
         store.commit("userModule/setAccount", account as Account);
         store.dispatch("portfolio/getPortfolio", user.uid);

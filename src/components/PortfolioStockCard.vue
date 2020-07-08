@@ -5,11 +5,12 @@
       header-bg-variant="success"
       header-text-variant="white"
       align="center"
-      :title="stock.stockName"
+      :title="stock"
     >
-      <b-card-text> {{ stock.stockData.priceAtTransaction }} $ </b-card-text>
+      {{ stock }}
+      <!-- <b-card-text> {{ stock.stockData.priceAtTransaction }} $ </b-card-text> -->
       <b-card-text>
-        Amount Of Stock Owned: {{ stock.stockData.amount }}
+        Amount Of Stock Owned: {{ stock.stocksOwned }}
       </b-card-text>
       <b-button variant="success" @click="sellStock(stock, 1)">Sell</b-button>
       <b-row class="my-1">
