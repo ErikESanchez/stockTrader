@@ -1,9 +1,11 @@
 export class Stock {
   price: number;
   shares: number;
-  constructor(currentPrice: number, numberOfShares: number) {
+  name: string;
+  constructor(currentPrice: number, numberOfShares: number, name: string) {
     this.price = currentPrice;
     this.shares = numberOfShares;
+    this.name = name;
   }
 
   getNumberOfShares() {

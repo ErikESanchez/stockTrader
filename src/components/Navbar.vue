@@ -5,6 +5,14 @@
     </b-navbar-brand>
 
     <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
+    <!-- <button
+      @click="func()"
+      type="button"
+      class="btn btn-light dropdown-toggle"
+      data-toggle="dropdown"
+      aria-haspopup="true"
+      aria-expanded="false"
+    >Update User Funds</button>-->
 
     <b-collapse id="nav-collapse" is-nav>
       <b-navbar-nav>
@@ -13,89 +21,84 @@
       <b-navbar-nav>
         <router-link to="/portfolio" class="nav-link">Portfolio</router-link>
       </b-navbar-nav>
-
-      <b-navbar-nav class="ml-auto">
+      <b-navbar-nav class="ml-auto" v-if="account.user !== undefined || ''">
         <!-- <b-nav-form>
           <b-form-input size="sm" class="mr-sm-2" placeholder="Search"></b-form-input>
           <b-button size="sm" class="my-2 my-sm-0" type="submit">Search</b-button>
         </b-nav-form>-->
-
-        <b-nav-item-dropdown right>
-          <template v-slot:button-content>
-            <em>User</em>
-          </template>
-          <b-dropdown-item href="#">Profile</b-dropdown-item>
-          <b-dropdown-item href="#">Sign Out</b-dropdown-item>
-        </b-nav-item-dropdown>
-        <b-button size="sm" class="my-2 my-sm-0" type="submit">End day</b-button>
+        <b-navbar-nav class="nav-link">{{ funds }}</b-navbar-nav>
+        <div>
+          <b-nav-item-dropdown right>
+            <template v-slot:button-content>
+              <em>{{ account.user.displayName || account.user.email }}</em>
+            </template>
+            <b-dropdown-item>
+              <router-link to="/profile">Profile</router-link>
+            </b-dropdown-item>
+            <b-dropdown-item @click="logOut()">Sign Out</b-dropdown-item>
+          </b-nav-item-dropdown>
+          <!-- <b-button size="sm" class="my-2 my-sm-0" type="submit">End day</b-button> -->
+        </div>
+      </b-navbar-nav>
+      <b-navbar-nav class="ml-auto" v-else>
+        <div>
+          <router-link
+            to="/logIn"
+            size="sm"
+            class="my-2 my-sm-0 log-In-Button"
+            type="submit"
+          >
+            <b-button>Log In</b-button>
+          </router-link>
+          <router-link
+            to="/signUp"
+            size="sm"
+            class="my-2 my-sm-0"
+            type="submit"
+          >
+            <b-button>Sign Up</b-button>
+          </router-link>
+        </div>
       </b-navbar-nav>
     </b-collapse>
   </b-navbar>
-  <!-- <nav class="navbar navbar-expand-lg navbar-light bg-light nv">
-    <button
-      class="navbar-toggler"
-      type="button"
-      data-toggle="collapse"
-      data-target="#navbarSupportedContent"
-      aria-controls="navbarSupportedContent"
-      aria-expanded="false"
-      aria-label="Toggle navigation"
-    >
-      <span class="navbar-toggler-icon"></span>
-    </button>
-
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-      <ul class="navbar-nav mr-auto">
-        <li class="nav-item">
-          <router-link to="/stocks" class="nav-link">Stocks</router-link>
-          <span class="sr-only">(current)</span>
-        </li>
-        <li class="nav-item">
-          <router-link to="/portfolio" class="nav-link">Portfolio</router-link>
-        </li>
-      </ul>
-      <button type="button" class="btn btn-light">End Day</button>
-      <button
-        @click="func()"
-        type="button"
-        class="btn btn-light dropdown-toggle"
-        data-toggle="dropdown"
-        aria-haspopup="true"
-        aria-expanded="false"
-      >Update User Funds</button>
-      <button type="button" class="btn btn-light">Save Load</button>
-      <a>Funds: {{ funds }}</a>
-    </div>
-  </nav>-->
 </template>
 
 <script lang="ts">
 import Vue from "vue";
-import { userPriceHistory } from "../store";
-
+import store from "@/store";
+import { userPriceHistory } from "@/store";
+import { Account } from "@/Classes/Account";
+import { mapState } from "vuex";
 export default Vue.extend({
   data() {
     return {
-      funds: Array<userPriceHistory>()
+      latestUserFunds: Array<userPriceHistory>(),
     };
   },
-  created() {
-    this.$store.commit("updateUserFunds");
-    this.funds = this.$store.getters.getLatestUserFunds;
-    console.log(this.funds);
-    // ? How to make the navbar show the most recent form of funds, the code is here, just need to find somewhere to put it
-  },
-  methods: {
-    newPrices() {
-      this.BMW_Stock = this.$store.commit(
-        "generateStockPrices",
-        this.BMW_Stock
-      );
+
+  // Todo: Find a way to use mapState, can't right now because have to go through userModule
+  computed: {
+    ...mapState("userModule", ["loggedIn", "account"]),
+    funds() {
+      return 10000;
     },
-    func() {
-      this.funds = this.$store.getters.getLatestUserFunds;
-    }
-  }
+  },
+  // console.log(store.getters.getPortfolioClass.portfolio);
+  // return store.getters.getPortfolioClass.portfolio !== undefined
+  //   ? Math.round(
+  //       (store.state.portfolio.portfolioClass.portfolio.availableFunds +
+  //         Number.EPSILON) *
+  //         100
+  //     ) / 100
+  //   : NaN;
+  //   return "bruh";
+  // },
+  methods: {
+    logOut() {
+      store.dispatch("signOut");
+    },
+  },
 });
 </script>
 
@@ -104,5 +107,9 @@ export default Vue.extend({
   position: relative;
   top: -30px;
   margin: 30px;
+}
+
+.log-In-Button {
+  margin-right: 10px;
 }
 </style>
