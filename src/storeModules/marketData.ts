@@ -199,7 +199,7 @@ export const actions: ActionTree<any, any> = {
     // TODO: Figure out how to use an interface and to be able dynamically name a variable
     let stockData: stockData = Object();
     let dateOfMonth: Object = moment().subtract(1, "month");
-    let formatedDateOfMonth: string = moment(moment()).format("YYYY-MM");
+    let formatedDateOfMonth: string = moment(dateOfMonth).format("YYYY-MM");
     let isDone: Boolean;
     // * Bruh, this is all I had to do, to wait
     await Promise.resolve(

@@ -34,7 +34,6 @@
 </template>
 
 <script lang="ts">
-/* eslint-disable */
 import Vue from "vue";
 import store from "@/store";
 import { newStockTransaction } from "@/Classes/Portfolio";
@@ -63,7 +62,7 @@ export default Vue.extend({
           time: new Date(),
         },
       };
-      store.dispatch("buyStock", stockTransaction);
+      store.dispatch("portfolio/buyStock", stockTransaction);
     },
   },
 });
