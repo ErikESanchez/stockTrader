@@ -35,7 +35,8 @@ export default Vue.extend({
         let portfolio: Portfolio = new Portfolio(user.uid);
         let account: Account = new Account(user);
         store.commit("userModule/setAccount", account as Account);
-        store.commit("portfolio/setPortfolioClass", portfolio as Portfolio);
+        store.dispatch("portfolio/getPortfolio", user.uid);
+        // store.commit("portfolio/setPortfolioClass", portfolio as Portfolio);
         this.signedIn = true as boolean;
         this.dataLoaded = true;
       } else {

@@ -1,90 +1,54 @@
 import Vue from "vue";
 import { ActionTree, GetterTree, MutationTree } from "vuex";
-import { Portfolio, newStockTransaction } from "@/Classes/Portfolio";
+import { newStockTransaction } from "@/Classes/Portfolio";
+import { firebaseData } from "@/firebase";
+import { firestore } from "firebase";
+import { Stock } from "@/Classes/Stock";
 
-const state = {
+const state: State = {
   funds: 10000,
-  myStocks: Array<userStock>(),
-  historyOfTrades: Array<userStock>(),
-  portfolioClass: Portfolio,
+  portfolio: Object(),
+  uid: String(),
 };
 const getters: GetterTree<any, any> = {
-  getPortfolioClass(state: any) {
-    return state.portfolioClass;
-  },
-  getTotalFunds: (state) => {
+  getTotalFunds: (state: State) => {
     return state.funds;
   },
-  getAllStocks: (state) => {
-    return state.stocks;
-  },
-  getUserStocks: (state) => {
-    return state.myStocks;
-  },
-  ownStock: (state) => (stockName: string): boolean => {
-    let doIOwnStock = false;
-    state.myStocks.forEach((stock: userStock) => {
-      if (stock.name === stockName) {
-        doIOwnStock = true;
-      }
-    });
-    return doIOwnStock;
+  getPortfolio: (state: State) => {
+    return state.portfolio;
   },
 };
-const mutations: MutationTree<any> = {
-  setPortfolioClass(state, portfolio: Portfolio) {
-    Vue.set(state, "portfolioClass", portfolio);
-  },
-  updateFunds(state, priceDifference: number) {
-    state.funds += priceDifference;
-  },
-  // updateStocksBuy(state, data: newStockTransaction) {
-  //   let newStockPurchaseData: stockTransactionData = {
-  //     priceAtTransaction: data.stockData.priceAtTransaction,
-  //     amount: data.stockData.amount,
-  //     time: data.stockData.time,
-  //   };
-
-  //   if (data.alreadyHaveStock) {
-  //     state.portfolio.myStocks.forEach((stock: userStock) => {
-  //       if (stock.name === data.stockName) {
-  //         stock.stocksOwned.push(newStockPurchaseData);
-  //       }
-  //     });
-  //   } else {
-  //     let newStock: userStock = {
-  //       name: data.stockName,
-  //       stocksOwned: [newStockPurchaseData],
-  //     };
-  //     state.portfolio.myStocks.push(newStock);
-  //   }
-
-  //   console.log("Update Stock with a BUY");
-  // },
-  // updateStocksSell(state, data: newStockTransaction) {}
-};
+const mutations: MutationTree<any> = {};
 const actions: ActionTree<any, any> = {
+  getPortfolio({ state }, uid: string) {
+    state.uid = uid;
+    firebaseData
+      .firestore()
+      .collection("portfolios")
+      .doc(uid)
+      .get()
+      .then((doc: doc) => {
+        console.log(doc.id, "=>", doc.data());
+        state.portfolio = doc.data() as UserPortfolio;
+      });
+  },
   buyStock({ state }, stockTransaction: newStockTransaction) {
-    state.portfolioClass.buyStock(stockTransaction);
-    // console.log(stockTransaction);
+    let stockClass: Stock = new Stock(
+      stockTransaction.stockData.priceAtTransaction,
+      stockTransaction.stockData.amount,
+      stockTransaction.stockName
+    );
+    firebaseData
+      .firestore()
+      .collection("portfolios")
+      .doc(state.uid as string)
+      .update({
+        availableFunds:
+          state.portfolio.availableFunds - stockClass.getTotalWorth(),
+        ownedStock: firestore.FieldValue.arrayUnion(stockTransaction),
+        portfolio: state.portfolio.portfolioWorth + stockClass.getTotalWorth(),
+      });
   },
-  getUserFirebaseStocks({ state }) {
-    console.log(state.portfolioClass);
-    state.portfolioClass.getUserFirebaseStocks();
-  },
-  // buyStock({ commit, }, transactionData: newStockTransaction) {
-  //   if (getters.ownStock(transactionData.stockName)) {
-  //     transactionData.alreadyHaveStock = true;
-  //     commit("updateStocksBuy", transactionData);
-  //   } else {
-  //     commit("updateStocksBuy", transactionData);
-  //   }
-  //   commit(
-  //     "updateFunds",
-  //     transactionData.stockData.amount * transactionData.stockData.priceAtTransaction
-  //   );
-  // },
-  // sellStock({ commit, getters }, transactionData: newStockTransaction) {}
 };
 
 interface stockTransactionData {
@@ -93,9 +57,20 @@ interface stockTransactionData {
   time: Date;
 }
 
-interface userStock {
+interface State {
+  funds: number;
+  portfolio: UserPortfolio;
+  uid: string;
+}
+interface UserPortfolio {
+  availableFunds: number;
   name: string;
   stocksOwned: Array<stockTransactionData>;
+  portfolioWorth: number;
+}
+
+interface doc {
+  [id: string]: any;
 }
 
 export default {

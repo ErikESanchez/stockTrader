@@ -26,7 +26,9 @@
           <b-form-input size="sm" class="mr-sm-2" placeholder="Search"></b-form-input>
           <b-button size="sm" class="my-2 my-sm-0" type="submit">Search</b-button>
         </b-nav-form>-->
-        <b-navbar-nav class="nav-link">{{ funds }}</b-navbar-nav>
+        <b-navbar-nav class="nav-link">{{
+          portfolio.availableFunds
+        }}</b-navbar-nav>
         <div>
           <b-nav-item-dropdown right>
             <template v-slot:button-content>
@@ -80,20 +82,8 @@ export default Vue.extend({
   // Todo: Find a way to use mapState, can't right now because have to go through userModule
   computed: {
     ...mapState("userModule", ["loggedIn", "account"]),
-    funds() {
-      return 10000;
-    },
+    ...mapState("portfolio", ["portfolio"]),
   },
-  // console.log(store.getters.getPortfolioClass.portfolio);
-  // return store.getters.getPortfolioClass.portfolio !== undefined
-  //   ? Math.round(
-  //       (store.state.portfolio.portfolioClass.portfolio.availableFunds +
-  //         Number.EPSILON) *
-  //         100
-  //     ) / 100
-  //   : NaN;
-  //   return "bruh";
-  // },
   methods: {
     logOut() {
       store.dispatch("signOut");

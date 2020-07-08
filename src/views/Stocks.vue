@@ -48,7 +48,7 @@ export default Vue.extend({
     async callAPI() {
       let stockList: Array<string> = ["AAPL", "GOOGL", "MSFT", "AMZN", "FB"];
       await stockList.forEach(async (symbol: string) => {
-        store.dispatch("getApiDaily", symbol);
+        store.dispatch("marketData/getApiDaily", symbol);
       });
       console.log("It called");
       // this.getDatabaseDailyData();
@@ -103,10 +103,10 @@ export default Vue.extend({
       return dataIsUpToDate;
     },
     async APIData(stock: any) {
-      this.$store.dispatch("getApiDaily", stock);
+      this.$store.dispatch("marketData/getApiDaily", stock);
     },
     async getDatabaseDailyData() {
-      await store.dispatch("getDatabaseDailyData");
+      await store.dispatch("marketData/getDatabaseDailyData");
     },
   },
   components: {
