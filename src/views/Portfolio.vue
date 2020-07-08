@@ -1,12 +1,11 @@
 <template>
   <div>
     <p>Portfolio</p>
-    <b-card-group deck v-if="dataReady">
+    <b-card-group deck>
       <portfolio-stock-card
-        v-for="stock in stockData"
-        :key="stock"
+        v-for="(stock, index) in portfolio.ownedStocks"
         :stock="stock"
-        :stockAmount="stockAmount"
+        :key="index"
       ></portfolio-stock-card>
     </b-card-group>
   </div>
@@ -17,42 +16,23 @@ import Vue from "vue";
 import { userStock } from "@/store";
 import PortfolioStockCard from "@/components/PortfolioStockCard.vue";
 import store from "@/store";
+import { mapState } from "vuex";
 
 export default Vue.extend({
   name: "portfolio",
   components: {
-    PortfolioStockCard
+    PortfolioStockCard,
   },
   data() {
     return {
       dataReady: false,
       stockData: Array<userStock>(),
-      stockAmount: new Number()
+      stockAmount: new Number(),
     };
   },
-  mounted() {
-    this.initializeUserStocks();
-    this.dataReady = true;
-  },
-  methods: {
-    initializeUserStocks() {
-      this.stockData = store.getters.getUserStocks;
-      let totalAmount = new Array();
-      // ! index in the forEach loop is a key!
-      Object.entries(this.stockData).forEach(stock => {
-        for (let i = 0; i < stock[1]["stocksOwned"].length; i++) {
-          let amount = Number(stock[1]["stocksOwned"][i]["amount"]);
-          totalAmount.push(amount);
-          this.stockAmount = totalAmount.reduce((a, b) => {
-            return a + b;
-          }, 0);
-          console.log(this.stockAmount);
-        }
-      });
-    }
-  }
+  mounted() {},
+  computed: mapState("portfolio", ["portfolio"]),
 });
 </script>
 
-<style>
-</style>
+<style></style>
