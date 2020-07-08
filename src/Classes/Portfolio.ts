@@ -1,14 +1,8 @@
 import { Stock } from "./Stock";
 import { firebaseData } from "@/firebase";
 import store from "@/store";
-// import { newStockTransaction } from '@/store';
-import axios from "axios";
-import { apikey } from "../apikey";
-import moment from "moment";
 import portfolio from "@/storeModules/portfolio";
 import { firestore } from "firebase";
-
-// * Need to make the logic for the user stroring stocks i think,
 export class Portfolio {
   name: string;
   ownedStocks: stockTransactionData | undefined;
@@ -96,18 +90,6 @@ export class Portfolio {
       });
     console.log(stock.stockName);
   }
-  // setNewStockCollection() {
-  //   console.log("New Stock Collection")
-  //   firebaseData
-  //     .firestore()
-  //     .collection("portfolios")
-  //     .doc(this.name)
-  //     .collection(stock.stockName)
-  //     .doc("metaData")
-  //     .set({
-  //       amount: stock.stockData.amount,
-  //     });
-  // }
 }
 
 interface portfolio {
