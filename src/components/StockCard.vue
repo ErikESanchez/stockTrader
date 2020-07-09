@@ -1,6 +1,14 @@
 <template>
   <div>
-    <b-card
+    <div class="card-body">
+      <h5 class="card-title">{{ stock["stockData"]["name"] }}</h5>
+      <p class="card-text">
+        {{ stock["stockData"]["open"] }}$
+        {{ stock["stockData"]["lastRefreshed"] }}
+      </p>
+      <button class="btn btn-primary">Sell Stock</button>
+    </div>
+    <!-- <b-card
       border-variant="primary"
       header-bg-variant="success"
       header-text-variant="white"
@@ -25,11 +33,11 @@
       <b-row class="my-1">
         <b-col sm="3"></b-col>
         <b-col sm="9">
-          <!-- Todo: Don't let the amount go below 0, or more than the volume of stocks -->
-          <b-form-input type="number" v-model="amountToBuy"></b-form-input>
-        </b-col>
-      </b-row>
-    </b-card>
+          Todo: Don't let the amount go below 0, or more than the volume of stocks
+    <b-form-input type="number" v-model="amountToBuy"></b-form-input>
+    </b-col>
+    </b-row>
+     </b-card> -->
   </div>
 </template>
 
@@ -37,34 +45,30 @@
 import Vue from "vue";
 import store from "@/store";
 import { newStockTransaction } from "@/Classes/Portfolio";
-interface stock {
-  [key: string]: any;
-  name: string;
-  value: number;
-}
+
 export default Vue.extend({
+  props: ["stock", "index"],
   data() {
     return {
       amountToBuy: 1,
-      apiStockData: Object,
-      stockRoute: ("stocks/" +
-        this.stock[this.keyProp]["stockData"]["name"]) as string,
+      // Todo: For some reason this gives an error
+      // stockRoute: ("stocks/" +
+      //   this.stock[this.index]["stockData"]["name"]) as string,
     };
   },
-  props: ["stock", "keyProp"],
-  methods: {
-    buyStock(stock: stock) {
-      let stockTransaction: newStockTransaction = {
-        stockName: stock.stockData.name,
-        stockData: {
-          priceAtTransaction: stock.stockData.high,
-          amount: this.amountToBuy,
-          time: new Date(),
-        },
-      };
-      store.dispatch("portfolio/buyStock", stockTransaction);
-    },
-  },
+  // methods: {
+  //   buyStock(stock: stock) {
+  //     let stockTransaction: newStockTransaction = {
+  //       stockName: stock.stockData.name,
+  //       stockData: {
+  //         priceAtTransaction: stock.stockData.high,
+  //         amount: this.amountToBuy,
+  //         time: new Date(),
+  //       },
+  //     };
+  //     store.dispatch("portfolio/buyStock", stockTransaction);
+  //   },
+  // },
 });
 </script>
 
