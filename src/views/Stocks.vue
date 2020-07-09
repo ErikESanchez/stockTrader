@@ -37,6 +37,7 @@ export default Vue.extend({
     if (this.formatedStocks[0] === undefined) {
       await this.getDatabaseDailyData();
     }
+    await store.dispatch("getUserFirebaseStocks");
     this.dataReady = true;
   },
   computed: mapState("marketData", ["formatedStocks"]),
