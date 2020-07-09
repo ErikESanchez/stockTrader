@@ -13,7 +13,7 @@
     </ul>
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav mr-auto"></ul>
-      <form class="form-inline my-2 my-lg-0" v-if="account">
+      <form class="form-inline my-2 my-lg-0" v-if="user.email">
         <ul class="navbar-nav mr-auto">
           <li class="nav-item active">
             <div class="nav-link">Funds</div>
@@ -28,18 +28,26 @@
               aria-haspopup="true"
               aria-expanded="false"
             >
-              {{ account.user.email || account.user.displayName }}
+              <!-- {{ account.user.email || account.user.displayName }} -->
             </a>
             <div class="dropdown-menu" aria-labelledby="navbarDropdown">
               <router-link to="/profile" class="dropdown-item"
-                >Profile</router-link
-              >
-              <router-link to="/" class="dropdown-item" @click="logOut()">
-                Sign out
+                >Profile
               </router-link>
+              <li class="dropdown-item" @click="signOut()">
+                Sign Out
+              </li>
             </div>
           </li>
         </ul>
+      </form>
+      <form class="from-inline my-2 my-lg-0" v-else>
+        <router-link to="signin" class="btn btn-outline-light my-2 my-sm-0"
+          >Sign In
+        </router-link>
+        <router-link to="signup" class="btn btn-outline-light my-2 my-sm-0">
+          Sign Up
+        </router-link>
       </form>
 
       <!-- <form class="form-inline my-2 my-lg-0">
@@ -61,7 +69,6 @@
 import Vue from "vue";
 import store from "@/store";
 import { userPriceHistory } from "@/store";
-import { Account } from "@/Classes/Account";
 import { mapState } from "vuex";
 export default Vue.extend({
   data() {
@@ -69,14 +76,12 @@ export default Vue.extend({
       latestUserFunds: Array<userPriceHistory>(),
     };
   },
-
-  // Todo: Find a way to use mapState, can't right now because have to go through userModule
   computed: {
-    ...mapState("userModule", ["loggedIn", "account"]),
+    ...mapState("userModule", ["user"]),
     ...mapState("portfolio", ["portfolio"]),
   },
   methods: {
-    logOut() {
+    signOut() {
       store.dispatch("userModule/signOut");
     },
   },

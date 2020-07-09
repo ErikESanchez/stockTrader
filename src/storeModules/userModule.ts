@@ -1,37 +1,70 @@
 import Vue from "vue";
-import { Account, userInput, userChanges } from "@/Classes/Account";
 import { ActionTree, GetterTree, MutationTree } from "vuex";
+import { firebaseData } from "@/firebase";
 
 const state = {
   user: Object(),
-  account: Account,
-  userFetched: Boolean(),
 };
 
 const getters: GetterTree<any, any> = {
-  getAccount: (state: state) => {
-    return state.account;
+  setUser: (state: state) => {
+    return state.user;
   },
 };
 
 const mutations: MutationTree<any> = {
-  setAccount(state: state, user: any) {
-    Vue.set(state, "account", user);
+  setUser(state: state, user: any) {
+    Vue.set(state, "user", user);
   },
 };
 
 const actions: ActionTree<any, any> = {
-  login({ state }, userInput: userInput) {
-    state.account.login(userInput as userInput);
+  signIn({ state }, userInput: UserInput) {
+    if (userInput.username != "" && userInput.password != "") {
+      firebaseData
+        .auth()
+        .signInWithEmailAndPassword(userInput.username, userInput.password)
+        .catch(function(error) {
+          console.log(error.code, error.message);
+        });
+    }
   },
   async signOut({ state }) {
-    state.account.signOut();
+    firebaseData
+      .auth()
+      .signOut()
+      .then(() => {
+        console.log("Signed Out");
+        state.user = Object();
+      })
+      .catch(function(error) {
+        console.log("Oops... an error occured", error);
+      });
   },
-  createNewUser({ state }, userInput: userInput) {
-    state.account.createNewUser(userInput as userInput);
+  createNewUser({ state }, userInput: UserInput) {
+    if (userInput.username != "" && userInput.password != "") {
+      firebaseData
+        .auth()
+        .createUserWithEmailAndPassword(userInput.username, userInput.password)
+        .catch(function(error) {
+          console.error(error.code, error.message);
+        });
+    } else {
+      console.log("Please type in a valid username and password");
+    }
   },
   saveProfileChanges({ state }, userChanges: string) {
-    state.account.changeUserProfile(userChanges as string);
+    state.user
+      .updateProfile({
+        displayName: userChanges,
+      })
+      .then(function() {
+        // Update successful.
+      })
+      .catch(function(error: any) {
+        console.error(error);
+        // An error happened.
+      });
   },
 };
 
@@ -39,6 +72,11 @@ interface state {
   user: Object;
   account: Account;
   userFetched: Boolean;
+}
+
+export interface UserInput {
+  username: string;
+  password: string;
 }
 
 export default {
