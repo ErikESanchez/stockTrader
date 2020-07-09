@@ -1,16 +1,14 @@
 <template>
-  <div>
-    <!-- <b-button
+  <!-- <b-button
       @click="APIData('AAPL'); APIData('GOOGL'); APIData('MSFT'); APIData('AMZN'); APIData('FB'); APIData('INTC');"
     >Get API Data</b-button>-->
-    <b-card-group deck v-if="dataReady">
-      <stock-card
-        v-for="(stock, key) in formatedStocks"
-        :key="key"
-        :stock="formatedStocks"
-        :keyProp="key"
-      ></stock-card>
-    </b-card-group>
+  <div class="card" style="width: 18rem;" v-if="dataReady">
+    <stock-card
+      v-for="(stock, index) in formatedStocks"
+      :stock="stock"
+      :index="index"
+      :key="index"
+    ></stock-card>
   </div>
 </template>
 
@@ -37,7 +35,6 @@ export default Vue.extend({
     if (this.formatedStocks[0] === undefined) {
       await this.getDatabaseDailyData();
     }
-    await store.dispatch("getUserFirebaseStocks");
     this.dataReady = true;
   },
   computed: mapState("marketData", ["formatedStocks"]),

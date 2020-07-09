@@ -7,7 +7,7 @@ import Stocks from "./views/Stocks.vue";
 import Portfolio from "./views/Portfolio.vue";
 import singleStock from "./views/singleStock.vue";
 import SignUpPage from "./views/SignUpPage.vue";
-import LogInPage from "./views/LogInPage.vue";
+import signInPage from "./views/signInPage.vue";
 import Profile from "./views/Profile.vue";
 
 export default new Router({
@@ -33,14 +33,14 @@ export default new Router({
       component: Portfolio,
     },
     {
-      path: "/signUp",
+      path: "/signup",
       name: "signUp",
       component: SignUpPage,
     },
     {
-      path: "/logIn",
-      name: "logIn",
-      component: LogInPage,
+      path: "/signin",
+      name: "signIn",
+      component: signInPage,
     },
     {
       path: "/profile",

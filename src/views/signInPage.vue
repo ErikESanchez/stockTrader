@@ -21,8 +21,8 @@
 <script lang="ts">
 import Vue from "vue";
 import { firebaseData } from "../firebase";
-import { Account } from "@/Classes/Account";
 import store from "@/store";
+import { UserInput } from "../storeModules/userModule";
 export default Vue.extend({
   data() {
     return {
@@ -34,11 +34,11 @@ export default Vue.extend({
   },
   methods: {
     login(username: string, password: string) {
-      let userInput: Object = {
+      let userInput: UserInput = {
         username: username,
         password: password,
       };
-      store.dispatch("userModule/login", userInput);
+      store.dispatch("userModule/signIn", userInput);
     },
   },
 });

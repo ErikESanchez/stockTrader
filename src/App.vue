@@ -9,7 +9,6 @@
 import Vue from "vue";
 import Navbar from "./components/Navbar.vue";
 import { Portfolio } from "@/Classes/Portfolio";
-import { Account } from "@/Classes/Account";
 import { firebaseData } from "@/firebase";
 import store from "@/store";
 
@@ -18,25 +17,14 @@ export default Vue.extend({
   components: {
     Navbar,
   },
-  data() {
-    return {
-      signedIn: false,
-      dataLoaded: false,
-    };
-  },
   async created() {
     await firebaseData.auth().onAuthStateChanged(async (user) => {
       if (user) {
-        let account: Account = new Account(user);
-        store.commit("userModule/setAccount", account as Account);
+        store.commit("userModule/setUser", user);
         store.dispatch("portfolio/getPortfolio", user.uid);
-        this.signedIn = true as boolean;
-        this.dataLoaded = true;
       } else {
-        let account: Account = new Account();
-        store.commit("userModule/setAccount", account as Account);
+        store.commit("userModule/setUser", Object);
         console.log("$$$ Sign Up to get some dolla dolla bills yall $$$");
-        this.dataLoaded = true as boolean;
       }
     });
   },
@@ -44,6 +32,6 @@ export default Vue.extend({
 </script>
 
 <style lang="scss">
-@import "~bootstrap/scss/bootstrap";
 @import "~bootstrap/dist/css/bootstrap.css";
+@import "~bootstrap/scss/bootstrap";
 </style>
