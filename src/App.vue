@@ -7,7 +7,6 @@
 
 <script lang="ts">
 import Vue from "vue";
-
 import Navbar from "./components/Navbar.vue";
 import { Portfolio } from "@/Classes/Portfolio";
 import { Account } from "@/Classes/Account";

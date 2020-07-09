@@ -1,12 +1,12 @@
 <template>
   <div>
     <b-input-group prepend="Username" class="mt-3">
-      <b-form-input v-model="userInput.username"></b-form-input>
+      <b-form-input v-model.trim="userInput.username"></b-form-input>
       <b-input-group-append></b-input-group-append>
     </b-input-group>
 
     <b-input-group prepend="Password" class="mt-3" type="password">
-      <b-form-input v-model="userInput.password"></b-form-input>
+      <b-form-input v-model.trim="userInput.password"></b-form-input>
       <b-input-group-append></b-input-group-append>
     </b-input-group>
 
