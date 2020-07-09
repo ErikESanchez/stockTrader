@@ -44,6 +44,6 @@ export default Vue.extend({
 </script>
 
 <style lang="scss">
-@import "~bootstrap/scss/bootstrap";
 @import "~bootstrap/dist/css/bootstrap.css";
+@import "~bootstrap/scss/bootstrap";
 </style>
