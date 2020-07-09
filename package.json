@@ -36,13 +36,15 @@
     "vuex": "^3.1.2"
   },
   "devDependencies": {
+    "@types/webpack-env": "^1.15.2",
     "@vue/cli-plugin-babel": "~4.2.0",
     "@vue/cli-plugin-eslint": "~4.2.0",
     "@vue/cli-service": "~4.2.0",
     "babel-eslint": "^10.0.3",
     "eslint-plugin-vue": "^6.1.2",
     "node-sass": "^4.14.1",
-    "vue-template-compiler": "^2.6.11"
+    "vue-template-compiler": "^2.6.11",
+    "webpack-env": "^0.8.0"
   },
   "eslintConfig": {
     "root": true,
