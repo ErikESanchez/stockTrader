@@ -1,6 +1,6 @@
 import { firebaseData } from "@/firebase";
 import store from "@/store";
-import { apikey } from "@/apikey";
+// import { apikey } from "@/apikey";
 import moment from "moment";
 
 export class MarketData {
