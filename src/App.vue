@@ -17,23 +17,14 @@ export default Vue.extend({
   components: {
     Navbar,
   },
-  data() {
-    return {
-      signedIn: false,
-      dataLoaded: false,
-    };
-  },
   async created() {
     await firebaseData.auth().onAuthStateChanged(async (user) => {
       if (user) {
         store.commit("userModule/setUser", user);
         store.dispatch("portfolio/getPortfolio", user.uid);
-        this.signedIn = true as boolean;
-        this.dataLoaded = true;
       } else {
         store.commit("userModule/setUser", Object);
         console.log("$$$ Sign Up to get some dolla dolla bills yall $$$");
-        this.dataLoaded = true as boolean;
       }
     });
   },

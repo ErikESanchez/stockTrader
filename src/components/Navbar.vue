@@ -16,7 +16,7 @@
       <form class="form-inline my-2 my-lg-0" v-if="user.email">
         <ul class="navbar-nav mr-auto">
           <li class="nav-item active">
-            <div class="nav-link">Funds</div>
+            <div class="nav-link">{{ portfolio.availableFunds }}$</div>
           </li>
           <li class="nav-item dropleft">
             <a
@@ -28,7 +28,7 @@
               aria-haspopup="true"
               aria-expanded="false"
             >
-              <!-- {{ account.user.email || account.user.displayName }} -->
+              {{ user.email || user.displayName }}
             </a>
             <div class="dropdown-menu" aria-labelledby="navbarDropdown">
               <router-link to="/profile" class="dropdown-item"
