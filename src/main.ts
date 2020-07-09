@@ -6,10 +6,9 @@ import BootstrapVue from "bootstrap-vue";
 import App from "./App.vue";
 import moment from "moment";
 import async from "async";
+import "bootstrap";
 Vue.prototype.moment = moment;
 Vue.prototype.async = async;
-// const BootstrapVue = require("bootstrap-vue/dist/bootstrap-vue.esm");
-// Import the styles directly.
 import "bootstrap/dist/css/bootstrap.css";
 import "bootstrap-vue/dist/bootstrap-vue.css";
 Vue.use(BootstrapVue);
