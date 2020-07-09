@@ -8,6 +8,7 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
+    "@babel/core": "^7.10.4",
     "@types/async": "^3.2.1",
     "@types/chart.js": "^2.9.22",
     "@types/moment": "^2.13.0",
