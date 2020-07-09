@@ -1,69 +1,60 @@
 <template>
-  <b-navbar toggleable="lg" type="dark" variant="info">
-    <b-navbar-brand href="#">
-      <router-link to="/" class="navbar-brand">Stock Trader</router-link>
-    </b-navbar-brand>
-
-    <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
-    <!-- <button
-      @click="func()"
-      type="button"
-      class="btn btn-light dropdown-toggle"
-      data-toggle="dropdown"
-      aria-haspopup="true"
-      aria-expanded="false"
-    >Update User Funds</button>-->
-
-    <b-collapse id="nav-collapse" is-nav>
-      <b-navbar-nav>
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <router-link to="/" class="navbar-brand">
+      Stock Trader
+    </router-link>
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item active">
         <router-link to="/stocks" class="nav-link">Stocks</router-link>
-      </b-navbar-nav>
-      <b-navbar-nav>
+      </li>
+      <li class="nav-item active">
         <router-link to="/portfolio" class="nav-link">Portfolio</router-link>
-      </b-navbar-nav>
-      <b-navbar-nav class="ml-auto" v-if="account.user !== undefined || ''">
-        <!-- <b-nav-form>
-          <b-form-input size="sm" class="mr-sm-2" placeholder="Search"></b-form-input>
-          <b-button size="sm" class="my-2 my-sm-0" type="submit">Search</b-button>
-        </b-nav-form>-->
-        <b-navbar-nav class="nav-link">{{
-          portfolio.availableFunds
-        }}</b-navbar-nav>
-        <div>
-          <b-nav-item-dropdown right>
-            <template v-slot:button-content>
-              <em>{{ account.user.displayName || account.user.email }}</em>
-            </template>
-            <b-dropdown-item>
-              <router-link to="/profile">Profile</router-link>
-            </b-dropdown-item>
-            <b-dropdown-item @click="logOut()">Sign Out</b-dropdown-item>
-          </b-nav-item-dropdown>
-          <!-- <b-button size="sm" class="my-2 my-sm-0" type="submit">End day</b-button> -->
-        </div>
-      </b-navbar-nav>
-      <b-navbar-nav class="ml-auto" v-else>
-        <div>
-          <router-link
-            to="/logIn"
-            size="sm"
-            class="my-2 my-sm-0 log-In-Button"
-            type="submit"
-          >
-            <b-button>Log In</b-button>
-          </router-link>
-          <router-link
-            to="/signUp"
-            size="sm"
-            class="my-2 my-sm-0"
-            type="submit"
-          >
-            <b-button>Sign Up</b-button>
-          </router-link>
-        </div>
-      </b-navbar-nav>
-    </b-collapse>
-  </b-navbar>
+      </li>
+    </ul>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav mr-auto"></ul>
+      <form class="form-inline my-2 my-lg-0" v-if="account">
+        <ul class="navbar-nav mr-auto">
+          <li class="nav-item active">
+            <div class="nav-link">Funds</div>
+          </li>
+          <li class="nav-item dropleft">
+            <a
+              class="nav-link dropdown-toggle text-light"
+              href="#"
+              id="navbarDropdown"
+              role="button"
+              data-toggle="dropdown"
+              aria-haspopup="true"
+              aria-expanded="false"
+            >
+              {{ account.user.email || account.user.displayName }}
+            </a>
+            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+              <router-link to="/profile" class="dropdown-item"
+                >Profile</router-link
+              >
+              <router-link to="/" class="dropdown-item" @click="logOut()">
+                Sign out
+              </router-link>
+            </div>
+          </li>
+        </ul>
+      </form>
+
+      <!-- <form class="form-inline my-2 my-lg-0">
+        <input
+          class="form-control mr-sm-2"
+          type="search"
+          placeholder="Search"
+          aria-label="Search"
+        />
+        <button class="btn btn-outline-success my-2 my-sm-0" type="submit">
+          Search
+        </button>
+      </form> -->
+    </div>
+  </nav>
 </template>
 
 <script lang="ts">
