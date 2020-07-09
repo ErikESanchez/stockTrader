@@ -5,17 +5,18 @@
       header-bg-variant="success"
       header-text-variant="white"
       align="center"
-      :key="stock.name"
+      :title="stock"
     >
-      {{ stock.name }}
-      <!-- With the prop either make a for loop to loop through all the indexes, or make a function to do so, 
-      probaly going to have to do it with a function-->
-      <b-card-text>Amount Of Stock Owned: {{ stockAmount }}</b-card-text>
+      {{ stock }}
+      <!-- <b-card-text> {{ stock.stockData.priceAtTransaction }} $ </b-card-text> -->
+      <b-card-text>
+        Amount Of Stock Owned: {{ stock.stocksOwned }}
+      </b-card-text>
       <b-button variant="success" @click="sellStock(stock, 1)">Sell</b-button>
       <b-row class="my-1">
         <b-col sm="3"></b-col>
         <b-col sm="9">
-          <b-form-input type="number" v-model="amountToSell"></b-form-input>
+          <b-form-input type="number"></b-form-input>
         </b-col>
       </b-row>
     </b-card>
@@ -30,25 +31,8 @@ interface stock {
   value: number;
 }
 export default Vue.extend({
-  props: {
-    stock: Object,
-    stockAmount: Number
-  },
-  data() {
-    return {
-      amountToSell: 0
-    };
-  },
-  methods: {
-    // sellStock(stock, amount?) {
-    //   console.log(stock);
-    // }
-  },
-  mounted() {
-    console.log(this.stock);
-  }
+  props: ["stock"],
 });
 </script>
 
-<style>
-</style>
+<style></style>
