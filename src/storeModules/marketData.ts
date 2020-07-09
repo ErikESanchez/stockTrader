@@ -1,6 +1,6 @@
 import Vue from "vue";
 import { ActionTree, GetterTree, MutationTree } from "vuex";
-import { apikey } from "../apikey";
+// import { apikey } from "../apikey";
 import { firebaseData } from "../firebase";
 import moment from "moment";
 import axios from "axios";
@@ -99,91 +99,91 @@ export const actions: ActionTree<any, any> = {
       });
     return monthData;
   },
-  async getApiIntraday({ dispatch }, stock) {
-    let payloadFormat: TIME_SERIES = {
-      function: "TIME_SERIES_INTRADAY",
-      symbol: stock,
-      interval: "1min",
-      apikey: apikey,
-      outputsize: "full",
-    };
-    let dayData: any;
-    await dispatch("getStockQuote", payloadFormat).then((IntradayData) => {
-      dayData = IntradayData;
-      //   console.log("Intraday Response", IntradayData);
-      //   let metaData: any = IntradayData.data["Meta Data"];
-      //   let priceData: any = IntradayData.data["Time Series (1min)"];
-      //   let symbol: string = metaData["2. Symbol"];
-      //   // Send this to the database
-      //   // db.collection("stocks").doc(symbol).update({
-      //   //   "metaData(Intraday)": metaData
-      //   // }).catch(err => {
-      //   //   console.error("Error adding document", err)
-      //   // })
-      //   let timesArr: Array<string> = Object.getOwnPropertyNames(priceData);
-      //   let latestDate: string = timesArr.reduce((a: string, b: string) => {
-      //     return new Date(a) > new Date(b) ? a : b;
-      //   });
-      //   let formatedDate: string = moment(latestDate).format("YYYY-MM-DD");
-      //   timesArr.forEach((res, key, arr) => {
-      //     if (formatedDate) {
-      //       console.log("Time");
-      //     }
-      //   });
-      //   //  db.collection("stocks").doc(symbol).collection("Time Series(Intraday)").doc(formatedHour).set({
-      //   //     priceData: hourObject
-      //   //   }).catch(error => {
-      //   //     console.error(error);
-      //   //   })
-    });
-    return dayData;
-  },
-  async getApiDaily({ dispatch }, stock) {
-    let payloadFormat: TIME_SERIES = {
-      function: "TIME_SERIES_DAILY",
-      symbol: stock,
-      interval: "30min",
-      apikey: apikey,
-      outputsize: "compact",
-    };
-    await dispatch("getStockQuote", payloadFormat).then((DailyData) => {
-      let metaData: { [key: string]: string } = DailyData.data["Meta Data"];
-      let priceData: any = DailyData.data["Time Series (Daily)"];
-      console.log(metaData);
-      let symbol: string = metaData["2. Symbol"];
-      firebaseData
-        .firestore()
-        .collection("stocks")
-        .doc(symbol)
-        .set({
-          "metaData(Daily)": metaData,
-        })
-        .catch(function(error) {
-          console.error("Error adding document", error);
-        });
-      // Todo: Make an interface for the object
-      let monthObject: any = {};
-      // ! Need to make this set files in the database by month
-      Object.keys(priceData).filter((date) => {
-        let monthDate: string = moment(date).format("YYYY-MM");
-        if (monthDate) {
-          monthObject[date] = priceData[date];
-          firebaseData
-            .firestore()
-            .collection("stocks")
-            .doc(symbol)
-            .collection("Time Series(Daily)")
-            .doc(monthDate)
-            .set({
-              priceData: monthObject,
-            })
-            .catch((error) => {
-              console.error(`Error adding subdocument`, error);
-            });
-        }
-      });
-    });
-  },
+  // async getApiIntraday({ dispatch }, stock) {
+  //   let payloadFormat: TIME_SERIES = {
+  //     function: "TIME_SERIES_INTRADAY",
+  //     symbol: stock,
+  //     interval: "1min",
+  //     apikey: apikey,
+  //     outputsize: "full",
+  //   };
+  //   let dayData: any;
+  //   await dispatch("getStockQuote", payloadFormat).then((IntradayData) => {
+  //     dayData = IntradayData;
+  //     //   console.log("Intraday Response", IntradayData);
+  //     //   let metaData: any = IntradayData.data["Meta Data"];
+  //     //   let priceData: any = IntradayData.data["Time Series (1min)"];
+  //     //   let symbol: string = metaData["2. Symbol"];
+  //     //   // Send this to the database
+  //     //   // db.collection("stocks").doc(symbol).update({
+  //     //   //   "metaData(Intraday)": metaData
+  //     //   // }).catch(err => {
+  //     //   //   console.error("Error adding document", err)
+  //     //   // })
+  //     //   let timesArr: Array<string> = Object.getOwnPropertyNames(priceData);
+  //     //   let latestDate: string = timesArr.reduce((a: string, b: string) => {
+  //     //     return new Date(a) > new Date(b) ? a : b;
+  //     //   });
+  //     //   let formatedDate: string = moment(latestDate).format("YYYY-MM-DD");
+  //     //   timesArr.forEach((res, key, arr) => {
+  //     //     if (formatedDate) {
+  //     //       console.log("Time");
+  //     //     }
+  //     //   });
+  //     //   //  db.collection("stocks").doc(symbol).collection("Time Series(Intraday)").doc(formatedHour).set({
+  //     //   //     priceData: hourObject
+  //     //   //   }).catch(error => {
+  //     //   //     console.error(error);
+  //     //   //   })
+  //   });
+  //   return dayData;
+  // },
+  // async getApiDaily({ dispatch }, stock) {
+  //   let payloadFormat: TIME_SERIES = {
+  //     function: "TIME_SERIES_DAILY",
+  //     symbol: stock,
+  //     interval: "30min",
+  //     apikey: apikey,
+  //     outputsize: "compact",
+  //   };
+  //   await dispatch("getStockQuote", payloadFormat).then((DailyData) => {
+  //     let metaData: { [key: string]: string } = DailyData.data["Meta Data"];
+  //     let priceData: any = DailyData.data["Time Series (Daily)"];
+  //     console.log(metaData);
+  //     let symbol: string = metaData["2. Symbol"];
+  //     firebaseData
+  //       .firestore()
+  //       .collection("stocks")
+  //       .doc(symbol)
+  //       .set({
+  //         "metaData(Daily)": metaData,
+  //       })
+  //       .catch(function(error) {
+  //         console.error("Error adding document", error);
+  //       });
+  //     // Todo: Make an interface for the object
+  //     let monthObject: any = {};
+  //     // ! Need to make this set files in the database by month
+  //     Object.keys(priceData).filter((date) => {
+  //       let monthDate: string = moment(date).format("YYYY-MM");
+  //       if (monthDate) {
+  //         monthObject[date] = priceData[date];
+  //         firebaseData
+  //           .firestore()
+  //           .collection("stocks")
+  //           .doc(symbol)
+  //           .collection("Time Series(Daily)")
+  //           .doc(monthDate)
+  //           .set({
+  //             priceData: monthObject,
+  //           })
+  //           .catch((error) => {
+  //             console.error(`Error adding subdocument`, error);
+  //           });
+  //       }
+  //     });
+  //   });
+  // },
   async getStockQuote({ commit }, payload: TIME_SERIES) {
     return await axios.get(marketDataUrl, {
       params: {
