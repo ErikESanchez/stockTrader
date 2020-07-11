@@ -54,25 +54,19 @@ export default Vue.extend({
         })
       );
     },
-    monthChart(): void {
+    async monthChart() {
       let chart: Chart = this.chart;
       let symbol: string = this.$router.currentRoute.params.stockName;
-      Promise.resolve(store.dispatch("getMonthData", symbol)).then(
-        (monthData: Object) => {
-          if (monthData) {
-            // ? It would probably be better to use a prop and pass it down from the parent component
-            let data: any = store.getters.getMonthData;
-            console.log(data);
-            Promise.resolve(chart.renderChart(data, symbol)).then(
-              (dataCollections: any) => {
-                console.log(dataCollections);
-                this.stockChartData = dataCollections;
-              }
-            );
-          }
-        }
-      );
-      this.loaded = true;
+      let monthData = await store.dispatch("marketData/getMonthData", symbol);
+      if (monthData) {
+        await chart
+          .renderChart(monthData, symbol)
+          .then((dataCollection: any) => {
+            console.log(dataCollection);
+            this.stockChartData = dataCollection;
+            this.loaded = true;
+          });
+      }
     },
   },
   computed: {
