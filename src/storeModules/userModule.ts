@@ -19,9 +19,9 @@ const mutations: MutationTree<any> = {
 };
 
 const actions: ActionTree<any, any> = {
-  signIn({ state }, userInput: UserInput) {
-    if (userInput.username != "" && userInput.password != "") {
-      firebaseData
+  async signIn({ state }, userInput: UserInput) {
+    if (userInput.username !== "" && userInput.password !== "") {
+      await firebaseData
         .auth()
         .signInWithEmailAndPassword(userInput.username, userInput.password)
         .catch(function(error) {

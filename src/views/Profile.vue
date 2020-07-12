@@ -1,9 +1,16 @@
 <template>
   <div>
     <h5>Change your user name</h5>
-    <b-form-input v-model="text" placeholder="Enter your name"></b-form-input>
+    <input
+      class="form-control"
+      type="text"
+      placeholder="Enter your name"
+      v-model="text"
+    />
     <div class="mt-2">Value: {{ text }}</div>
-    <b-button @click="saveProfileChanges">Save Profile Settings</b-button>
+    <button type="submit" class="btn btn-primary" @click="saveProfileChanges">
+      Submit
+    </button>
   </div>
 </template>
 

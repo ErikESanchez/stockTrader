@@ -1,14 +1,12 @@
 <template>
   <div>
     <p>Portfolio</p>
-    <b-card-group deck>
-      {{ portfolio.ownedStocks }}
-      <portfolio-stock-card
-        v-for="(stock, index) in portfolio.ownedStocks"
-        :stock="stock"
-        :key="index"
-      ></portfolio-stock-card>
-    </b-card-group>
+    {{ portfolio.ownedStocks }}
+    <portfolio-stock-card
+      v-for="(stock, index) in portfolio.ownedStocks"
+      :stock="stock"
+      :key="index"
+    ></portfolio-stock-card>
   </div>
 </template>
 

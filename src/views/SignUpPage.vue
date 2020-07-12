@@ -1,18 +1,32 @@
 <template>
   <div>
-    <b-input-group prepend="Username" class="mt-3">
-      <b-form-input v-model="userInput.username"></b-form-input>
-      <b-input-group-append></b-input-group-append>
-    </b-input-group>
-
-    <b-input-group prepend="Password" class="mt-3" type="password">
-      <b-form-input v-model="userInput.password"></b-form-input>
-      <b-input-group-append></b-input-group-append>
-    </b-input-group>
-
-    <b-button variant="outline-success" @click="createNewUser()"
-      >Sign Up</b-button
-    >
+    <div>
+      <div class="form-group">
+        <label for="exampleInputEmail1">Email address</label>
+        <input
+          type="email"
+          class="form-control"
+          id="exampleInputEmail1"
+          aria-describedby="emailHelp"
+          v-model.trim="userInput.username"
+        />
+        <small id="emailHelp" class="form-text text-muted"
+          >We'll never share your email with anyone else.</small
+        >
+      </div>
+      <div class="form-group">
+        <label for="exampleInputPassword1">Password</label>
+        <input
+          type="password"
+          class="form-control"
+          id="exampleInputPassword1"
+          v-model.trim="userInput.password"
+        />
+      </div>
+      <button class="btn btn-primary" @click="createNewUser()">
+        Sign Up
+      </button>
+    </div>
   </div>
 </template>
 
