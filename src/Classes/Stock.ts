@@ -8,6 +8,14 @@ export class Stock {
     this.name = name;
   }
 
+  getFundTotal(availableFunds: number) {
+    if (availableFunds > 0) {
+      return availableFunds - this.price;
+    } else {
+      return;
+    }
+  }
+
   getNumberOfShares() {
     return this.shares;
   }

@@ -1,14 +1,17 @@
 import Vue from "vue";
 import { ActionTree, GetterTree, MutationTree } from "vuex";
-import { newStockTransaction, UserPortfolio } from "@/Classes/Portfolio";
+import {
+  newStockTransaction,
+  UserPortfolio,
+  firebaseStock,
+} from "@/Classes/Portfolio";
 import { firebaseData } from "@/firebase";
-import { firestore, User } from "firebase";
 import { Stock } from "@/Classes/Stock";
+import { firestore, User } from "firebase";
 
 const state: State = {
-  funds: 10000,
+  funds: Number(),
   portfolio: Object(),
-  uid: String(),
 };
 const getters: GetterTree<any, any> = {
   getTotalFunds: (state: State) => {
@@ -20,40 +23,65 @@ const getters: GetterTree<any, any> = {
 };
 const mutations: MutationTree<any> = {};
 const actions: ActionTree<any, any> = {
-  getPortfolio({ state }, uid: string) {
-    state.uid = uid;
-    firebaseData
-      .firestore()
-      .collection("portfolios")
-      .doc(uid)
-      .get()
-      .then((doc: doc) => {
-        console.log(doc.id, "=>", doc.data());
-        state.portfolio = doc.data() as UserPortfolio;
-      });
+  async setPortfolio({ state, rootState }) {
+    const user = rootState.userModule.user;
+    await Promise.resolve(
+      firebaseData
+        .firestore()
+        .collection("portfolios")
+        .doc(user.uid)
+        .get()
+        .then((doc: doc) => {
+          console.log(doc.id, "=>", doc.data());
+          return doc.data() as UserPortfolio;
+        })
+    ).then((portfolio: UserPortfolio) => {
+      if (
+        Object.keys(portfolio).length === 0 &&
+        portfolio.constructor === Object
+      ) {
+        firebaseData
+          .firestore()
+          .collection("portfolios")
+          .doc(user.uid as string)
+          .set({
+            availableFunds: 10000,
+            name: user.displayName || user.email,
+            ownedStocks: {},
+            portfolioWorth: 0,
+          });
+        state.portfolio = portfolio;
+      } else {
+        state.portfolio = portfolio;
+      }
+    });
   },
-  async buyStock({ state, dispatch }, stockTransaction: newStockTransaction) {
+  async buyStock(
+    { state, dispatch, rootState },
+    stockTransaction: newStockTransaction
+  ) {
     let stockClass: Stock = new Stock(
       stockTransaction.stockData.priceAtTransaction,
       stockTransaction.stockData.amount,
       stockTransaction.stockName
     );
     let portfolio: UserPortfolio = state.portfolio;
-
-    if (
-      Object.keys(portfolio.ownedStocks).length === 0 &&
-      portfolio.ownedStocks.constructor === Object
-    ) {
+    const user = rootState.userModule.user;
+    if (portfolio.ownedStocks[stockTransaction.stockName]) {
       await firebaseData
         .firestore()
         .collection("portfolios")
-        .doc(state.uid as string)
-        .set({
-          // availableFunds: portfolio.availableFunds - stockClass.getTotalWorth(),
-          // ownedStock:
+        .doc(user.uid)
+        .update({
+          availableFunds: stockClass.getFundTotal(portfolio.availableFunds),
+          ownedStocks: firestore.FieldValue.arrayUnion(stockTransaction),
+          portfolioWorth: Number(),
         });
-      console.log("bruh");
     }
+    // else {
+    // await firebaseData.firestore().collection("portfolios").doc(user.uid).set
+    // }
+
     // if ()
     // await firebaseData
     //   .firestore()
@@ -79,7 +107,6 @@ const actions: ActionTree<any, any> = {
 interface State {
   funds: number;
   portfolio: UserPortfolio;
-  uid: string;
 }
 
 interface TotalUserStocks {

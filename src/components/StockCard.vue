@@ -8,7 +8,9 @@
         {{ stock["stockData"]["open"] }}$
         {{ stock["stockData"]["lastRefreshed"] }}
       </p>
-      <button class="btn btn-primary">Sell Stock</button>
+      <button class="btn btn-primary" @click="buyStock(stock)">
+        Buy Stock
+      </button>
     </div>
   </div>
 </template>
@@ -17,29 +19,30 @@
 import Vue from "vue";
 import store from "@/store";
 import { newStockTransaction } from "@/Classes/Portfolio";
+import { stockDataFormat } from "@/storeModules/marketData";
 
 export default Vue.extend({
   props: ["stock"],
   data() {
     return {
       amountToBuy: 1,
-      // Todo: For some reason this gives an error
       stockRoute: ("stocks/" + this.stock["stockData"]["name"]) as string,
     };
   },
-  // methods: {
-  //   buyStock(stock: stock) {
-  //     let stockTransaction: newStockTransaction = {
-  //       stockName: stock.stockData.name,
-  //       stockData: {
-  //         priceAtTransaction: stock.stockData.high,
-  //         amount: this.amountToBuy,
-  //         time: new Date(),
-  //       },
-  //     };
-  //     store.dispatch("portfolio/buyStock", stockTransaction);
-  //   },
-  // },
+  methods: {
+    buyStock(stock: stockDataFormat) {
+      let stockTransaction: newStockTransaction = {
+        stockName: stock.stockData.name,
+        stockData: {
+          priceAtTransaction: stock.stockData.high,
+          amount: this.amountToBuy,
+          time: new Date(),
+        },
+      };
+      console.log(stockTransaction);
+      store.dispatch("portfolio/buyStock", stockTransaction);
+    },
+  },
 });
 </script>
 

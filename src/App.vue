@@ -21,7 +21,7 @@ export default Vue.extend({
     await firebaseData.auth().onAuthStateChanged(async (user) => {
       if (user) {
         store.commit("userModule/setUser", user);
-        store.dispatch("portfolio/getPortfolio", user.uid);
+        store.dispatch("portfolio/setPortfolio");
       } else {
         store.commit("userModule/setUser", Object);
         console.log("$$$ Sign Up to get some dolla dolla bills yall $$$");

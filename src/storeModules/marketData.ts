@@ -281,7 +281,7 @@ export interface TIME_SERIES {
   outputsize?: string;
 }
 
-interface stockDataFormat {
+export interface stockDataFormat {
   stockData: {
     name: string;
     open: number;
