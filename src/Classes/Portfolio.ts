@@ -22,7 +22,7 @@ export interface TIME_SERIES_DAILY {
 
 export interface firebaseStock {
   [stockName: string]: {
-    stockData: stockTransactionData;
+    amountOwned: number;
   };
 }
 export interface newStockTransaction {

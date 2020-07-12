@@ -2,8 +2,8 @@
   <div>
     <div class="card mb-2">
       <div class="card-body">
-        <h5 class="card-title">{{ stock }}</h5>
-        <p class="card-text">Amount Of Stock Owned: {{ stock.stocksOwned }}</p>
+        <h5 class="card-title">{{ stock.symbol }}</h5>
+        <p class="card-text">Amount Of Stock Owned: {{ stock.amountOwned }}</p>
         <button class="btn btn-primary">Sell Stock</button>
       </div>
     </div>

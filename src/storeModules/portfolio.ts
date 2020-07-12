@@ -1,10 +1,6 @@
 import Vue from "vue";
 import { ActionTree, GetterTree, MutationTree } from "vuex";
-import {
-  newStockTransaction,
-  UserPortfolio,
-  firebaseStock,
-} from "@/Classes/Portfolio";
+import { newStockTransaction, UserPortfolio } from "@/Classes/Portfolio";
 import { firebaseData } from "@/firebase";
 import { Stock } from "@/Classes/Stock";
 import { firestore, User } from "firebase";
@@ -36,11 +32,7 @@ const actions: ActionTree<any, any> = {
           return doc.data() as UserPortfolio;
         })
     ).then(async (portfolio: UserPortfolio) => {
-      if (
-        portfolio === undefined ||
-        Object.keys(portfolio).length === 0 ||
-        portfolio.constructor === Object
-      ) {
+      if (portfolio === undefined || Object.keys(portfolio).length === 0) {
         await firebaseData
           .firestore()
           .collection("portfolios")
@@ -68,16 +60,55 @@ const actions: ActionTree<any, any> = {
     );
     let portfolio: UserPortfolio = state.portfolio;
     const user = rootState.userModule.user;
+    console.log(portfolio);
+
     if (portfolio.ownedStocks[stockTransaction.stockName]) {
+      console.log("update");
       await firebaseData
         .firestore()
         .collection("portfolios")
         .doc(user.uid)
         .update({
-          availableFunds: stockClass.getFundTotal(portfolio.availableFunds),
-          ownedStocks: firestore.FieldValue.arrayUnion(stockTransaction),
-          portfolioWorth: Number(),
+          // availableFunds:
+          //   portfolio.availableFunds -
+          //   stockTransaction.stockData.priceAtTransaction,
+          // name: portfolio.name,
+
+          // ["ownedStocks." + stockTransaction.stockName + ".amountOwned"]:
+          //   portfolio.ownedStocks[stockTransaction.stockName].amountOwned +
+          //   stockTransaction.stockData.amount,
+
+          ["ownedStocks"]: {
+            [stockTransaction.stockName]: {
+              ["amountOwned"]:
+                portfolio.ownedStocks[stockTransaction.stockName].amountOwned +
+                stockTransaction.stockData.amount,
+            },
+          },
+          // ownedStocks: firestore.FieldValue.arrayUnion(stockTransaction),
         });
+      dispatch("setPortfolio");
+    } else {
+      console.log("set");
+      await firebaseData
+        .firestore()
+        .collection("portfolios")
+        .doc(user.uid)
+        .set(
+          {
+            availableFunds:
+              portfolio.availableFunds -
+              stockTransaction.stockData.priceAtTransaction,
+            ownedStocks: {
+              [stockTransaction.stockName]: {
+                amountOwned: stockTransaction.stockData.amount,
+                symbol: stockTransaction.stockName,
+              },
+            },
+          },
+          { merge: true }
+        );
+      dispatch("setPortfolio");
     }
     // else {
     // await firebaseData.firestore().collection("portfolios").doc(user.uid).set
