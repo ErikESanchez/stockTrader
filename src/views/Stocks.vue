@@ -2,11 +2,11 @@
   <!-- <b-button
       @click="APIData('AAPL'); APIData('GOOGL'); APIData('MSFT'); APIData('AMZN'); APIData('FB'); APIData('INTC');"
     >Get API Data</b-button>-->
-  <div class="card" style="width: 18rem;" v-if="dataReady">
+  <div class="container" style="width: 18rem;" v-if="dataReady">
     <stock-card
+      class="card-deck"
       v-for="(stock, index) in formatedStocks"
       :stock="stock"
-      :index="index"
       :key="index"
     ></stock-card>
   </div>

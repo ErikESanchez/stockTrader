@@ -91,7 +91,8 @@ export const actions: ActionTree<any, any> = {
       .then((res) => {
         if (res) {
           commit("formatMonthData", res.data());
-          monthData = res;
+          console.log(res.data());
+          monthData = res.data();
         }
       })
       .catch(function(error) {
@@ -280,7 +281,7 @@ export interface TIME_SERIES {
   outputsize?: string;
 }
 
-interface stockDataFormat {
+export interface stockDataFormat {
   stockData: {
     name: string;
     open: number;

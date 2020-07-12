@@ -1,5 +1,6 @@
 export class Chart {
   async renderChart(chartData: any, symbol: string) {
+    console.log(chartData.priceData);
     let dataCollection: chartData = {
       labels: Array(),
       datasets: [
@@ -11,8 +12,10 @@ export class Chart {
         },
       ],
     };
-    Object.keys(chartData[0]).forEach((stockDate: string) => {
-      dataCollection.datasets[0].data.push(chartData[0][stockDate]["4. close"]);
+    Object.keys(chartData.priceData).forEach((stockDate: string) => {
+      dataCollection.datasets[0].data.push(
+        chartData.priceData[stockDate]["4. close"]
+      );
       dataCollection.labels.push(stockDate);
     });
     return dataCollection;

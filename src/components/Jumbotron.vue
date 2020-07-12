@@ -6,7 +6,7 @@
       <p class="lead">Click on: 'End Day' to begin a new day!</p>
       <hr />
       <h2 class="lead">
-        <strong>Your Funds: ${{funds}}</strong>
+        <!-- <strong>Your Funds: ${{ funds }}</strong> -->
       </h2>
     </div>
   </div>
@@ -18,13 +18,9 @@ import store from "@/store";
 export default Vue.extend({
   data() {
     return {
-      funds: 0
+      funds: 0,
     };
   },
-  created() {
-    this.funds = store.getters.getTotalFunds;
-  },
-  methods: {}
 });
 </script>
 
@@ -33,4 +29,3 @@ export default Vue.extend({
   margin: 30px;
 }
 </style>
-

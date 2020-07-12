@@ -1,25 +1,12 @@
 <template>
   <div>
-    <b-card
-      border-variant="primary"
-      header-bg-variant="success"
-      header-text-variant="white"
-      align="center"
-      :title="stock"
-    >
-      {{ stock }}
-      <!-- <b-card-text> {{ stock.stockData.priceAtTransaction }} $ </b-card-text> -->
-      <b-card-text>
-        Amount Of Stock Owned: {{ stock.stocksOwned }}
-      </b-card-text>
-      <b-button variant="success" @click="sellStock(stock, 1)">Sell</b-button>
-      <b-row class="my-1">
-        <b-col sm="3"></b-col>
-        <b-col sm="9">
-          <b-form-input type="number"></b-form-input>
-        </b-col>
-      </b-row>
-    </b-card>
+    <div class="card mb-2">
+      <div class="card-body">
+        <h5 class="card-title">{{ stock }}</h5>
+        <p class="card-text">Amount Of Stock Owned: {{ stock.stocksOwned }}</p>
+        <button class="btn btn-primary">Sell Stock</button>
+      </div>
+    </div>
   </div>
 </template>
 
