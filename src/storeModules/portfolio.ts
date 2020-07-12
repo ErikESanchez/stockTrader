@@ -35,12 +35,13 @@ const actions: ActionTree<any, any> = {
           console.log(doc.id, "=>", doc.data());
           return doc.data() as UserPortfolio;
         })
-    ).then((portfolio: UserPortfolio) => {
+    ).then(async (portfolio: UserPortfolio) => {
       if (
-        Object.keys(portfolio).length === 0 &&
+        portfolio === undefined ||
+        Object.keys(portfolio).length === 0 ||
         portfolio.constructor === Object
       ) {
-        firebaseData
+        await firebaseData
           .firestore()
           .collection("portfolios")
           .doc(user.uid as string)
