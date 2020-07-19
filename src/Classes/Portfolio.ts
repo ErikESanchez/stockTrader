@@ -8,7 +8,7 @@ export class Portfolio {
 export interface UserPortfolio {
   availableFunds: number;
   name: String;
-  ownedStocks: firebaseStock;
+  ownedStocks: firebaseStockTransaction;
   ownedStockData: Array<stockTransactionData>;
   portfolioWorth: number;
 }
@@ -21,15 +21,19 @@ export interface TIME_SERIES_DAILY {
 }
 
 export interface firebaseStock {
-  [stockName: string]: {
+  amountOwned: number;
+}
+export interface firebaseStockTransaction {
+  [symbol: string]: {
+    stockName: string;
     amountOwned: number;
   };
 }
+
 export interface newStockTransaction {
   stockName: string;
   stockData: stockTransactionData;
 }
-
 interface stockTransactionData {
   priceAtTransaction: number;
   amount: number;
