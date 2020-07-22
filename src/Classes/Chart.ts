@@ -1,6 +1,7 @@
+import { MonthData } from "@/storeModules/marketData";
+
 export class Chart {
-  async renderChart(chartData: any, symbol: string) {
-    console.log(chartData.priceData);
+  async renderChart(chartData: MonthData, symbol: string) {
     let dataCollection: chartData = {
       labels: Array(),
       datasets: [
@@ -12,10 +13,9 @@ export class Chart {
         },
       ],
     };
-    Object.keys(chartData.priceData).forEach((stockDate: string) => {
-      dataCollection.datasets[0].data.push(
-        chartData.priceData[stockDate]["4. close"]
-      );
+    Object.keys(chartData).forEach((stockDate: string) => {
+      console.log(stockDate);
+      dataCollection.datasets[0].data.push(chartData[stockDate]["1. open"]);
       dataCollection.labels.push(stockDate);
     });
     return dataCollection;

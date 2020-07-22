@@ -18,7 +18,7 @@
 <script lang="ts">
 import Vue from "vue";
 import store from "@/store";
-import { newStockTransaction } from "@/Classes/Portfolio";
+import { newStockTransaction } from "@/storeModules/portfolio";
 import { stockDataFormat } from "@/storeModules/marketData";
 
 export default Vue.extend({
@@ -32,14 +32,13 @@ export default Vue.extend({
   methods: {
     buyStock(stock: stockDataFormat) {
       let stockTransaction: newStockTransaction = {
-        stockName: stock.stockData.name,
-        stockData: {
+        symbol: stock.stockData.name,
+        data: {
           priceAtTransaction: stock.stockData.high,
           amount: this.amountToBuy,
           time: new Date(),
         },
       };
-      console.log(stockTransaction);
       store.dispatch("portfolio/buyStock", stockTransaction);
     },
   },

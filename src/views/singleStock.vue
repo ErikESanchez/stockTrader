@@ -13,6 +13,7 @@
 import Vue from "vue";
 import LineChart from "../components/LineChart.vue";
 import store from "@/store";
+import { MonthData } from "@/storeModules/marketData";
 import { Chart, chartData } from "@/Classes/Chart";
 export default Vue.extend({
   name: "singleStock",
@@ -57,23 +58,33 @@ export default Vue.extend({
     async monthChart() {
       let chart: Chart = this.chart;
       let symbol: string = this.$router.currentRoute.params.stockName;
-      let monthData = await store.dispatch("marketData/getMonthData", symbol);
-      if (monthData) {
-        await chart
-          .renderChart(monthData, symbol)
-          .then((dataCollection: any) => {
-            console.log(dataCollection);
-            this.stockChartData = dataCollection;
-            this.loaded = true;
-          });
-      }
+      await store
+        .dispatch("marketData/getMonthData", symbol)
+        .then((monthData: MonthData) => {
+          if (monthData) {
+            console.log(monthData);
+            chart.renderChart(monthData, symbol).then((dataCollection: any) => {
+              this.stockChartData = dataCollection;
+              this.loaded = true;
+            });
+          }
+        });
+      // if (monthData) {
+      //   await chart
+      //     .renderChart(monthData, symbol)
+      //     .then((dataCollection: any) => {
+      //       console.log(dataCollection);
+      //       this.stockChartData = dataCollection;
+      //       this.loaded = true;
+      //     });
+      // }
     },
   },
   computed: {
     stockData() {
       return store.getters.getStocks;
     },
-    chartOptions(): any {
+    chartOptions() {
       return {
         responsive: true,
         // Keep it false so it stays as a rectangle

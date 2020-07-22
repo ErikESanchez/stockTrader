@@ -31,7 +31,7 @@ const mutations: MutationTree<any> = {
     state.stocks.push(newStock);
   },
   formatMonthData(state, monthPayload) {
-    let newMonthObject: monthData = {};
+    let newMonthObject: MonthData = {};
     const currentMonthDates = new Array(
       moment("2020-04-01", "YYYY-MM-DD").daysInMonth()
     )
@@ -48,7 +48,7 @@ const mutations: MutationTree<any> = {
         newMonthObject[orderedDates] = monthPayload.priceData[orderedDates];
       }
     });
-    state.monthStockData.push(newMonthObject);
+    state.monthStockData = newMonthObject;
   },
   formatDatabaseData(state, stockPayload: any) {
     // ? The functions runs fine once, but runs another four times for some reason?
@@ -79,8 +79,7 @@ const mutations: MutationTree<any> = {
 };
 
 export const actions: ActionTree<any, any> = {
-  async getMonthData({ commit }, symbol: string) {
-    let monthData: any;
+  async getMonthData({ state, commit }, symbol: string) {
     await firebaseData
       .firestore()
       .collection("stocks")
@@ -91,14 +90,12 @@ export const actions: ActionTree<any, any> = {
       .then((res) => {
         if (res) {
           commit("formatMonthData", res.data());
-          console.log(res.data());
-          monthData = res.data();
         }
       })
       .catch(function(error) {
         console.error(error);
       });
-    return monthData;
+    return state.monthStockData;
   },
   // async getApiIntraday({ dispatch }, stock) {
   //   let payloadFormat: TIME_SERIES = {
@@ -264,7 +261,7 @@ interface doc {
 interface time {
   [time: string]: number;
 }
-interface monthData {
+export interface MonthData {
   [date: string]: any;
 }
 interface stockData {

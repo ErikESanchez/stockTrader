@@ -1,6 +1,5 @@
 import Vue from "vue";
 import { ActionTree, GetterTree, MutationTree } from "vuex";
-import { newStockTransaction, UserPortfolio } from "@/Classes/Portfolio";
 import { firebaseData } from "@/firebase";
 import { Stock } from "@/Classes/Stock";
 
@@ -61,74 +60,66 @@ const actions: ActionTree<any, any> = {
     stockTransaction: newStockTransaction
   ) {
     let stockClass: Stock = new Stock(
-      stockTransaction.stockData.priceAtTransaction,
-      stockTransaction.stockData.amount,
-      stockTransaction.stockName
+      stockTransaction.data.priceAtTransaction,
+      stockTransaction.data.amount,
+      stockTransaction.symbol
     );
     let portfolio: UserPortfolio = state.portfolio;
-    const user = rootState.userModule.user;
+    const user: { uid: string } = rootState.userModule.user;
     if (Object.keys(portfolio.ownedStocks).length === 0) {
-      console.log("need to make a new stock to loop through");
       await firebaseData
         .firestore()
         .collection("portfolios")
         .doc(user.uid)
         .update({
           availableFunds:
-            portfolio.availableFunds -
-            stockTransaction.stockData.priceAtTransaction,
+            portfolio.availableFunds - stockTransaction.data.priceAtTransaction,
           ownedStocks: {
-            [stockTransaction.stockName]: {
-              amountOwned: stockTransaction.stockData.amount,
-              symbol: stockTransaction.stockName,
+            [stockTransaction.symbol]: {
+              amountOwned: stockTransaction.data.amount,
+              symbol: stockTransaction.symbol,
             },
           },
           portfolioWorth: portfolio.portfolioWorth + stockClass.getTotalWorth(),
         });
       dispatch("setPortfolio");
     } else {
-      console.log("just loop through the stocks");
       Object.keys(portfolio.ownedStocks).forEach(
         async (symbol: string, index: number, arr: Array<string>) => {
-          console.log("Symbol", symbol);
-          if (stockTransaction.stockName === symbol) {
-            console.log(`User owns a ${stockTransaction.stockName} stock`);
+          if (stockTransaction.symbol === symbol) {
+            console.log(`User owns a ${stockTransaction.symbol} stock`);
             await firebaseData
               .firestore()
               .collection("portfolios")
-              .doc(user.uid)
+              .doc(user.uid as string)
               .set(
                 {
                   availableFunds:
                     portfolio.availableFunds -
-                    stockTransaction.stockData.priceAtTransaction,
+                    stockTransaction.data.priceAtTransaction,
                   ownedStocks: {
-                    [stockTransaction.stockName]: {
-                      symbol: stockTransaction.stockName,
+                    [stockTransaction.symbol]: {
+                      symbol: stockTransaction.symbol,
                       amountOwned:
-                        portfolio.ownedStocks[stockTransaction.stockName]
-                          .amountOwned + stockTransaction.stockData.amount,
+                        portfolio.ownedStocks[stockTransaction.symbol]
+                          .amountOwned + stockTransaction.data.amount,
                     },
                   },
                   portfolioWorth:
                     portfolio.portfolioWorth + stockClass.getTotalWorth(),
-
-                  // ownedStocks: firestore.FieldValue.arrayUnion(stockTransaction),
                 },
                 { merge: true }
               );
             dispatch("setPortfolio");
           } else if (
             index === arr.length - 1 &&
-            stockTransaction.stockName !== symbol
+            stockTransaction.symbol !== symbol
           ) {
-            console.log(
-              `User does not own a ${stockTransaction.stockName} stock`
-            );
+            console.log(`User does not own a ${stockTransaction.symbol} stock`);
             await firebaseData
               .firestore()
               .collection("portfolios")
-              .doc(user.uid)
+              .doc(user.uid as string)
               // todo: maybe change this to update ╰(*°▽°*)╯
               .set(
                 {
@@ -136,9 +127,9 @@ const actions: ActionTree<any, any> = {
                   //   portfolio.availableFunds -
                   //   stockTransaction.stockData.priceAtTransaction,
                   ownedStocks: {
-                    [stockTransaction.stockName]: {
-                      amountOwned: stockTransaction.stockData.amount,
-                      symbol: stockTransaction.stockName,
+                    [stockTransaction.symbol]: {
+                      amountOwned: stockTransaction.data.amount,
+                      symbol: stockTransaction.symbol,
                     },
                   },
                 },
@@ -151,7 +142,7 @@ const actions: ActionTree<any, any> = {
     }
   },
   async getAllUsers() {
-    let userData: Array<any> = [];
+    let userData: Array<UserPortfolio> = [];
     await firebaseData
       .firestore()
       .collection("portfolios")
@@ -159,7 +150,7 @@ const actions: ActionTree<any, any> = {
       .then((querySnapshot) => {
         querySnapshot.forEach((doc) => {
           console.log(doc.id, "=>", doc.data());
-          userData.push(doc.data());
+          userData.push(doc.data() as UserPortfolio);
         });
       });
     return userData;
@@ -171,11 +162,31 @@ interface State {
   portfolio: UserPortfolio;
 }
 
-interface TotalUserStocks {
-  [name: string]: {
-    stocksOwned: number;
+export interface UserPortfolio {
+  availableFunds: number;
+  name: String;
+  ownedStocks: firebaseStockTransaction;
+  portfolioWorth: number;
+}
+
+export interface firebaseStockTransaction {
+  [symbol: string]: {
+    stockName: string;
+    amountOwned: number;
   };
 }
+
+export interface newStockTransaction {
+  symbol: string;
+  data: stockTransactionData;
+}
+
+interface stockTransactionData {
+  priceAtTransaction: number;
+  amount: number;
+  time: Date;
+}
+
 interface doc {
   [id: string]: any;
 }
