@@ -8,7 +8,6 @@
 <script lang="ts">
 import Vue from "vue";
 import Navbar from "./components/Navbar.vue";
-import { Portfolio } from "@/Classes/Portfolio";
 import { firebaseData } from "@/firebase";
 import store from "@/store";
 
