@@ -14,6 +14,7 @@ import Vue from "vue";
 import LineChart from "../components/LineChart.vue";
 import store from "@/store";
 import { MonthData } from "@/storeModules/marketData";
+import { ChartData, ChartOptions } from "@/components/LineChart.vue";
 export default Vue.extend({
   name: "singleStock",
   components: {
@@ -26,7 +27,7 @@ export default Vue.extend({
     };
   },
   methods: {
-    async monthChart() {
+    async monthChart(): Promise<void> {
       const symbol: string = this.$router.currentRoute.params.stockName;
       let dataCollection: ChartData = {
         labels: [],
@@ -44,13 +45,11 @@ export default Vue.extend({
           if (monthData) {
             Object.keys(monthData).forEach(
               (date: string, index: number, dateArray: Array<string>) => {
-                console.log(date);
                 dataCollection.datasets[0].data.push(
                   monthData[date]["1. open"]
                 );
                 dataCollection.labels.push(date);
                 if (index === dateArray.length - 1) {
-                  console.log(dataCollection);
                   this.chartData = dataCollection;
                   this.loaded = true;
                 }
@@ -61,10 +60,7 @@ export default Vue.extend({
     },
   },
   computed: {
-    stockData() {
-      return store.getters.getStocks;
-    },
-    chartOptions() {
+    chartOptions(): ChartOptions {
       return {
         responsive: true,
         // Keep it false so it stays as a rectangle
@@ -73,14 +69,8 @@ export default Vue.extend({
     },
   },
   async mounted() {
-    // this.monthChart();
     this.monthChart();
   },
 });
-
-interface ChartData {
-  labels: Array<any>;
-  datasets: Array<any>;
-}
 </script>
 <style lang="sass" scoped></style>
