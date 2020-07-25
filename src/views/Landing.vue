@@ -12,6 +12,7 @@
 import Vue from "vue";
 import UserPortfolios from "@/components/UserPortfolios.vue";
 import store from "@/store";
+import { UserPortfolio } from "@/storeModules/portfolio";
 export default Vue.extend({
   name: "landing",
   components: {
@@ -19,14 +20,15 @@ export default Vue.extend({
   },
   data() {
     return {
-      userData: {},
+      userData: Object() as Array<UserPortfolio>,
     };
   },
   async mounted() {
-    await store.dispatch("portfolio/getAllUsers").then((res) => {
-      console.log("res", res);
-      this.userData = res;
-    });
+    await store
+      .dispatch("portfolio/getAllUsers")
+      .then((userPortfolios: Array<UserPortfolio>) => {
+        this.userData = userPortfolios;
+      });
   },
 });
 </script>

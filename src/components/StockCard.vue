@@ -30,7 +30,7 @@ export default Vue.extend({
     };
   },
   methods: {
-    buyStock(stock: stockDataFormat) {
+    buyStock(stock: stockDataFormat): void {
       let stockTransaction: newStockTransaction = {
         symbol: stock.stockData.name,
         data: {

@@ -141,7 +141,7 @@ const actions: ActionTree<any, any> = {
       );
     }
   },
-  async getAllUsers() {
+  async getAllUsers(): Promise<Array<UserPortfolio>> {
     let userData: Array<UserPortfolio> = [];
     await firebaseData
       .firestore()
