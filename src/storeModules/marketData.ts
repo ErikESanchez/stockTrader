@@ -87,9 +87,10 @@ export const actions: ActionTree<any, any> = {
       .collection("Time Series(Daily)")
       .doc("2020-04")
       .get()
-      .then((res) => {
-        if (res) {
-          commit("formatMonthData", res.data());
+      .then((doc) => {
+        if (doc) {
+          commit("formatMonthData", doc.data());
+          console.log(typeof doc.data());
         }
       })
       .catch(function(error) {
@@ -198,58 +199,53 @@ export const actions: ActionTree<any, any> = {
     let stockData: stockData = Object();
     let dateOfMonth: Object = moment().subtract(1, "month");
     let formatedDateOfMonth: string = moment(dateOfMonth).format("YYYY-MM");
-    let isDone: Boolean;
-    // * Bruh, this is all I had to do, to wait
-    await Promise.resolve(
-      firebaseData
-        .firestore()
-        .collection("stocks")
-        .get()
-        .then(function(querySnapshot) {
-          querySnapshot.forEach((doc: doc) => {
-            // console.log(doc.id, "=>", doc.data());
-            stockData[doc.id] = {
-              "metaData(Daily)": doc.data()["metaData(Daily)"],
-            };
-            return stockData;
-          });
-        })
-        .catch(function(error) {
-          console.error("Error getting documents", error);
-        })
-    );
-    await Promise.resolve(
-      Object.keys(stockData).forEach(
-        (symbol: string, key: number, arr: any) => {
-          return firebaseData
-            .firestore()
-            .collection("stocks")
-            .doc(symbol)
-            .collection("Time Series(Daily)")
-            .doc(formatedDateOfMonth)
-            .get()
-            .then(function(doc: doc) {
-              if (
-                doc.exists &&
-                stockData[symbol]["timeSeriesData"] === undefined
-              ) {
-                stockData[symbol]["timeSeriesData"] = doc.data().priceData;
-                if (Object.is(arr.length - 1, key)) {
-                  // console.log(
-                  //   `Last callback call at ${key} with value ${symbol}`
-                  // );
-                  commit("formatDatabaseData", stockData);
-                }
-                // ? Might not be the best place to put this
-              } else {
-                console.log("Document doesn't exist");
+    await firebaseData
+      .firestore()
+      .collection("stocks")
+      .get()
+      .then(function(querySnapshot) {
+        querySnapshot.forEach((doc: doc) => {
+          // console.log(doc.id, "=>", doc.data());
+          stockData[doc.id] = {
+            "metaData(Daily)": doc.data()["metaData(Daily)"],
+          };
+          return stockData;
+        });
+      })
+      .catch(function(error) {
+        console.error("Error getting documents", error);
+      });
+
+    Object.keys(stockData).forEach(
+      async (symbol: string, key: number, arr: any) => {
+        return await firebaseData
+          .firestore()
+          .collection("stocks")
+          .doc(symbol)
+          .collection("Time Series(Daily)")
+          .doc(formatedDateOfMonth)
+          .get()
+          .then(function(doc: doc) {
+            if (
+              doc.exists &&
+              stockData[symbol]["timeSeriesData"] === undefined
+            ) {
+              stockData[symbol]["timeSeriesData"] = doc.data().priceData;
+              if (Object.is(arr.length - 1, key)) {
+                // console.log(
+                //   `Last callback call at ${key} with value ${symbol}`
+                // );
+                commit("formatDatabaseData", stockData);
               }
-            })
-            .catch(function(error) {
-              console.error("Error getting document:", error);
-            });
-        }
-      )
+              // ? Might not be the best place to put this
+            } else {
+              console.log("Document doesn't exist");
+            }
+          })
+          .catch(function(error) {
+            console.error("Error getting document:", error);
+          });
+      }
     );
   },
 };

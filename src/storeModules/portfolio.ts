@@ -1,7 +1,7 @@
 import Vue from "vue";
 import { ActionTree, GetterTree, MutationTree } from "vuex";
 import { firebaseData } from "@/firebase";
-import { Stock } from "@/Classes/Stock";
+import { Portfolio } from "@/Classes/Portfolio";
 
 const state: State = {
   funds: Number(),
@@ -59,28 +59,23 @@ const actions: ActionTree<any, any> = {
     { state, dispatch, rootState },
     stockTransaction: newStockTransaction
   ) {
-    let stockClass: Stock = new Stock(
-      stockTransaction.data.priceAtTransaction,
-      stockTransaction.data.amount,
-      stockTransaction.symbol
-    );
     let portfolio: UserPortfolio = state.portfolio;
     const user: { uid: string } = rootState.userModule.user;
+    let portfolioClass: Portfolio = new Portfolio(portfolio, stockTransaction);
     if (Object.keys(portfolio.ownedStocks).length === 0) {
       await firebaseData
         .firestore()
         .collection("portfolios")
         .doc(user.uid)
         .update({
-          availableFunds:
-            portfolio.availableFunds - stockTransaction.data.priceAtTransaction,
+          availableFunds: portfolioClass.calculateAvailableFunds(),
           ownedStocks: {
             [stockTransaction.symbol]: {
               amountOwned: stockTransaction.data.amount,
               symbol: stockTransaction.symbol,
             },
           },
-          portfolioWorth: portfolio.portfolioWorth + stockClass.getTotalWorth(),
+          portfolioWorth: portfolioClass.calculatePortfolioWorth(),
         });
       dispatch("setPortfolio");
     } else {
@@ -94,9 +89,7 @@ const actions: ActionTree<any, any> = {
               .doc(user.uid as string)
               .set(
                 {
-                  availableFunds:
-                    portfolio.availableFunds -
-                    stockTransaction.data.priceAtTransaction,
+                  availableFunds: portfolioClass.calculateAvailableFunds(),
                   ownedStocks: {
                     [stockTransaction.symbol]: {
                       symbol: stockTransaction.symbol,
@@ -105,8 +98,7 @@ const actions: ActionTree<any, any> = {
                           .amountOwned + stockTransaction.data.amount,
                     },
                   },
-                  portfolioWorth:
-                    portfolio.portfolioWorth + stockClass.getTotalWorth(),
+                  portfolioWorth: portfolioClass.calculatePortfolioWorth(),
                 },
                 { merge: true }
               );
@@ -123,15 +115,14 @@ const actions: ActionTree<any, any> = {
               // todo: maybe change this to update ╰(*°▽°*)╯
               .set(
                 {
-                  // availableFunds:
-                  //   portfolio.availableFunds -
-                  //   stockTransaction.stockData.priceAtTransaction,
+                  availableFunds: portfolioClass.calculateAvailableFunds(),
                   ownedStocks: {
                     [stockTransaction.symbol]: {
                       amountOwned: stockTransaction.data.amount,
                       symbol: stockTransaction.symbol,
                     },
                   },
+                  portfolioWorth: portfolioClass.calculatePortfolioWorth(),
                 },
                 { merge: true }
               );
