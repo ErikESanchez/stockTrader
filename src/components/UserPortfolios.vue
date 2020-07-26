@@ -6,6 +6,10 @@
         Portfolio Worth:
         <div class="text-success">{{ user.portfolioWorth }}</div>
       </h6>
+      <h6 class="card-subtitle mb-2 text-white">
+        Funds
+        <div class="text-success">{{ user.availableFunds }}</div>
+      </h6>
       <p class="card-text" v-for="stock in user.ownedStocks" :key="stock.id">
         {{ stock.symbol }}
         Amount Owned: {{ stock.amountOwned }}
