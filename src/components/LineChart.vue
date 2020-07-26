@@ -34,6 +34,7 @@ export interface Dataset {
 
 export interface ChartOptions {
   responsive: boolean;
+  maintainAspectRatio: boolean;
   lineTension?: number;
 }
 </script>

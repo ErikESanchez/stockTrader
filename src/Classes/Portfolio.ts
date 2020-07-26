@@ -1,53 +1,28 @@
+import { UserPortfolio, newStockTransaction } from "@/storeModules/portfolio";
+
 export class Portfolio {
-  portfolio: UserPortfolio;
-  constructor(portfolio: UserPortfolio) {
+  portfolio = Object() as UserPortfolio;
+  stockTransaction = Object() as newStockTransaction;
+  constructor(portfolio: UserPortfolio, stockTransaction: newStockTransaction) {
     this.portfolio = portfolio;
+    this.stockTransaction = stockTransaction;
   }
-}
-
-export interface UserPortfolio {
-  availableFunds: number;
-  name: String;
-  ownedStocks: firebaseStockTransaction;
-  ownedStockData: Array<stockTransactionData>;
-  portfolioWorth: number;
-}
-export interface TIME_SERIES_DAILY {
-  function: "TIME_SERIES_DAILY";
-  symbol: string;
-  interval: string;
-  apikey: string;
-  outputsize?: string;
-}
-
-export interface firebaseStock {
-  amountOwned: number;
-}
-export interface firebaseStockTransaction {
-  [symbol: string]: {
-    stockName: string;
-    amountOwned: number;
-  };
-}
-
-export interface newStockTransaction {
-  stockName: string;
-  stockData: stockTransactionData;
-}
-interface stockTransactionData {
-  priceAtTransaction: number;
-  amount: number;
-  time: Date;
-}
-
-interface userStock {
-  name: string;
-  stocksOwned: Array<stockTransactionData>;
-}
-
-export interface userPriceHistory {
-  funds: number;
-  time: Date;
+  calculateBoughtAvailableFunds(): number {
+    const newFunds: number =
+      this.portfolio.availableFunds -
+      this.stockTransaction.data.priceAtTransaction;
+    return Number(Math.round(parseFloat(newFunds + "e" + 2)) + "e-" + 2);
+  }
+  calculateBoughtPortfolioWorth(): number {
+    const newWorth: number =
+      this.portfolio.portfolioWorth +
+      this.stockTransaction.data.priceAtTransaction;
+    return Number(Math.round(parseFloat(newWorth + "e" + 2)) + "e-" + 2);
+  }
+  calculateSoldAvailableFunds(): number {
+    const newFunds: number = this.portfolio.availableFunds;
+    return Number(Math.round(parseFloat(newFunds + "e" + 2)) + "e-" + 2);
+  }
 }
 
 export let storeSchema = {

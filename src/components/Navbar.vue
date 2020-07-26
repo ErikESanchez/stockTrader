@@ -1,5 +1,8 @@
 <template>
-  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <nav
+    class="navbar navbar-expand-lg navbar-dark bg-dark"
+    style="border-bottom: 1px solid #696969"
+  >
     <router-link to="/" class="navbar-brand">
       Stock Trader
     </router-link>
@@ -16,7 +19,9 @@
       <form class="form-inline my-2 my-lg-0" v-if="user.email">
         <ul class="navbar-nav mr-auto">
           <li class="nav-item active">
-            <div class="nav-link">{{ portfolio.availableFunds }}$</div>
+            <div class="nav-link text-success">
+              {{ portfolio.availableFunds }}$
+            </div>
           </li>
           <li class="nav-item dropleft">
             <a

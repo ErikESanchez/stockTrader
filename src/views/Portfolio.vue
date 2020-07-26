@@ -1,11 +1,11 @@
 <template>
   <div>
-    <p>Portfolio</p>
+    <p class="text-white">Portfolio</p>
     <portfolio-stock-card
       v-for="(stock, index) in portfolio.ownedStocks"
       :stock="stock"
       :key="index"
-    ></portfolio-stock-card>
+    />
   </div>
 </template>
 
@@ -28,7 +28,6 @@ export default Vue.extend({
       stockAmount: new Number(),
     };
   },
-  mounted() {},
   computed: mapState("portfolio", ["portfolio"]),
 });
 </script>

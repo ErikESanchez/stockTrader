@@ -3,8 +3,8 @@
     <h1>Load the real data for a single stock</h1>
     <line-chart
       v-if="loaded == true"
-      :chartData="stockChartData"
-      :options="chartOptions"
+      :chartData="chartData"
+      :chartOptions="chartOptions"
       style="height: 300px;"
     ></line-chart>
   </div>
@@ -13,7 +13,8 @@
 import Vue from "vue";
 import LineChart from "../components/LineChart.vue";
 import store from "@/store";
-import { Chart, chartData } from "@/Classes/Chart";
+import { MonthData } from "@/storeModules/marketData";
+import { ChartData, ChartOptions } from "@/components/LineChart.vue";
 export default Vue.extend({
   name: "singleStock",
   components: {
@@ -21,59 +22,45 @@ export default Vue.extend({
   },
   data() {
     return {
-      chart: new Chart(),
       loaded: false,
-      stockChartData: (): Object => ({
-        labels: Array(),
-        datasets: Array(),
-      }),
+      chartData: Object() as ChartData,
     };
   },
   methods: {
-    dayChart(): void {
-      let chart: Chart = this.chart;
-      let symbol: string = this.$router.currentRoute.params.stockName;
-      Promise.resolve(
-        store.dispatch("getApiIntraday", symbol).then((dayData: any) => {
-          if (dayData) {
-            let metaData: any = dayData["data"]["Meta Data"];
-            let priceData: any = dayData["data"]["Time Series (1min)"];
-            console.log(metaData, priceData);
-            // Todo: I have to figure out a way to store the data in a reasonable manner, or get better at calling the api.
-            Promise.resolve(
-              chart
-                .renderChart(priceData, symbol)
-                .then((dataCollections: any) => {
-                  console.log("Data Collection", dataCollections);
-                  this.stockChartData = dataCollections;
-                })
+    async monthChart(): Promise<void> {
+      const symbol: string = this.$router.currentRoute.params.stockName;
+      let dataCollection: ChartData = {
+        labels: [],
+        datasets: [
+          {
+            label: symbol,
+            data: [],
+            backgroundColor: ["rgb(255, 99, 132)"],
+          },
+        ],
+      };
+      await store
+        .dispatch("marketData/getMonthData", symbol)
+        .then((monthData: MonthData) => {
+          if (monthData) {
+            Object.keys(monthData).forEach(
+              (date: string, index: number, dateArray: Array<string>) => {
+                dataCollection.datasets[0].data.push(
+                  monthData[date]["1. open"]
+                );
+                dataCollection.labels.push(date);
+                if (index === dateArray.length - 1) {
+                  this.chartData = dataCollection;
+                  this.loaded = true;
+                }
+              }
             );
-          } else {
-            console.log("Data did not reach chart");
           }
-        })
-      );
-    },
-    async monthChart() {
-      let chart: Chart = this.chart;
-      let symbol: string = this.$router.currentRoute.params.stockName;
-      let monthData = await store.dispatch("marketData/getMonthData", symbol);
-      if (monthData) {
-        await chart
-          .renderChart(monthData, symbol)
-          .then((dataCollection: any) => {
-            console.log(dataCollection);
-            this.stockChartData = dataCollection;
-            this.loaded = true;
-          });
-      }
+        });
     },
   },
   computed: {
-    stockData() {
-      return store.getters.getStocks;
-    },
-    chartOptions(): any {
+    chartOptions(): ChartOptions {
       return {
         responsive: true,
         // Keep it false so it stays as a rectangle
@@ -82,7 +69,6 @@ export default Vue.extend({
     },
   },
   async mounted() {
-    // this.monthChart();
     this.monthChart();
   },
 });

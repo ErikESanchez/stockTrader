@@ -1,14 +1,18 @@
 <template>
-  <div class="card mb-2">
+  <div
+    class="card bg-dark border-light"
+    style="margin-top: 10px; width: 140px; height: 125px "
+  >
     <div class="card-body">
-      <router-link :to="stockRoute" class="card-title">
+      <router-link :to="stockRoute" class="card-title text-light">
         {{ stock["stockData"]["name"] }}
       </router-link>
-      <p class="card-text">
-        {{ stock["stockData"]["open"] }}$
-        {{ stock["stockData"]["lastRefreshed"] }}
-      </p>
-      <button class="btn btn-primary" @click="buyStock(stock)">
+      <h5 class="card-title text-success">{{ stock["stockData"]["open"] }}$</h5>
+
+      <!-- <p class="card-text text-success"> -->
+      <!-- {{ stock["stockData"]["lastRefreshed"] }} -->
+      <!-- </p> -->
+      <button class="btn btn-light" @click="buyStock(stock)">
         Buy Stock
       </button>
     </div>
@@ -18,7 +22,7 @@
 <script lang="ts">
 import Vue from "vue";
 import store from "@/store";
-import { newStockTransaction } from "@/Classes/Portfolio";
+import { newStockTransaction } from "@/storeModules/portfolio";
 import { stockDataFormat } from "@/storeModules/marketData";
 
 export default Vue.extend({
@@ -30,16 +34,15 @@ export default Vue.extend({
     };
   },
   methods: {
-    buyStock(stock: stockDataFormat) {
+    buyStock(stock: stockDataFormat): void {
       let stockTransaction: newStockTransaction = {
-        stockName: stock.stockData.name,
-        stockData: {
+        symbol: stock.stockData.name,
+        data: {
           priceAtTransaction: stock.stockData.high,
           amount: this.amountToBuy,
           time: new Date(),
         },
       };
-      console.log(stockTransaction);
       store.dispatch("portfolio/buyStock", stockTransaction);
     },
   },

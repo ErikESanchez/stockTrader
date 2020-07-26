@@ -1,8 +1,7 @@
 import Vue from "vue";
 import { ActionTree, GetterTree, MutationTree } from "vuex";
-import { newStockTransaction, UserPortfolio } from "@/Classes/Portfolio";
 import { firebaseData } from "@/firebase";
-import { Stock } from "@/Classes/Stock";
+import { Portfolio } from "@/Classes/Portfolio";
 
 const state: State = {
   funds: Number(),
@@ -27,7 +26,7 @@ const actions: ActionTree<any, any> = {
         .doc(user.uid)
         .get()
         .then((doc: doc) => {
-          console.log(doc.id, "=>", doc.data());
+          // console.log(doc.id, "=>", doc.data());
           return doc.data() as UserPortfolio;
         })
     ).then(async (portfolio: UserPortfolio) => {
@@ -52,7 +51,7 @@ const actions: ActionTree<any, any> = {
           .update({
             ownedStocks: portfolio.ownedStocks,
           });
-        console.log(portfolio);
+        // console.log(portfolio);
       }
     });
   },
@@ -60,98 +59,73 @@ const actions: ActionTree<any, any> = {
     { state, dispatch, rootState },
     stockTransaction: newStockTransaction
   ) {
-    let stockClass: Stock = new Stock(
-      stockTransaction.stockData.priceAtTransaction,
-      stockTransaction.stockData.amount,
-      stockTransaction.stockName
-    );
     let portfolio: UserPortfolio = state.portfolio;
-    const user = rootState.userModule.user;
-    if (Object.keys(portfolio.ownedStocks).length === 0) {
-      console.log("need to make a new stock to loop through");
+    const uid: string = rootState.userModule.user.uid;
+    let portfolioClass: Portfolio = new Portfolio(portfolio, stockTransaction);
+    if (portfolio.ownedStocks[`${stockTransaction.symbol}`]) {
+      console.log(`You own ${stockTransaction.symbol}`);
       await firebaseData
         .firestore()
         .collection("portfolios")
-        .doc(user.uid)
-        .update({
-          availableFunds:
-            portfolio.availableFunds -
-            stockTransaction.stockData.priceAtTransaction,
-          ownedStocks: {
-            [stockTransaction.stockName]: {
-              amountOwned: stockTransaction.stockData.amount,
-              symbol: stockTransaction.stockName,
+        .doc(uid)
+        .set(
+          {
+            availableFunds: portfolioClass.calculateBoughtAvailableFunds(),
+            ownedStocks: {
+              [stockTransaction.symbol]: {
+                symbol: stockTransaction.symbol,
+                amountOwned:
+                  portfolio.ownedStocks[stockTransaction.symbol].amountOwned +
+                  stockTransaction.data.amount,
+              },
             },
+            portfolioWorth: portfolioClass.calculateBoughtPortfolioWorth(),
           },
-          portfolioWorth: portfolio.portfolioWorth + stockClass.getTotalWorth(),
-        });
+          { merge: true }
+        );
       dispatch("setPortfolio");
-    } else {
-      console.log("just loop through the stocks");
-      Object.keys(portfolio.ownedStocks).forEach(
-        async (symbol: string, index: number, arr: Array<string>) => {
-          console.log("Symbol", symbol);
-          if (stockTransaction.stockName === symbol) {
-            console.log(`User owns a ${stockTransaction.stockName} stock`);
-            await firebaseData
-              .firestore()
-              .collection("portfolios")
-              .doc(user.uid)
-              .set(
-                {
-                  availableFunds:
-                    portfolio.availableFunds -
-                    stockTransaction.stockData.priceAtTransaction,
-                  ownedStocks: {
-                    [stockTransaction.stockName]: {
-                      symbol: stockTransaction.stockName,
-                      amountOwned:
-                        portfolio.ownedStocks[stockTransaction.stockName]
-                          .amountOwned + stockTransaction.stockData.amount,
-                    },
-                  },
-                  portfolioWorth:
-                    portfolio.portfolioWorth + stockClass.getTotalWorth(),
+    } else if (
+      portfolio.ownedStocks[`${stockTransaction.symbol}`] === undefined
+    ) {
+      console.log(`User does not own a ${stockTransaction.symbol} stock`);
+      console.log(portfolioClass.calculateBoughtPortfolioWorth());
 
-                  // ownedStocks: firestore.FieldValue.arrayUnion(stockTransaction),
-                },
-                { merge: true }
-              );
-            dispatch("setPortfolio");
-          } else if (
-            index === arr.length - 1 &&
-            stockTransaction.stockName !== symbol
-          ) {
-            console.log(
-              `User does not own a ${stockTransaction.stockName} stock`
-            );
-            await firebaseData
-              .firestore()
-              .collection("portfolios")
-              .doc(user.uid)
-              // todo: maybe change this to update ╰(*°▽°*)╯
-              .set(
-                {
-                  // availableFunds:
-                  //   portfolio.availableFunds -
-                  //   stockTransaction.stockData.priceAtTransaction,
-                  ownedStocks: {
-                    [stockTransaction.stockName]: {
-                      amountOwned: stockTransaction.stockData.amount,
-                      symbol: stockTransaction.stockName,
-                    },
-                  },
-                },
-                { merge: true }
-              );
-            dispatch("setPortfolio");
-          }
-        }
-      );
+      await firebaseData
+        .firestore()
+        .collection("portfolios")
+        .doc(uid as string)
+        // todo: maybe change this to update ╰(*°▽°*)╯
+        .set(
+          {
+            availableFunds: portfolioClass.calculateBoughtAvailableFunds(),
+            ownedStocks: {
+              [stockTransaction.symbol]: {
+                amountOwned: stockTransaction.data.amount,
+                symbol: stockTransaction.symbol,
+              },
+            },
+            portfolioWorth: portfolioClass.calculateBoughtPortfolioWorth(),
+          },
+          { merge: true }
+        );
+      dispatch("setPortfolio");
     }
   },
-  async getAllUsers() {
-    let userData: Array<any> = [];
+  async sellStock({ rootState }, symbol: string) {
+    let portfolio: UserPortfolio = state.portfolio;
+    const uid: string = rootState.userModule.user.uid;
+    await firebaseData
+      .firestore()
+      .collection("portfolios")
+      .doc(uid)
+      .update({
+        availableFunds: Number(),
+        ownedStocks: {},
+        portfolioWorth: Number(),
+      });
+  },
+  async getAllUsers(): Promise<Array<UserPortfolio>> {
+    let userData: Array<UserPortfolio> = [];
     await firebaseData
       .firestore()
       .collection("portfolios")
@@ -159,7 +133,7 @@ const actions: ActionTree<any, any> = {
       .then((querySnapshot) => {
         querySnapshot.forEach((doc) => {
           console.log(doc.id, "=>", doc.data());
-          userData.push(doc.data());
+          userData.push(doc.data() as UserPortfolio);
         });
       });
     return userData;
@@ -171,11 +145,31 @@ interface State {
   portfolio: UserPortfolio;
 }
 
-interface TotalUserStocks {
-  [name: string]: {
-    stocksOwned: number;
+export interface UserPortfolio {
+  availableFunds: number;
+  name: String;
+  ownedStocks: firebaseStockTransaction;
+  portfolioWorth: number;
+}
+
+export interface firebaseStockTransaction {
+  [symbol: string]: {
+    stockName: string;
+    amountOwned: number;
   };
 }
+
+export interface newStockTransaction {
+  symbol: string;
+  data: stockTransactionData;
+}
+
+interface stockTransactionData {
+  priceAtTransaction: number;
+  amount: number;
+  time: Date;
+}
+
 interface doc {
   [id: string]: any;
 }
