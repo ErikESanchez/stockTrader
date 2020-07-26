@@ -7,17 +7,21 @@ export class Portfolio {
     this.portfolio = portfolio;
     this.stockTransaction = stockTransaction;
   }
-  calculateAvailableFunds(): number {
+  calculateBoughtAvailableFunds(): number {
     const newFunds: number =
       this.portfolio.availableFunds -
       this.stockTransaction.data.priceAtTransaction;
     return Number(Math.round(parseFloat(newFunds + "e" + 2)) + "e-" + 2);
   }
-  calculatePortfolioWorth(): number {
+  calculateBoughtPortfolioWorth(): number {
     const newWorth: number =
       this.portfolio.portfolioWorth +
       this.stockTransaction.data.priceAtTransaction;
     return Number(Math.round(parseFloat(newWorth + "e" + 2)) + "e-" + 2);
+  }
+  calculateSoldAvailableFunds(): number {
+    const newFunds: number = this.portfolio.availableFunds;
+    return Number(Math.round(parseFloat(newFunds + "e" + 2)) + "e-" + 2);
   }
 }
 

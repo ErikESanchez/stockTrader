@@ -60,35 +60,17 @@ const actions: ActionTree<any, any> = {
     stockTransaction: newStockTransaction
   ) {
     let portfolio: UserPortfolio = state.portfolio;
-    const user: { uid: string } = rootState.userModule.user;
+    const uid: string = rootState.userModule.user.uid;
     let portfolioClass: Portfolio = new Portfolio(portfolio, stockTransaction);
-    console.log(portfolio.ownedStocks[`${stockTransaction.symbol}`]);
-    if (portfolio.ownedStocks === undefined) {
-      console.log("User does not own any stocks");
-      await firebaseData
-        .firestore()
-        .collection("portfolios")
-        .doc(user.uid)
-        .update({
-          availableFunds: portfolioClass.calculateAvailableFunds(),
-          ownedStocks: {
-            [stockTransaction.symbol]: {
-              amountOwned: stockTransaction.data.amount,
-              symbol: stockTransaction.symbol,
-            },
-          },
-          portfolioWorth: portfolioClass.calculatePortfolioWorth(),
-        });
-      dispatch("setPortfolio");
-    } else if (portfolio.ownedStocks[`${stockTransaction.symbol}`]) {
+    if (portfolio.ownedStocks[`${stockTransaction.symbol}`]) {
       console.log(`You own ${stockTransaction.symbol}`);
       await firebaseData
         .firestore()
         .collection("portfolios")
-        .doc(user.uid as string)
+        .doc(uid)
         .set(
           {
-            availableFunds: portfolioClass.calculateAvailableFunds(),
+            availableFunds: portfolioClass.calculateBoughtAvailableFunds(),
             ownedStocks: {
               [stockTransaction.symbol]: {
                 symbol: stockTransaction.symbol,
@@ -97,7 +79,7 @@ const actions: ActionTree<any, any> = {
                   stockTransaction.data.amount,
               },
             },
-            portfolioWorth: portfolioClass.calculatePortfolioWorth(),
+            portfolioWorth: portfolioClass.calculateBoughtPortfolioWorth(),
           },
           { merge: true }
         );
@@ -106,43 +88,41 @@ const actions: ActionTree<any, any> = {
       portfolio.ownedStocks[`${stockTransaction.symbol}`] === undefined
     ) {
       console.log(`User does not own a ${stockTransaction.symbol} stock`);
+      console.log(portfolioClass.calculateBoughtPortfolioWorth());
+
       await firebaseData
         .firestore()
         .collection("portfolios")
-        .doc(user.uid as string)
+        .doc(uid as string)
         // todo: maybe change this to update ╰(*°▽°*)╯
         .set(
           {
-            availableFunds: portfolioClass.calculateAvailableFunds(),
+            availableFunds: portfolioClass.calculateBoughtAvailableFunds(),
             ownedStocks: {
               [stockTransaction.symbol]: {
                 amountOwned: stockTransaction.data.amount,
                 symbol: stockTransaction.symbol,
               },
             },
-            portfolioWorth: portfolioClass.calculatePortfolioWorth(),
+            portfolioWorth: portfolioClass.calculateBoughtPortfolioWorth(),
           },
           { merge: true }
         );
       dispatch("setPortfolio");
     }
-    // if (Object.keys(portfolio.ownedStocks).length === 0) {
-    //
-    // } else {
-    //   Object.keys(portfolio.ownedStocks).forEach(
-    //     async (symbol: string, index: number, arr: Array<string>) => {
-    //       if (stockTransaction.symbol === symbol) {
-    //         console.log(`User owns a ${stockTransaction.symbol} stock`);
-
-    //       } else if (
-    //         index === arr.length - 1 &&
-    //         symbol !== stockTransaction.symbol
-    //       ) {
-
-    //       }
-    //     }
-    //   );
-    // }
+  },
+  async sellStock({ rootState }, symbol: string) {
+    let portfolio: UserPortfolio = state.portfolio;
+    const uid: string = rootState.userModule.user.uid;
+    await firebaseData
+      .firestore()
+      .collection("portfolios")
+      .doc(uid)
+      .update({
+        availableFunds: Number(),
+        ownedStocks: {},
+        portfolioWorth: Number(),
+      });
   },
   async getAllUsers(): Promise<Array<UserPortfolio>> {
     let userData: Array<UserPortfolio> = [];
