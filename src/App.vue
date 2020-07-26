@@ -33,4 +33,10 @@ export default Vue.extend({
 <style lang="scss">
 @import "~bootstrap/dist/css/bootstrap.css";
 @import "~bootstrap/scss/bootstrap";
+#app {
+  background: #343a40 !important;
+}
+html {
+  background: #343a40 !important;
+}
 </style>
