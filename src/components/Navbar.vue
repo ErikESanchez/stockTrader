@@ -19,7 +19,9 @@
       <form class="form-inline my-2 my-lg-0" v-if="user.email">
         <ul class="navbar-nav mr-auto">
           <li class="nav-item active">
-            <div class="nav-link">{{ portfolio.availableFunds }}$</div>
+            <div class="nav-link text-success">
+              {{ portfolio.availableFunds }}$
+            </div>
           </li>
           <li class="nav-item dropleft">
             <a

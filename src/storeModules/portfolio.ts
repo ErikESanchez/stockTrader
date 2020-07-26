@@ -26,7 +26,7 @@ const actions: ActionTree<any, any> = {
         .doc(user.uid)
         .get()
         .then((doc: doc) => {
-          console.log(doc.id, "=>", doc.data());
+          // console.log(doc.id, "=>", doc.data());
           return doc.data() as UserPortfolio;
         })
     ).then(async (portfolio: UserPortfolio) => {
@@ -51,7 +51,7 @@ const actions: ActionTree<any, any> = {
           .update({
             ownedStocks: portfolio.ownedStocks,
           });
-        console.log(portfolio);
+        // console.log(portfolio);
       }
     });
   },
@@ -62,7 +62,9 @@ const actions: ActionTree<any, any> = {
     let portfolio: UserPortfolio = state.portfolio;
     const user: { uid: string } = rootState.userModule.user;
     let portfolioClass: Portfolio = new Portfolio(portfolio, stockTransaction);
-    if (Object.keys(portfolio.ownedStocks).length === 0) {
+    console.log(portfolio.ownedStocks[`${stockTransaction.symbol}`]);
+    if (portfolio.ownedStocks === undefined) {
+      console.log("User does not own any stocks");
       await firebaseData
         .firestore()
         .collection("portfolios")
@@ -78,59 +80,69 @@ const actions: ActionTree<any, any> = {
           portfolioWorth: portfolioClass.calculatePortfolioWorth(),
         });
       dispatch("setPortfolio");
-    } else {
-      Object.keys(portfolio.ownedStocks).forEach(
-        async (symbol: string, index: number, arr: Array<string>) => {
-          if (stockTransaction.symbol === symbol) {
-            console.log(`User owns a ${stockTransaction.symbol} stock`);
-            await firebaseData
-              .firestore()
-              .collection("portfolios")
-              .doc(user.uid as string)
-              .set(
-                {
-                  availableFunds: portfolioClass.calculateAvailableFunds(),
-                  ownedStocks: {
-                    [stockTransaction.symbol]: {
-                      symbol: stockTransaction.symbol,
-                      amountOwned:
-                        portfolio.ownedStocks[stockTransaction.symbol]
-                          .amountOwned + stockTransaction.data.amount,
-                    },
-                  },
-                  portfolioWorth: portfolioClass.calculatePortfolioWorth(),
-                },
-                { merge: true }
-              );
-            dispatch("setPortfolio");
-          } else if (
-            index === arr.length - 1 &&
-            stockTransaction.symbol !== symbol
-          ) {
-            console.log(`User does not own a ${stockTransaction.symbol} stock`);
-            await firebaseData
-              .firestore()
-              .collection("portfolios")
-              .doc(user.uid as string)
-              // todo: maybe change this to update ╰(*°▽°*)╯
-              .set(
-                {
-                  availableFunds: portfolioClass.calculateAvailableFunds(),
-                  ownedStocks: {
-                    [stockTransaction.symbol]: {
-                      amountOwned: stockTransaction.data.amount,
-                      symbol: stockTransaction.symbol,
-                    },
-                  },
-                  portfolioWorth: portfolioClass.calculatePortfolioWorth(),
-                },
-                { merge: true }
-              );
-            dispatch("setPortfolio");
-          }
-        }
-      );
+    } else if (portfolio.ownedStocks[`${stockTransaction.symbol}`]) {
+      console.log(`You own ${stockTransaction.symbol}`);
+      await firebaseData
+        .firestore()
+        .collection("portfolios")
+        .doc(user.uid as string)
+        .set(
+          {
+            availableFunds: portfolioClass.calculateAvailableFunds(),
+            ownedStocks: {
+              [stockTransaction.symbol]: {
+                symbol: stockTransaction.symbol,
+                amountOwned:
+                  portfolio.ownedStocks[stockTransaction.symbol].amountOwned +
+                  stockTransaction.data.amount,
+              },
+            },
+            portfolioWorth: portfolioClass.calculatePortfolioWorth(),
+          },
+          { merge: true }
+        );
+      dispatch("setPortfolio");
+    } else if (
+      portfolio.ownedStocks[`${stockTransaction.symbol}`] === undefined
+    ) {
+      console.log(`User does not own a ${stockTransaction.symbol} stock`);
+      await firebaseData
+        .firestore()
+        .collection("portfolios")
+        .doc(user.uid as string)
+        // todo: maybe change this to update ╰(*°▽°*)╯
+        .set(
+          {
+            availableFunds: portfolioClass.calculateAvailableFunds(),
+            ownedStocks: {
+              [stockTransaction.symbol]: {
+                amountOwned: stockTransaction.data.amount,
+                symbol: stockTransaction.symbol,
+              },
+            },
+            portfolioWorth: portfolioClass.calculatePortfolioWorth(),
+          },
+          { merge: true }
+        );
+      dispatch("setPortfolio");
     }
+    // if (Object.keys(portfolio.ownedStocks).length === 0) {
+    //
+    // } else {
+    //   Object.keys(portfolio.ownedStocks).forEach(
+    //     async (symbol: string, index: number, arr: Array<string>) => {
+    //       if (stockTransaction.symbol === symbol) {
+    //         console.log(`User owns a ${stockTransaction.symbol} stock`);
+
+    //       } else if (
+    //         index === arr.length - 1 &&
+    //         symbol !== stockTransaction.symbol
+    //       ) {
+
+    //       }
+    //     }
+    //   );
+    // }
   },
   async getAllUsers(): Promise<Array<UserPortfolio>> {
     let userData: Array<UserPortfolio> = [];
