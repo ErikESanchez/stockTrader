@@ -90,7 +90,7 @@ export const actions: ActionTree<any, any> = {
       .then((doc) => {
         if (doc) {
           commit("formatMonthData", doc.data());
-          console.log(typeof doc.data());
+          console.log(doc.data());
         }
       })
       .catch(function(error) {
@@ -198,7 +198,7 @@ export const actions: ActionTree<any, any> = {
     // TODO: Figure out how to use an interface and to be able dynamically name a variable
     let stockData: stockData = Object();
     let dateOfMonth: Object = moment().subtract(1, "month");
-    let formatedDateOfMonth: string = moment(dateOfMonth).format("YYYY-MM");
+    let formatedDateOfMonth: string = moment("2020-04").format("YYYY-MM");
     await firebaseData
       .firestore()
       .collection("stocks")
