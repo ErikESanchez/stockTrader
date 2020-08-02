@@ -1,18 +1,25 @@
 <template>
-  <div class="card bg-dark text-white border-light" style="width: 18rem;">
-    <div class="card-body">
-      <h5 class="card-title">{{ user.name }}</h5>
-      <h6 class="card-subtitle mb-2 text-white">
-        Portfolio Worth:
-        <div class="text-success">{{ user.portfolioWorth }}</div>
+  <div class="card bg-dark text-white border-light" style="width: 500px;">
+    <div class="card-body" style="font: 21px Nunito, sans-serif">
+      <h5 class="card-title text-center">{{ user.name }}</h5>
+      <h6
+        class="card-subtitle mb-2 text-white"
+        style="font: 21px Nunito, sans-serif"
+      >
+        <div style="overflow-x: auto; white-space: nowrap;">
+          Portfolio Worth:
+          <div class="text-success" style="display: inline-block">
+            {{ user.portfolioWorth }}$
+          </div>
+        </div>
+        Funds:
+        <div class="text-success" style="display: inline-block">
+          {{ user.availableFunds }}$
+        </div>
       </h6>
-      <h6 class="card-subtitle mb-2 text-white">
-        Funds
-        <div class="text-success">{{ user.availableFunds }}</div>
-      </h6>
+      <h6 class="card-subtitle mb-2 text-white"></h6>
       <p class="card-text" v-for="stock in user.ownedStocks" :key="stock.id">
-        {{ stock.symbol }}
-        Amount Owned: {{ stock.amountOwned }}
+        {{ stock.symbol }} Stock: {{ stock.amountOwned }}
       </p>
     </div>
   </div>
