@@ -19,7 +19,10 @@
       <form class="form-inline my-2 my-lg-0" v-if="user.email">
         <ul class="navbar-nav mr-auto">
           <li class="nav-item active">
-            <div class="nav-link text-success">
+            <div
+              class="nav-link text-success"
+              style="font: 18px Nunito, sans-serif"
+            >
               {{ portfolio.availableFunds }}$
             </div>
           </li>

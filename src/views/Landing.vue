@@ -1,6 +1,8 @@
 <template>
   <div>
     <user-portfolios
+      class="container"
+      style="margin-top: 10px;"
       v-for="(user, index) in userData"
       :user="user"
       :key="index"
