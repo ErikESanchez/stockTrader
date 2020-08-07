@@ -1,7 +1,7 @@
 <template>
   <nav
-    class="navbar navbar-expand-lg navbar-dark bg-dark"
-    style="border-bottom: 1px solid #696969"
+    class="navbar navbar-expand-lg navbar-dark"
+    style="background-color: #232627"
   >
     <router-link to="/" class="navbar-brand">
       Stock Trader

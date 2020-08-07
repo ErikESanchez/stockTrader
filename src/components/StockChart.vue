@@ -63,7 +63,7 @@ export default Vue.extend({
         },
         colors: ["#E91E63"],
         dataLabels: {
-          enabled: true,
+          enabled: false,
         },
         stroke: {
           curve: "smooth",
