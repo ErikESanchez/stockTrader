@@ -1,41 +1,34 @@
 <template>
   <div>
-    <h1>Load the real data for a single stock</h1>
-    <line-chart
-      v-if="loaded == true"
-      :chartData="chartData"
-      :chartOptions="chartOptions"
-      style="height: 300px;"
-    ></line-chart>
+    <stock-chart :stockData="chartData" class="container-fluid" />
   </div>
 </template>
 <script lang="ts">
 import Vue from "vue";
-import LineChart from "../components/LineChart.vue";
+import StockChart from "../components/StockChart.vue";
 import store from "@/store";
 import { MonthData } from "@/storeModules/marketData";
-import { ChartData, ChartOptions } from "@/components/LineChart.vue";
+// import { ChartData, ChartOptions } from "@/components/LineChart.vue";
 export default Vue.extend({
   name: "singleStock",
   components: {
-    LineChart,
+    StockChart,
   },
   data() {
     return {
       loaded: false,
-      chartData: Object() as ChartData,
+      chartData: Object(),
     };
   },
   methods: {
     async monthChart(): Promise<void> {
       const symbol: string = this.$router.currentRoute.params.stockName;
-      let dataCollection: ChartData = {
+      let dataCollection: any = {
         labels: [],
         datasets: [
           {
-            label: symbol,
+            name: symbol,
             data: [],
-            backgroundColor: ["rgb(255, 99, 132)"],
           },
         ],
       };
@@ -60,13 +53,13 @@ export default Vue.extend({
     },
   },
   computed: {
-    chartOptions(): ChartOptions {
-      return {
-        responsive: true,
-        // Keep it false so it stays as a rectangle
-        maintainAspectRatio: false,
-      };
-    },
+    // chartOptions(): ChartOptions {
+    //   return {
+    //     responsive: true,
+    //     // Keep it false so it stays as a rectangle
+    //     maintainAspectRatio: false,
+    //   };
+    // },
   },
   async mounted() {
     this.monthChart();

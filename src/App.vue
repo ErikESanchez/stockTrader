@@ -35,10 +35,10 @@ export default Vue.extend({
 @import "~bootstrap/scss/bootstrap";
 #app {
   font: 17px Poppins Helvetica, sans-serif !important;
-  background: #343a40 !important;
+  background: #181a1b !important;
 }
 html {
   font: 17px Poppins Helvetica, sans-serif !important;
-  background: #343a40 !important;
+  background: #181a1b !important;
 }
 </style>
