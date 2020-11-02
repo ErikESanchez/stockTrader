@@ -118,8 +118,6 @@ const actions: ActionTree<any, any> = {
     }
   },
   async sellStock({ rootState, dispatch }, symbol: string) {
-    // Todo: Make an if statement to stop user from selling stocks that they don't own
-    // * Example: If user is below or equal to 0, he should not be able to sell
     let portfolio: UserPortfolio = state.portfolio;
     const uid: string = rootState.userModule.user.uid;
     if (portfolio.availableFunds >= 0 && portfolio.ownedStocks[symbol].amountOwned > 0) {
@@ -144,19 +142,8 @@ const actions: ActionTree<any, any> = {
           dispatch("setPortfolio")
         }
       });
-    } else {
-      console.log("Bruh, you poor.")
-    }
-
-    // await firebaseData
-    //   .firestore()
-    //   .collection("portfolios")
-    //   .doc(uid)
-    //   .update({
-    //     availableFunds: Number(),
-    //     ownedStocks: {},
-    //     portfolioWorth: Number(),
-    //   });
+    } 
+    // Todo: Create a little message popup (that doesn't interupt UX) for either insufficient funds to not stocks to sell
   },
   async getAllUsers(): Promise<Array<UserPortfolio>> {
     let userData: Array<UserPortfolio> = [];
