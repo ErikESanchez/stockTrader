@@ -142,7 +142,17 @@ const actions: ActionTree<any, any> = {
           dispatch("setPortfolio")
         }
       });
-    } 
+    }
+    // else if (portfolio.ownedStocks[symbol].amountOwned <= 0) {
+    //   console.log('bruh')
+    //   await firebaseData.firestore().collection("portfolios").doc(uid as string).update({
+    //     ownedStocks: {
+          // Todo: Get FieldValue.delete() to work, for some reason it's not recognized
+    //       [symbol]: firebaseData.firestore().FieldValue.delete()
+    //     }
+    //   })
+    //   console.log("Delete")
+    // }
     // Todo: Create a little message popup (that doesn't interupt UX) for either insufficient funds to not stocks to sell
   },
   async getAllUsers(): Promise<Array<UserPortfolio>> {
