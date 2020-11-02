@@ -122,7 +122,7 @@ const actions: ActionTree<any, any> = {
     // * Example: If user is below or equal to 0, he should not be able to sell
     let portfolio: UserPortfolio = state.portfolio;
     const uid: string = rootState.userModule.user.uid;
-    if (portfolio.availableFunds >= 0) {
+    if (portfolio.availableFunds >= 0 && portfolio.ownedStocks[symbol].amountOwned > 0) {
       // console.log("Bruh, you got the cash.")
       rootState.marketData.formatedStocks.forEach(async (stock: any) => {
         if (stock.stockData.name === symbol) {
