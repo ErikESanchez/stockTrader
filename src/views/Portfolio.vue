@@ -28,6 +28,9 @@ export default Vue.extend({
       stockAmount: new Number(),
     };
   },
+  async mounted() {
+    await store.dispatch("marketData/getDatabaseDailyData", null, { root: true });
+  },
   computed: mapState("portfolio", ["portfolio"]),
 });
 </script>

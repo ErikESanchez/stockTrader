@@ -225,7 +225,7 @@ export const actions: ActionTree<any, any> = {
           .collection("Time Series(Daily)")
           .doc(formatedDateOfMonth)
           .get()
-          .then(function(doc: doc) {
+          .then(( doc: doc) => {
             if (
               doc.exists &&
               stockData[symbol]["timeSeriesData"] === undefined
@@ -235,7 +235,7 @@ export const actions: ActionTree<any, any> = {
                 // console.log(
                 //   `Last callback call at ${key} with value ${symbol}`
                 // );
-                commit("formatDatabaseData", stockData);
+                 commit("formatDatabaseData", stockData);
               }
               // ? Might not be the best place to put this
             } else {

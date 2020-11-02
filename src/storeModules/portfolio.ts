@@ -60,69 +60,103 @@ const actions: ActionTree<any, any> = {
     stockTransaction: newStockTransaction
   ) {
     let portfolio: UserPortfolio = state.portfolio;
+    console.log(portfolio.availableFunds)
     const uid: string = rootState.userModule.user.uid;
     let portfolioClass: Portfolio = new Portfolio(portfolio, stockTransaction);
-    if (portfolio.ownedStocks[`${stockTransaction.symbol}`]) {
-      console.log(`You own ${stockTransaction.symbol}`);
-      await firebaseData
-        .firestore()
-        .collection("portfolios")
-        .doc(uid)
-        .set(
-          {
-            availableFunds: portfolioClass.calculateBoughtAvailableFunds(),
-            ownedStocks: {
-              [stockTransaction.symbol]: {
-                symbol: stockTransaction.symbol,
-                amountOwned:
-                  portfolio.ownedStocks[stockTransaction.symbol].amountOwned +
-                  stockTransaction.data.amount,
+    if (portfolio.availableFunds >= 0) {
+      console.log('bruh you got money')
+      if (portfolio.ownedStocks[`${stockTransaction.symbol}`]) {
+        console.log(`You own ${stockTransaction.symbol}`);
+        await firebaseData
+          .firestore()
+          .collection("portfolios")
+          .doc(uid)
+          .set(
+            {
+              availableFunds: portfolioClass.calculateBoughtAvailableFunds(),
+              ownedStocks: {
+                [stockTransaction.symbol]: {
+                  symbol: stockTransaction.symbol,
+                  amountOwned:
+                    portfolio.ownedStocks[stockTransaction.symbol].amountOwned +
+                    stockTransaction.data.amount,
+                },
               },
+              portfolioWorth: portfolioClass.calculateBoughtPortfolioWorth(),
             },
-            portfolioWorth: portfolioClass.calculateBoughtPortfolioWorth(),
-          },
-          { merge: true }
-        );
-      dispatch("setPortfolio");
-    } else if (
-      portfolio.ownedStocks[`${stockTransaction.symbol}`] === undefined
-    ) {
-      console.log(`User does not own a ${stockTransaction.symbol} stock`);
-      console.log(portfolioClass.calculateBoughtPortfolioWorth());
+            { merge: true }
+          );
+        dispatch("setPortfolio");
+      } else if (
+        portfolio.ownedStocks[`${stockTransaction.symbol}`] === undefined
+      ) {
+        console.log(`User does not own a ${stockTransaction.symbol} stock`);
+        console.log(portfolioClass.calculateBoughtPortfolioWorth());
 
-      await firebaseData
-        .firestore()
-        .collection("portfolios")
-        .doc(uid as string)
-        // todo: maybe change this to update ╰(*°▽°*)╯
-        .set(
-          {
-            availableFunds: portfolioClass.calculateBoughtAvailableFunds(),
-            ownedStocks: {
-              [stockTransaction.symbol]: {
-                amountOwned: stockTransaction.data.amount,
-                symbol: stockTransaction.symbol,
+        await firebaseData
+          .firestore()
+          .collection("portfolios")
+          .doc(uid as string)
+          // todo: maybe change this to update ╰(*°▽°*)╯
+          .set(
+            {
+              availableFunds: portfolioClass.calculateBoughtAvailableFunds(),
+              ownedStocks: {
+                [stockTransaction.symbol]: {
+                  amountOwned: stockTransaction.data.amount,
+                  symbol: stockTransaction.symbol,
+                },
               },
+              portfolioWorth: portfolioClass.calculateBoughtPortfolioWorth(),
             },
-            portfolioWorth: portfolioClass.calculateBoughtPortfolioWorth(),
-          },
-          { merge: true }
-        );
-      dispatch("setPortfolio");
+            { merge: true }
+          );
+        dispatch("setPortfolio");
+      }
+    } else {
+      console.log('bruh you aint got money')
     }
   },
-  async sellStock({ rootState }, symbol: string) {
+  async sellStock({ rootState, dispatch }, symbol: string) {
+    // Todo: Make an if statement to stop user from selling stocks that they don't own
+    // * Example: If user is below or equal to 0, he should not be able to sell
     let portfolio: UserPortfolio = state.portfolio;
     const uid: string = rootState.userModule.user.uid;
-    await firebaseData
-      .firestore()
-      .collection("portfolios")
-      .doc(uid)
-      .update({
-        availableFunds: Number(),
-        ownedStocks: {},
-        portfolioWorth: Number(),
+    if (portfolio.availableFunds >= 0) {
+      // console.log("Bruh, you got the cash.")
+      rootState.marketData.formatedStocks.forEach(async (stock: any) => {
+        if (stock.stockData.name === symbol) {
+          // console.log("It's a match")
+          let sellPrice: number = stock.stockData.close
+          console.log(portfolio.ownedStocks[symbol])
+          await firebaseData.firestore().collection("portfolios").doc(uid as string).set({
+            availableFunds: portfolio.availableFunds + sellPrice,
+            ownedStocks: {
+              [symbol]: {
+                symbol: symbol,
+                amountOwned: portfolio.ownedStocks[symbol].amountOwned - 1
+              }
+            },
+            portfolioWorth: portfolio.portfolioWorth - sellPrice
+          },
+            { merge: true }
+          );
+          dispatch("setPortfolio")
+        }
       });
+    } else {
+      console.log("Bruh, you poor.")
+    }
+
+    // await firebaseData
+    //   .firestore()
+    //   .collection("portfolios")
+    //   .doc(uid)
+    //   .update({
+    //     availableFunds: Number(),
+    //     ownedStocks: {},
+    //     portfolioWorth: Number(),
+    //   });
   },
   async getAllUsers(): Promise<Array<UserPortfolio>> {
     let userData: Array<UserPortfolio> = [];
