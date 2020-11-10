@@ -3,7 +3,7 @@ import { ActionTree, GetterTree, MutationTree } from "vuex";
 // import { apikey } from "../apikey";
 import { firebaseData } from "../firebase";
 import moment from "moment";
-import axios from "axios";
+  import axios from "axios";
 const marketDataUrl = "https://www.alphavantage.co/query";
 
 const state = {

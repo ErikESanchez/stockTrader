@@ -8,9 +8,17 @@
       v-model="text"
     />
     <div class="mt-2">Value: {{ text }}</div>
-    <button type="submit" class="btn btn-primary" @click="saveProfileChanges">
+    <button type="submit" class="btn btn-primary" @click="changeUserName">
       Submit
     </button>
+    <h5 class="text-white">Change your user profile, input the picture link</h5>
+    <input
+      class="form-control"
+      type="text"
+      placeholder="Enter Link"
+      v-model="photoURL"
+    />
+    <button type="submit" class="btn btn-primary" @click="changeUserPicture">Submit</button>
   </div>
 </template>
 
@@ -21,13 +29,17 @@ export default Vue.extend({
   data() {
     return {
       text: String(),
+      photoURL: String()
     };
   },
   methods: {
     //   Todo: Whenever this function is called, make sure to set a timer to stop too many changes
-    saveProfileChanges() {
-      store.dispatch("saveProfileChanges", this.text as string);
+    changeUserName() {
+      store.dispatch("changeUserName", this.text as string);
     },
+    changeUserPicture(){
+      store.dispatch('userModule/changeUserPicture', this.photoURL as string)
+    }
   },
 });
 </script>

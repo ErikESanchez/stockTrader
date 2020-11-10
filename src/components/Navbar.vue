@@ -3,9 +3,7 @@
     class="navbar navbar-expand-lg navbar-dark"
     style="background-color: #232627"
   >
-    <router-link to="/" class="navbar-brand">
-      Stock Trader
-    </router-link>
+    <router-link to="/" class="navbar-brand"> Stock Trader </router-link>
     <ul class="navbar-nav mr-auto">
       <li class="nav-item active">
         <router-link to="/stocks" class="nav-link">Stocks</router-link>
@@ -27,6 +25,7 @@
             </div>
           </li>
           <li class="nav-item dropleft">
+            <img :src="user.photoURL" width="25" height="25">
             <a
               class="nav-link dropdown-toggle text-light"
               href="#"
@@ -42,9 +41,7 @@
               <router-link to="/profile" class="dropdown-item"
                 >Profile
               </router-link>
-              <li class="dropdown-item" @click="signOut()">
-                Sign Out
-              </li>
+              <li class="dropdown-item" @click="signOut()">Sign Out</li>
             </div>
           </li>
         </ul>
@@ -87,6 +84,11 @@ export default Vue.extend({
   computed: {
     ...mapState("userModule", ["user"]),
     ...mapState("portfolio", ["portfolio"]),
+  },
+  watch: {
+    user() {
+      console.log(this.user.photoURL);
+    },
   },
   methods: {
     signOut() {

@@ -24,7 +24,7 @@ const actions: ActionTree<any, any> = {
       await firebaseData
         .auth()
         .signInWithEmailAndPassword(userInput.username, userInput.password)
-        .catch(function(error) {
+        .catch(function (error) {
           console.log(error.code, error.message);
         });
     }
@@ -37,7 +37,7 @@ const actions: ActionTree<any, any> = {
         console.log("Signed Out");
         state.user = Object();
       })
-      .catch(function(error) {
+      .catch(function (error) {
         console.log("Oops... an error occured", error);
       });
   },
@@ -46,26 +46,35 @@ const actions: ActionTree<any, any> = {
       firebaseData
         .auth()
         .createUserWithEmailAndPassword(userInput.username, userInput.password)
-        .catch(function(error) {
+        .catch(function (error) {
           console.error(error.code, error.message);
         });
     } else {
       console.log("Please type in a valid username and password");
     }
   },
-  saveProfileChanges({ state }, userChanges: string) {
+  changeUserName({ state }, userChanges: string) {
     state.user
       .updateProfile({
         displayName: userChanges,
       })
-      .then(function() {
+      .then(function () {
         // Update successful.
       })
-      .catch(function(error: any) {
+      .catch(function (error: any) {
         console.error(error);
         // An error happened.
       });
   },
+  changeUserPicture({ state }, userLink: string) {
+    state.user.updateProfile({
+      photoURL: userLink
+    }).then(function () {
+      // Update succcessful
+    }).catch(function (error: any) {
+      console.error(error)
+    })
+  }
 };
 
 interface state {
