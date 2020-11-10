@@ -25,7 +25,6 @@
             </div>
           </li>
           <li class="nav-item dropleft">
-            <img :src="user.photoURL" width="25" height="25">
             <a
               class="nav-link dropdown-toggle text-light"
               href="#"
@@ -36,6 +35,7 @@
               aria-expanded="false"
             >
               {{ user.email || user.displayName }}
+              <img :src="user.photoURL" width="25" height="25" />
             </a>
             <div class="dropdown-menu" aria-labelledby="navbarDropdown">
               <router-link to="/profile" class="dropdown-item"
