@@ -105,6 +105,10 @@ export default Vue.extend({
   margin: 30px;
 }
 
+nav {
+  font-family: Poppins,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";
+}
+
 .log-In-Button {
   margin-right: 10px;
 }

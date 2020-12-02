@@ -3,7 +3,7 @@ import { ActionTree, GetterTree, MutationTree } from "vuex";
 // import { apikey } from "../apikey";
 import { firebaseData } from "../firebase";
 import moment from "moment";
-  import axios from "axios";
+import axios from "axios";
 const marketDataUrl = "https://www.alphavantage.co/query";
 
 const state = {
@@ -93,7 +93,7 @@ export const actions: ActionTree<any, any> = {
           console.log(doc.data());
         }
       })
-      .catch(function(error) {
+      .catch(function (error) {
         console.error(error);
       });
     return state.monthStockData;
@@ -203,7 +203,7 @@ export const actions: ActionTree<any, any> = {
       .firestore()
       .collection("stocks")
       .get()
-      .then(function(querySnapshot) {
+      .then(function (querySnapshot) {
         querySnapshot.forEach((doc: doc) => {
           // console.log(doc.id, "=>", doc.data());
           stockData[doc.id] = {
@@ -212,7 +212,7 @@ export const actions: ActionTree<any, any> = {
           return stockData;
         });
       })
-      .catch(function(error) {
+      .catch(function (error) {
         console.error("Error getting documents", error);
       });
 
@@ -225,7 +225,7 @@ export const actions: ActionTree<any, any> = {
           .collection("Time Series(Daily)")
           .doc(formatedDateOfMonth)
           .get()
-          .then(( doc: doc) => {
+          .then((doc: doc) => {
             if (
               doc.exists &&
               stockData[symbol]["timeSeriesData"] === undefined
@@ -235,14 +235,14 @@ export const actions: ActionTree<any, any> = {
                 // console.log(
                 //   `Last callback call at ${key} with value ${symbol}`
                 // );
-                 commit("formatDatabaseData", stockData);
+                commit("formatDatabaseData", stockData);
               }
               // ? Might not be the best place to put this
             } else {
               console.log("Document doesn't exist");
             }
           })
-          .catch(function(error) {
+          .catch(function (error) {
             console.error("Error getting document:", error);
           });
       }

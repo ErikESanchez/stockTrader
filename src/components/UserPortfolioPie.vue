@@ -1,6 +1,6 @@
 <template>
   <div>
-    <apexcharts :series="series" :options="chartOptions" />
+    <apexcharts :series="series" :options="chartOptions" height="200px"/>
   </div>
 </template>
 
@@ -11,29 +11,27 @@ export default Vue.extend({
   components: {
     apexcharts: VueApexCharts,
   },
-  props: ["portfolio"],
+  props: ["portfolioChart"],
   data() {
     return {
       series: [] as Array<number>,
       chartOptions: {
         plotOptions: {
           pie: {
-            donut: {
-              labels: {
+            labels: {
+              show: true,
+              name: {
                 show: true,
-                name: {
-                  show: true,
-                  color: "white",
-                },
-                value: {
-                  show: true,
-                  color: "white",
-                },
-                total: {
-                  show: true,
-                  label: "Total Hours",
-                  color: "white",
-                },
+                color: "white",
+              },
+              value: {
+                show: true,
+                color: "white",
+              },
+              total: {
+                show: true,
+                label: "Total Hours",
+                color: "white",
               },
             },
           },
@@ -64,12 +62,34 @@ export default Vue.extend({
       },
     };
   },
+  methods: {
+    // Todo: Add values to the series array in data 'this.series'
+    renderPortfolioData(portfolio: portfolioStock) {
+      for (let stock in portfolio){
+        console.log()
+        this.series.push(portfolio[stock].amountOwned)
+        this.chartOptions.labels.push(portfolio[stock].symbol)
+      }
+      // this.series.push(portfolio)
+    },
+  },
   watch: {
-    portfolio(): void {
-      console.log(this.portfolio);
+    portfolioChart: {
+      handler(val: portfolioStock) {
+        this.renderPortfolioData(val);
+      },
+      // ! 'immediate' value needs to be true
+      immediate: true,
     },
   },
 });
+
+interface portfolioStock {
+  [symbol: string]: {
+    amountOwned: number;
+    symbol: string;
+  };
+}
 </script>
 
 <style></style>
