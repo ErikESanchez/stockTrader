@@ -6,6 +6,7 @@ import { Portfolio } from "@/Classes/Portfolio";
 const state: State = {
   funds: Number(),
   portfolio: Object(),
+  userPortfolios: Object(),
 };
 const getters: GetterTree<any, any> = {
   getTotalFunds: (state: State) => {
@@ -15,7 +16,12 @@ const getters: GetterTree<any, any> = {
     return state.portfolio;
   },
 };
-const mutations: MutationTree<any> = {};
+const mutations: MutationTree<any> = {
+  updateUserPortfolios(state, portfolios) {
+    state.userPortfolios = portfolios
+    console.log(portfolios)
+  }
+};
 const actions: ActionTree<any, any> = {
   async setPortfolio({ state, rootState }) {
     const user = rootState.userModule.user;
@@ -117,7 +123,7 @@ const actions: ActionTree<any, any> = {
       console.log('bruh you aint got money')
     }
   },
-  async sellStock({ rootState, dispatch }, symbol: string) {
+  async sellStock({ rootState, dispatch, }, symbol: string) {
     let portfolio: UserPortfolio = state.portfolio;
     const uid: string = rootState.userModule.user.uid;
     if (portfolio.availableFunds >= 0 && portfolio.ownedStocks[symbol].amountOwned > 0) {
@@ -147,7 +153,7 @@ const actions: ActionTree<any, any> = {
     //   console.log('bruh')
     //   await firebaseData.firestore().collection("portfolios").doc(uid as string).update({
     //     ownedStocks: {
-          // Todo: Get FieldValue.delete() to work, for some reason it's not recognized
+    // Todo: Get FieldValue.delete() to work, for some reason it's not recognized
     //       [symbol]: firebaseData.firestore().FieldValue.delete()
     //     }
     //   })
@@ -155,7 +161,7 @@ const actions: ActionTree<any, any> = {
     // }
     // Todo: Create a little message popup (that doesn't interupt UX) for either insufficient funds to not stocks to sell
   },
-  async getAllUsers(): Promise<Array<UserPortfolio>> {
+  async getAllUsers({ commit }){
     let userData: Array<UserPortfolio> = [];
     await firebaseData
       .firestore()
@@ -167,13 +173,14 @@ const actions: ActionTree<any, any> = {
           userData.push(doc.data() as UserPortfolio);
         });
       });
-    return userData;
+    commit('updateUserPortfolios', userData)
   },
 };
 
 interface State {
   funds: number;
   portfolio: UserPortfolio;
+  userPortfolios: Object,
 }
 
 export interface UserPortfolio {

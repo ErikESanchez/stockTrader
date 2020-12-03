@@ -2,13 +2,17 @@
   <!-- <b-button
       @click="APIData('AAPL'); APIData('GOOGL'); APIData('MSFT'); APIData('AMZN'); APIData('FB'); APIData('INTC');"
     >Get API Data</b-button>-->
-  <div class="container" style="width: 18rem;" v-if="dataReady">
-    <stock-card
-      class="card-deck"
-      v-for="(stock, index) in formatedStocks"
-      :stock="stock"
-      :key="index"
-    ></stock-card>
+  <!-- Create a grid system, like the one on landing! -->
+  <!-- Make it more stylistic -->
+  <div class="container" v-if="dataReady">
+    <div class="row">
+      <stock-card
+        class="col"
+        v-for="(stock, index) in formatedStocks"
+        :stock="stock"
+        :key="index"
+      />
+    </div>
   </div>
 </template>
 
@@ -32,8 +36,10 @@ export default Vue.extend({
     };
   },
   async mounted() {
+    console.log(this.formatedStocks[0])
     if (this.formatedStocks[0] === undefined) {
       await this.getDatabaseDailyData();
+      console.log('bruh')
     }
     this.dataReady = true;
   },

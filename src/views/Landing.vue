@@ -18,24 +18,19 @@ import Vue from "vue";
 import UserPortfolios from "@/components/UserPortfolios.vue";
 import store from "@/store";
 import { UserPortfolio } from "@/storeModules/portfolio";
+import { mapState } from "vuex";
 export default Vue.extend({
   name: "landing",
   components: {
     UserPortfolios,
   },
-  data() {
-    return {
-      userPortfolios: Object() as Array<UserPortfolio>,
-    };
-  },
   async mounted() {
-    await store
-      .dispatch("portfolio/getAllUsers")
-      .then((userPortfolios: Array<UserPortfolio>) => {
-        this.userPortfolios = userPortfolios;
-        console.log(userPortfolios);
-      });
+    if (this.userPortfolios[0] === undefined) {
+      console.log("bruh");
+      await store.dispatch("portfolio/getAllUsers");
+    }
   },
+  computed: mapState("portfolio", ["userPortfolios"]),
 });
 </script>
 
