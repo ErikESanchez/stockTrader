@@ -66,11 +66,9 @@ export default Vue.extend({
     // Todo: Add values to the series array in data 'this.series'
     renderPortfolioData(portfolio: portfolioStock) {
       for (let stock in portfolio){
-        console.log()
         this.series.push(portfolio[stock].amountOwned)
         this.chartOptions.labels.push(portfolio[stock].symbol)
       }
-      // this.series.push(portfolio)
     },
   },
   watch: {

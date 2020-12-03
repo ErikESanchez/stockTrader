@@ -1,13 +1,15 @@
 <template>
-  <div>
+  <div class="container">
     <!-- Todo: Figure out a way to use a div instead -->
-    <user-portfolios
-      v-for="(portfolio, index) in userPortfolios"
-      :key="index"
-      class="container"
-      style="margin-top: 10px"
-      :userPortfolio="portfolio"
-    />
+    <div class="row">
+      <user-portfolios
+        v-for="(portfolio, index) in userPortfolios"
+        :key="index"
+        class="col-5"
+        style="margin: 5px"
+        :userPortfolio="portfolio"
+      />
+    </div>
   </div>
 </template>
 
