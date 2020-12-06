@@ -17,10 +17,10 @@ export default Vue.extend({
     Navbar,
   },
   async created() {
-    await firebaseData.auth().onAuthStateChanged(async (user) => {
+    await firebaseData.auth().onAuthStateChanged((user) => {
       if (user) {
         store.commit("userModule/setUser", user);
-        store.dispatch("portfolio/setPortfolio");
+        store.dispatch("portfolio/getAllDBPortfolios", user.uid);
       } else {
         store.commit("userModule/setUser", Object);
         console.log("$$$ Sign Up to get some dolla dolla bills yall $$$");

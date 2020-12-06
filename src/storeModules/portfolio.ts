@@ -6,7 +6,7 @@ import { Portfolio } from "@/Classes/Portfolio";
 const state: State = {
   funds: Number(),
   portfolio: Object(),
-  userPortfolios: Object(),
+  userPortfolios: Array(),
 };
 const getters: GetterTree<any, any> = {
   getTotalFunds: (state: State) => {
@@ -17,12 +17,40 @@ const getters: GetterTree<any, any> = {
   },
 };
 const mutations: MutationTree<any> = {
-  updateUserPortfolios(state, portfolios) {
-    state.userPortfolios = portfolios
+  setAllUserPortfolios(state, portfolios: Array<UserPortfolio>) {
     console.log(portfolios)
-  }
+    state.userPortfolios = portfolios;
+  },
+  setUserPortfolio(state, portfolio: UserPortfolio) {
+    state.portfolio = portfolio
+  },
+
 };
 const actions: ActionTree<any, any> = {
+  async getDBPortfolio({ commit }, uid: string) {
+    await firebaseData
+      .firestore()
+      .collection('portfolios')
+      .doc(uid)
+      .get()
+      .then((doc: doc) => {
+        commit('setUserPortfolio', doc.data() as UserPortfolio)
+      })
+  },
+  async getAllDBPortfolios({ commit }) {
+    let userPortfolios: Array<UserPortfolio> = []
+    await firebaseData
+      .firestore()
+      .collection('portfolios')
+      .get()
+      .then((querySnapshot) => {
+        querySnapshot.forEach((doc: doc) => {
+          console.log(doc.id, '=>', doc.data())
+          userPortfolios.push(doc.data())
+        })
+      })
+    commit('setAllUserPortfolios', userPortfolios)
+  },
   async setPortfolio({ state, rootState }) {
     const user = rootState.userModule.user;
     await Promise.resolve(
@@ -36,29 +64,29 @@ const actions: ActionTree<any, any> = {
           return doc.data() as UserPortfolio;
         })
     ).then(async (portfolio: UserPortfolio) => {
-      if (portfolio === undefined || Object.keys(portfolio).length === 0) {
-        await firebaseData
-          .firestore()
-          .collection("portfolios")
-          .doc(user.uid as string)
-          .set({
-            availableFunds: 10000,
-            name: user.displayName || user.email,
-            ownedStocks: {},
-            portfolioWorth: 0,
-          });
-        state.portfolio = portfolio;
-      } else {
-        state.portfolio = portfolio;
-        await firebaseData
-          .firestore()
-          .collection("portfolios")
-          .doc(user.uid as string)
-          .update({
-            ownedStocks: portfolio.ownedStocks,
-          });
-        // console.log(portfolio);
-      }
+      // if (portfolio === undefined || Object.keys(portfolio).length === 0) {
+      //   await firebaseData
+      //     .firestore()
+      //     .collection("portfolios")
+      //     .doc(user.uid as string)
+      //     .set({
+      //       availableFunds: 10000,
+      //       name: user.displayName || user.email,
+      //       ownedStocks: {},
+      //       portfolioWorth: 0,
+      //     });
+      //   state.portfolio = portfolio;
+      // } else {
+      //   state.portfolio = portfolio;
+      //   await firebaseData
+      //     .firestore()
+      //     .collection("portfolios")
+      //     .doc(user.uid as string)
+      //     .update({
+      //       ownedStocks: portfolio.ownedStocks,
+      //     });
+      //   // console.log(portfolio);
+      // }
     });
   },
   async buyStock(
@@ -66,11 +94,11 @@ const actions: ActionTree<any, any> = {
     stockTransaction: newStockTransaction
   ) {
     let portfolio: UserPortfolio = state.portfolio;
-    console.log(portfolio.availableFunds)
+    console.log(portfolio.availableFunds);
     const uid: string = rootState.userModule.user.uid;
     let portfolioClass: Portfolio = new Portfolio(portfolio, stockTransaction);
     if (portfolio.availableFunds >= 0) {
-      console.log('bruh you got money')
+      console.log("bruh you got money");
       if (portfolio.ownedStocks[`${stockTransaction.symbol}`]) {
         console.log(`You own ${stockTransaction.symbol}`);
         await firebaseData
@@ -120,32 +148,40 @@ const actions: ActionTree<any, any> = {
         dispatch("setPortfolio");
       }
     } else {
-      console.log('bruh you aint got money')
+      console.log("bruh you aint got money");
     }
   },
-  async sellStock({ rootState, dispatch, }, symbol: string) {
+  async sellStock({ rootState, dispatch }, symbol: string) {
     let portfolio: UserPortfolio = state.portfolio;
     const uid: string = rootState.userModule.user.uid;
-    if (portfolio.availableFunds >= 0 && portfolio.ownedStocks[symbol].amountOwned > 0) {
+    if (
+      portfolio.availableFunds >= 0 &&
+      portfolio.ownedStocks[symbol].amountOwned > 0
+    ) {
       // console.log("Bruh, you got the cash.")
       rootState.marketData.formatedStocks.forEach(async (stock: any) => {
         if (stock.stockData.name === symbol) {
           // console.log("It's a match")
-          let sellPrice: number = stock.stockData.close
-          console.log(portfolio.ownedStocks[symbol])
-          await firebaseData.firestore().collection("portfolios").doc(uid as string).set({
-            availableFunds: portfolio.availableFunds + sellPrice,
-            ownedStocks: {
-              [symbol]: {
-                symbol: symbol,
-                amountOwned: portfolio.ownedStocks[symbol].amountOwned - 1
-              }
-            },
-            portfolioWorth: portfolio.portfolioWorth - sellPrice
-          },
-            { merge: true }
-          );
-          dispatch("setPortfolio")
+          let sellPrice: number = stock.stockData.close;
+          console.log(portfolio.ownedStocks[symbol]);
+          await firebaseData
+            .firestore()
+            .collection("portfolios")
+            .doc(uid as string)
+            .set(
+              {
+                availableFunds: portfolio.availableFunds + sellPrice,
+                ownedStocks: {
+                  [symbol]: {
+                    symbol: symbol,
+                    amountOwned: portfolio.ownedStocks[symbol].amountOwned - 1,
+                  },
+                },
+                portfolioWorth: portfolio.portfolioWorth - sellPrice,
+              },
+              { merge: true }
+            );
+          dispatch("setPortfolio");
         }
       });
     }
@@ -161,7 +197,7 @@ const actions: ActionTree<any, any> = {
     // }
     // Todo: Create a little message popup (that doesn't interupt UX) for either insufficient funds to not stocks to sell
   },
-  async getAllUsers({ commit }){
+  async getAllUsers({ commit }) {
     let userData: Array<UserPortfolio> = [];
     await firebaseData
       .firestore()
@@ -173,14 +209,14 @@ const actions: ActionTree<any, any> = {
           userData.push(doc.data() as UserPortfolio);
         });
       });
-    commit('updateUserPortfolios', userData)
+    commit("updateUserPortfolios", userData);
   },
 };
 
 interface State {
   funds: number;
   portfolio: UserPortfolio;
-  userPortfolios: Object,
+  userPortfolios: Object;
 }
 
 export interface UserPortfolio {
