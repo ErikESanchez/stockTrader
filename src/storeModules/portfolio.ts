@@ -42,6 +42,8 @@ const actions: ActionTree<any, any> = {
     await firebaseData
       .firestore()
       .collection('portfolios')
+      // ! I don't know why this makes three calls?
+      // ? The get function just automatically makes them
       .get()
       .then((querySnapshot) => {
         querySnapshot.forEach((doc: doc) => {
@@ -196,20 +198,6 @@ const actions: ActionTree<any, any> = {
     //   console.log("Delete")
     // }
     // Todo: Create a little message popup (that doesn't interupt UX) for either insufficient funds to not stocks to sell
-  },
-  async getAllUsers({ commit }) {
-    let userData: Array<UserPortfolio> = [];
-    await firebaseData
-      .firestore()
-      .collection("portfolios")
-      .get()
-      .then((querySnapshot) => {
-        querySnapshot.forEach((doc) => {
-          // console.log(doc.id, "=>", doc.data());
-          userData.push(doc.data() as UserPortfolio);
-        });
-      });
-    commit("updateUserPortfolios", userData);
   },
 };
 

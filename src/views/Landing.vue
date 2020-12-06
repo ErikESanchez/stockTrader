@@ -24,13 +24,6 @@ export default Vue.extend({
   components: {
     UserPortfolios,
   },
-  async mounted() {
-
-    // if (this.userPortfolios[0] === undefined) {
-      // console.log("bruh");
-      // await store.dispatch("portfolio/getAllUsers");
-    // }
-  },
   computed: mapState("portfolio", ["userPortfolios"]),
 });
 </script>
