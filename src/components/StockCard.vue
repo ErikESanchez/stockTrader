@@ -35,7 +35,7 @@ export default Vue.extend({
   },
   methods: {
     buyStock(stock: stockDataFormat): void {
-      let stockTransaction: newStockTransaction = {
+      let boughtStockTransaction: newStockTransaction = {
         symbol: stock.stockData.name,
         data: {
           priceAtTransaction: stock.stockData.high,
@@ -43,7 +43,7 @@ export default Vue.extend({
           time: new Date(),
         },
       };
-      store.dispatch("portfolio/buyStock", stockTransaction);
+      store.dispatch("portfolio/buyStock", boughtStockTransaction);
     },
   },
 });

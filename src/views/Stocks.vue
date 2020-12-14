@@ -37,7 +37,7 @@ export default Vue.extend({
   },
   async mounted() {
     console.log(this.formatedStocks[0])
-    if (this.formatedStocks[0] === undefined) {
+    if (this.formatedStocks === undefined) {
       await this.getDatabaseDailyData();
       console.log('bruh')
     }

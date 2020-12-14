@@ -3,9 +3,10 @@ import { UserPortfolio, newStockTransaction } from "@/storeModules/portfolio";
 export class Portfolio {
   portfolio = Object() as UserPortfolio;
   stockTransaction = Object() as newStockTransaction;
+  symbol = String()
   constructor(portfolio: UserPortfolio, stockTransaction: newStockTransaction) {
     this.portfolio = portfolio;
-    this.stockTransaction = stockTransaction;
+    this.stockTransaction = stockTransaction!;
   }
   calculateBoughtAvailableFunds(): number {
     const newFunds: number =
