@@ -1,4 +1,5 @@
 import firebase from "firebase";
+import admin from 'firebase-admin'
 // Your web app's Firebase configuration
 let firebaseConfig = {
   apiKey: "AIzaSyCOR6Tbv6KkHGejJVPGYiGbWM8Av4m42nk",
@@ -10,7 +11,14 @@ let firebaseConfig = {
   appId: "1:502197568222:web:fdce89b9bb9cf526d8b84f",
   measurementId: "G-CGXD9V37XZ",
 };
+
+admin.initializeApp({
+  credential: admin.credential.applicationDefault(),
+  databaseURL: 'https://<DATABASE_NAME>.firebaseio.com'
+});
+
 // Initialize Firebase
 let firebaseData = firebase.initializeApp(firebaseConfig);
+let firebaseAdmin = firebase.initializeApp
 
 export { firebaseData };
