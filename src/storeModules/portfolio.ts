@@ -16,6 +16,9 @@ const getters: GetterTree<any, any> = {
   portfolio: (state: State) => {
     return state.portfolio;
   },
+  userPortfolios: (state: State) => {
+    return state.userPortfolios;
+  }
 };
 const mutations: MutationTree<any> = {
   setAllUserPortfolios(state, portfolios: Array<UserPortfolio>) {

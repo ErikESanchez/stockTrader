@@ -1,11 +1,13 @@
 <template>
-  <div>
-    <p class="text-white">Portfolio</p>
-    <portfolio-stock-card
-      v-for="(stock, index) in portfolio.ownedStocks"
-      :stock="stock"
-      :key="index"
-    />
+  <div class="container">
+    <div class="row">
+      <portfolio-stock-card
+        class="col-5"
+        v-for="(stock, index) in portfolio.ownedStocks"
+        :stock="stock"
+        :key="index"
+      />
+    </div>
   </div>
 </template>
 
@@ -14,26 +16,14 @@ import Vue from "vue";
 import { UserStock } from "@/store";
 import PortfolioStockCard from "@/components/PortfolioStockCard.vue";
 import store from "@/store";
-import { mapState } from "vuex";
+import { mapGetters } from "vuex";
 
 export default Vue.extend({
   name: "portfolio",
   components: {
     PortfolioStockCard,
   },
-  data() {
-    return {
-      dataReady: false,
-      stockData: Array<UserStock>(),
-      stockAmount: new Number(),
-    };
-  },
-  async mounted() {
-    await store.dispatch("marketData/getDatabaseDailyData", null, {
-      root: true,
-    });
-  },
-  computed: mapState("portfolio", ["portfolio"]),
+  computed: mapGetters("portfolio", ["portfolio"]),
 });
 </script>
 

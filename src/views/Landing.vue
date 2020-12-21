@@ -18,13 +18,13 @@ import Vue from "vue";
 import UserPortfolios from "@/components/UserPortfolios.vue";
 import store from "@/store";
 import { UserPortfolio } from "@/storeModules/portfolio";
-import { mapState } from "vuex";
+import { mapGetters } from "vuex";
 export default Vue.extend({
   name: "landing",
   components: {
     UserPortfolios,
   },
-  computed: mapState("portfolio", ["userPortfolios"]),
+  computed: mapGetters("portfolio", ["userPortfolios"]),
 });
 </script>
 
