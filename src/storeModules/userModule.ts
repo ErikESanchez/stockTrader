@@ -7,7 +7,7 @@ const state = {
 };
 
 const getters: GetterTree<any, any> = {
-  setUser: (state: state) => {
+  user: (state: state) => {
     return state.user;
   },
 };

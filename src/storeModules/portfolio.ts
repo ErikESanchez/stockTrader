@@ -13,7 +13,7 @@ const getters: GetterTree<any, any> = {
   getTotalFunds: (state: State) => {
     return state.funds;
   },
-  getPortfolio: (state: State) => {
+  portfolio: (state: State) => {
     return state.portfolio;
   },
 };

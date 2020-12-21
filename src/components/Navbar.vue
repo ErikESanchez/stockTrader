@@ -19,7 +19,7 @@
           <li class="nav-item active">
             <div
               class="nav-link text-success"
-              style="font: 18px Nunito, sans-serif"
+              style="font: 18px Nunito, sans-serif; margin-top: 5px"
             >
               {{ portfolio.availableFunds }}$
             </div>
@@ -54,18 +54,6 @@
           Sign Up
         </router-link>
       </form>
-
-      <!-- <form class="form-inline my-2 my-lg-0">
-        <input
-          class="form-control mr-sm-2"
-          type="search"
-          placeholder="Search"
-          aria-label="Search"
-        />
-        <button class="btn btn-outline-success my-2 my-sm-0" type="submit">
-          Search
-        </button>
-      </form> -->
     </div>
   </nav>
 </template>
@@ -74,21 +62,11 @@
 import Vue from "vue";
 import store from "@/store";
 import { userPriceHistory } from "@/store";
-import { mapState } from "vuex";
+import { mapGetters, mapState } from "vuex";
 export default Vue.extend({
-  data() {
-    return {
-      latestUserFunds: Array<userPriceHistory>(),
-    };
-  },
   computed: {
-    ...mapState("userModule", ["user"]),
-    ...mapState("portfolio", ["portfolio"]),
-  },
-  watch: {
-    user() {
-      console.log(this.user.photoURL);
-    },
+    ...mapGetters("userModule", ["user"]),
+    ...mapGetters("portfolio", ["portfolio"]),
   },
   methods: {
     signOut() {
@@ -106,7 +84,9 @@ export default Vue.extend({
 }
 
 nav {
-  font-family: Poppins,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";
+  font-family: Poppins, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji",
+    "Segoe UI Symbol";
 }
 
 .log-In-Button {

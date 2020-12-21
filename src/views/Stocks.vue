@@ -8,7 +8,7 @@
   <div class="container">
     <div class="row">
       <stock-card
-        class="col"
+        class="col-5"
         v-for="(stock, index) in formatedStocks"
         :stock="stock"
         :key="index"
@@ -27,11 +27,6 @@ import moment from "moment";
 
 export default Vue.extend({
   name: "stocksView",
-  data() {
-    return {
-      dataReady: false,
-    };
-  },
   async mounted() {
     if (this.formatedStocks[0] === undefined) {
       await this.getDatabaseDailyData();
@@ -40,66 +35,6 @@ export default Vue.extend({
   },
   computed: mapGetters({ formatedStocks: "marketData/formatedStocks" }),
   methods: {
-    async callAPI() {
-      let stockList: Array<string> = ["AAPL", "GOOGL", "MSFT", "AMZN", "FB"];
-      await stockList.forEach(async (symbol: string) => {
-        store.dispatch("marketData/getApiDaily", symbol);
-      });
-      console.log("It called");
-      // this.getDatabaseDailyData();
-    },
-    // ? For some reason if you typecast a function you can't use any global functions and variables
-    checkData(stocks: { [k: string]: any }) {
-      let dayOfWeek: Object = moment().weekday();
-      let dateAndHour: string = "YYYY-MM-DD HH:mm:ss";
-      let isWeekend: boolean = dayOfWeek === 6 || dayOfWeek === 0;
-      let today: string = moment().format("YYYY-MM-DD");
-      let yesterday: string = moment(moment().subtract(1, "day")).format(
-        "YYYY-MM-DD"
-      );
-      let twoDaysAgo: string = moment(moment().subtract(2, "day")).format(
-        "YYYY-MM-DD"
-      );
-      let timeInHours: string = moment(`${today} 15:00:00`, dateAndHour).format(
-        dateAndHour
-      );
-      let dataIsUpToDate: boolean = Boolean();
-      // ! Make this check for data in db as well
-      //  Todo: moment(moment().format(dateAndHour)).isSameOrAfter(timeInHours)
-      for (let stock of Object.keys(stocks)) {
-        let lastRefreshed: string = stocks[stock]["stockData"]["lastRefreshed"];
-        let checkIfAfterHours: boolean = moment(
-          moment().format(dateAndHour)
-        ).isSameOrAfter(timeInHours);
-        if (isWeekend === false && checkIfAfterHours === true) {
-          console.log("It's not the weekend");
-          console.log(`Need to call API it's after ${timeInHours}`);
-          // this.callAPI();
-
-          dataIsUpToDate = true;
-          // Todo: Check If I need this break, I'm pretty sure it's need
-          break;
-        } else if (dayOfWeek === 6 && lastRefreshed !== yesterday) {
-          console.log(`Need to call API for data from ${yesterday}`);
-          // this.callAPI();
-          dataIsUpToDate = true;
-          break;
-        } else if (dayOfWeek === 0 && lastRefreshed !== twoDaysAgo) {
-          console.log(`Need to call API for data from ${twoDaysAgo}`);
-          dataIsUpToDate = true;
-          // this.callAPI();
-          break;
-        }
-      }
-      if (isWeekend === true) {
-        console.log("Market's closed, Wall Street is doing the dirty");
-      }
-      console.log(dataIsUpToDate);
-      return dataIsUpToDate;
-    },
-    async APIData(stock: any) {
-      this.$store.dispatch("marketData/getApiDaily", stock);
-    },
     async getDatabaseDailyData() {
       await store.dispatch("marketData/getDatabaseDailyData");
     },
