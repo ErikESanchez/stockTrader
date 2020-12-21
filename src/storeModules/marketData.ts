@@ -14,7 +14,7 @@ const state = {
 };
 
 const getters: GetterTree<any, any> = {
-  getStocks: (state) => {
+  formatedStocks: (state) => {
     return state.formatedStocks;
   },
   getMonthData: (state) => {
@@ -52,6 +52,9 @@ const mutations: MutationTree<any> = {
   },
   formatDatabaseData(state, stockPayload: any) {
     // ? The functions runs fine once, but runs another four times for some reason?
+    // ? Have to redeclare formated stocks as an empty array because it will keep the old stock data
+    // ? when i push in new data
+    state.formatedStocks = []
     Object.keys(stockPayload).forEach((symbol) => {
       // Todo: Make interfaces for all the Objects
       let dates: Array<string> = Object.getOwnPropertyNames(

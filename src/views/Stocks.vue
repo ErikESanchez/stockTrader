@@ -4,7 +4,8 @@
     >Get API Data</b-button>-->
   <!-- Create a grid system, like the one on landing! -->
   <!-- Make it more stylistic -->
-  <div class="container" v-if="dataReady">
+  <!-- Might need v-if -->
+  <div class="container">
     <div class="row">
       <stock-card
         class="col"
@@ -21,33 +22,23 @@ import Vue from "vue";
 import StockCard from "../components/StockCard.vue";
 import { Market } from "@/Classes/Market";
 import store from "@/store";
-import { mapState } from "vuex";
+import { mapGetters } from "vuex";
 import moment from "moment";
 
 export default Vue.extend({
   name: "stocksView",
   data() {
     return {
-      text: "",
       dataReady: false,
-      moreStockData: Array(),
-      stock: null,
-      stockNameList: Array(),
     };
   },
   async mounted() {
-    console.log(this.formatedStocks[0])
-    if (this.formatedStocks === undefined) {
+    if (this.formatedStocks[0] === undefined) {
       await this.getDatabaseDailyData();
       console.log('bruh')
     }
-    this.dataReady = true;
   },
-  computed: mapState("marketData", ["formatedStocks"]),
-  // stockData() {
-  //   let stocks: Array<Object> = store.state.marketData.formatedStocks;
-  //   return stocks;
-  // },
+  computed: mapGetters({ formatedStocks: "marketData/formatedStocks" }),
   methods: {
     async callAPI() {
       let stockList: Array<string> = ["AAPL", "GOOGL", "MSFT", "AMZN", "FB"];
