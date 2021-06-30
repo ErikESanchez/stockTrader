@@ -1,6 +1,8 @@
 import Vue from "vue";
 import { ActionTree, GetterTree, MutationTree } from "vuex";
 import { firebaseData } from "@/firebase";
+import { UserPortfolio } from './portfolio'
+import router from '@/router'
 
 const state = {
   user: Object(),
@@ -24,7 +26,7 @@ const actions: ActionTree<any, any> = {
       await firebaseData
         .auth()
         .signInWithEmailAndPassword(userInput.username, userInput.password)
-        .catch(function (error) {
+        .catch(function (error: any) {
           console.log(error.code, error.message);
         });
     }
@@ -37,18 +39,34 @@ const actions: ActionTree<any, any> = {
         console.log("Signed Out");
         state.user = Object();
       })
-      .catch(function (error) {
+      .catch(function (error: any) {
         console.log("Oops... an error occured", error);
       });
   },
-  createNewUser({ state }, userInput: UserInput) {
+  async createNewUser({ commit }, userInput: UserInput) {
     if (userInput.username != "" && userInput.password != "") {
       firebaseData
         .auth()
         .createUserWithEmailAndPassword(userInput.username, userInput.password)
-        .catch(function (error) {
+        .catch(function (error: any) {
           console.error(error.code, error.message);
         });
+      await firebaseData.auth().onAuthStateChanged(async (user: any) => {
+        if (user) {
+          var uid = user.uid;
+          console.log(uid)
+          await firebaseData.firestore().collection('portfolios').doc(uid).set({
+            availableFunds: 10000,
+            name: userInput.username,
+            ownedStocks: {},
+            portfolioWorth: 0
+          })
+          router.push('/')
+        } else {
+          // User is signed out
+          // ...
+        }
+      });
     } else {
       console.log("Please type in a valid username and password");
     }
@@ -79,7 +97,7 @@ const actions: ActionTree<any, any> = {
 
 interface state {
   user: Object;
-  account: Account;
+  // account: Account;
   userFetched: Boolean;
 }
 
