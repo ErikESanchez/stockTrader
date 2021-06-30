@@ -41,7 +41,7 @@ const actions: ActionTree<any, any> = {
       // ! I don't know why this makes three calls?
       // ? The get function just automatically makes them
       .get()
-      .then((querySnapshot) => {
+      .then((querySnapshot: any) => {
         querySnapshot.forEach((doc: doc) => {
           userPortfolios.push(doc.data())
           if (doc.id === uid) {
@@ -112,47 +112,53 @@ const actions: ActionTree<any, any> = {
       console.log("bruh you aint got money");
     }
   },
-  async sellStock({ dispatch, rootState }, sellStockTransaction: newStockTransaction) {
+  async sellStock({ commit, rootState }, sellStockTransaction: newStockTransaction) {
     let portfolio: UserPortfolio = state.portfolio;
+    
     // let portfolioClass: Portfolio = new Portfolio(portfolio, symbol) 
     if (
       portfolio.ownedStocks[sellStockTransaction.symbol].amountOwned > 0
     ) {
       rootState.marketData.formatedStocks.forEach(async (stock: any) => {
         if (stock.stockData.name === sellStockTransaction.symbol) {
+          portfolio = {
+            availableFunds: portfolio.availableFunds + sellStockTransaction.data.priceAtTransaction,
+            ownedStocks: {
+              [sellStockTransaction.symbol]: {
+                symbol: sellStockTransaction.symbol,
+                amountOwned: portfolio.ownedStocks[sellStockTransaction.symbol].amountOwned - 1,
+              },
+            },
+            portfolioWorth: portfolio.portfolioWorth - sellStockTransaction.data.priceAtTransaction
+          }
           await firebaseData
             .firestore()
             .collection("portfolios")
             .doc(state.uid)
             .set(
               {
-                availableFunds: portfolio.availableFunds + sellStockTransaction.data.priceAtTransaction,
-                ownedStocks: {
-                  [sellStockTransaction.symbol]: {
-                    symbol: sellStockTransaction.symbol,
-                    amountOwned: portfolio.ownedStocks[sellStockTransaction.symbol].amountOwned - 1,
-                  },
-                },
-                portfolioWorth: portfolio.portfolioWorth - sellStockTransaction.data.priceAtTransaction,
+                availableFunds: portfolio.availableFunds,
+                ownedStocks: portfolio.ownedStocks,
+                portfolioWorth: portfolio.portfolioWorth,
               },
               { merge: true }
             );
-          dispatch("setPortfolio");
+          commit("setUserPortfolio", portfolio);
         }
       });
     }
-    else if (portfolio.ownedStocks[sellStockTransaction.symbol].amountOwned <= 0) {
-      console.log('bruh')
-      await firebaseData.firestore().collection("portfolios").doc(state.uid).update({
-        ownedStocks: {
-          // Todo: Get FieldValue.delete() to work, for some reason it's not recognized
-          // Todo: Ask Brayan why this doesn't 'exist', has to be somrething in the 'firebase.ts' config file
-          // ? If that doesn't work maybe it's the version of firebase, too old?
-          // [sellStockTransaction.symbol]: firebaseData.firestore.FieldValue.delete()
-        }
-      })
-      console.log("Delete")
-    }
+    // else if (portfolio.ownedStocks[sellStockTransaction.symbol].amountOwned <= 0) {
+    //   console.log('bruh')
+    //   await firebaseData.firestore().collection("portfolios").doc(state.uid).update({
+    //     ownedStocks: {
+    //       // Todo: Get FieldValue.delete() to work, for some reason it's not recognized
+    //       // Todo: Ask Brayan why this doesn't 'exist', has to be somrething in the 'firebase.ts' config file
+    //       // ? If that doesn't work maybe it's the version of firebase, too old?
+    //       // [sellStockTransaction.symbol]: firebaseData.firestore.FieldValue.delete()
+    //     }
+    //   })
+      // console.log("Delete")
+    // }
     // Todo: Create a little message popup (that doesn't interupt UX) for either insufficient funds to not stocks to sell
   },
 };
@@ -166,14 +172,14 @@ interface State {
 
 export interface UserPortfolio {
   availableFunds: number;
-  name: String;
+  name?: String;
   ownedStocks: firebaseStockTransaction;
   portfolioWorth: number;
 }
 
 export interface firebaseStockTransaction {
   [symbol: string]: {
-    stockName: string;
+    symbol: string;
     amountOwned: number;
   };
 }

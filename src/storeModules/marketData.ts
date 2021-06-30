@@ -90,13 +90,13 @@ export const actions: ActionTree<any, any> = {
       .collection("Time Series(Daily)")
       .doc("2020-04")
       .get()
-      .then((doc) => {
+      .then((doc: any) => {
         if (doc) {
           commit("formatMonthData", doc.data());
           console.log(doc.data());
         }
       })
-      .catch(function (error) {
+      .catch(function (error: any) {
         console.error(error);
       });
     return state.monthStockData;
@@ -206,7 +206,7 @@ export const actions: ActionTree<any, any> = {
       .firestore()
       .collection("stocks")
       .get()
-      .then(function (querySnapshot) {
+      .then(function (querySnapshot: any) {
         querySnapshot.forEach((doc: doc) => {
           // console.log(doc.id, "=>", doc.data());
           stockData[doc.id] = {
@@ -215,7 +215,7 @@ export const actions: ActionTree<any, any> = {
           return stockData;
         });
       })
-      .catch(function (error) {
+      .catch(function (error: any) {
         console.error("Error getting documents", error);
       });
 
@@ -245,7 +245,7 @@ export const actions: ActionTree<any, any> = {
               console.log("Document doesn't exist");
             }
           })
-          .catch(function (error) {
+          .catch(function (error: any) {
             console.error("Error getting document:", error);
           });
       }

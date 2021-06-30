@@ -16,14 +16,14 @@ import Vue from "vue";
 import { UserStock } from "@/store";
 import PortfolioStockCard from "@/components/PortfolioStockCard.vue";
 import store from "@/store";
-import { mapGetters } from "vuex";
+import { mapState } from "vuex";
 
 export default Vue.extend({
   name: "portfolio",
   components: {
     PortfolioStockCard,
   },
-  computed: mapGetters("portfolio", ["portfolio"]),
+  computed: mapState("portfolio", ["portfolio"]),
 });
 </script>
 

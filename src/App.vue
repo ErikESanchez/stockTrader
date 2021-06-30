@@ -10,13 +10,22 @@ import Vue from "vue";
 import Navbar from "./components/Navbar.vue";
 import { firebaseData } from "@/firebase";
 import store from "@/store";
+import {mapGetters} from "vuex"
 
 export default Vue.extend({
   name: "App",
   components: {
     Navbar,
   },
+   async mounted() {
+    if (this.formatedStocks[0] === undefined) {
+      await store.dispatch("marketData/getDatabaseDailyData")
+    }
+  },
+    computed: mapGetters({ formatedStocks: "marketData/formatedStocks" }),
+
   async created() {
+    
     await firebaseData.auth().onAuthStateChanged((user) => {
       if (user) {
         store.commit("userModule/setUser", user);
