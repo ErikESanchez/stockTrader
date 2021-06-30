@@ -14,5 +14,4 @@ let firebaseConfig = {
 
 // Initialize Firebase
 let firebaseData = firebase.initializeApp(firebaseConfig);
-
 export { firebaseData };

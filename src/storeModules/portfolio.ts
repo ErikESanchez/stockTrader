@@ -114,7 +114,7 @@ const actions: ActionTree<any, any> = {
   },
   async sellStock({ commit, rootState }, sellStockTransaction: newStockTransaction) {
     let portfolio: UserPortfolio = state.portfolio;
-    
+
     // let portfolioClass: Portfolio = new Portfolio(portfolio, symbol) 
     if (
       portfolio.ownedStocks[sellStockTransaction.symbol].amountOwned > 0
@@ -147,18 +147,13 @@ const actions: ActionTree<any, any> = {
         }
       });
     }
-    // else if (portfolio.ownedStocks[sellStockTransaction.symbol].amountOwned <= 0) {
-    //   console.log('bruh')
-    //   await firebaseData.firestore().collection("portfolios").doc(state.uid).update({
-    //     ownedStocks: {
-    //       // Todo: Get FieldValue.delete() to work, for some reason it's not recognized
-    //       // Todo: Ask Brayan why this doesn't 'exist', has to be somrething in the 'firebase.ts' config file
-    //       // ? If that doesn't work maybe it's the version of firebase, too old?
-    //       // [sellStockTransaction.symbol]: firebaseData.firestore.FieldValue.delete()
-    //     }
-    //   })
-      // console.log("Delete")
-    // }
+      // else if (portfolio.ownedStocks[sellStockTransaction.symbol].amountOwned <= 0) {
+      //   console.log('bruh')
+      //   await firebaseData.firestore().collection("portfolios").doc(state.uid).update({
+      //     ownedStocks[sellStockTransaction.symbol = firebaseData.firestore.FieldValue.delete()
+      //   })
+      //   console.log("Delete")
+      // }
     // Todo: Create a little message popup (that doesn't interupt UX) for either insufficient funds to not stocks to sell
   },
 };
