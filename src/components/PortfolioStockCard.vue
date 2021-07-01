@@ -21,7 +21,6 @@ export default Vue.extend({
   props: ["stock"],
   methods: {
     sellStock(stock: stockData) {
-      console.log(stock)
       let sellStockTransaction: newStockTransaction = {
         symbol: stock.symbol,
         data: {

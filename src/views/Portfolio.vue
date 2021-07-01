@@ -13,17 +13,15 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { UserStock } from "@/store";
 import PortfolioStockCard from "@/components/PortfolioStockCard.vue";
-import store from "@/store";
-import { mapState } from "vuex";
+import { mapGetters } from "vuex";
 
 export default Vue.extend({
   name: "portfolio",
   components: {
     PortfolioStockCard,
   },
-  computed: mapState("portfolio", ["portfolio"]),
+  computed: mapGetters({ portfolio: "portfolio/portfolio" }),
 });
 </script>
 

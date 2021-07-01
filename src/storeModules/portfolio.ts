@@ -10,9 +10,6 @@ const state: State = {
   uid: String()
 };
 const getters: GetterTree<any, any> = {
-  getTotalFunds: (state: State) => {
-    return state.funds;
-  },
   portfolio: (state: State) => {
     return state.portfolio;
   },
@@ -53,7 +50,7 @@ const actions: ActionTree<any, any> = {
     commit('setUid', uid)
   },
   async buyStock(
-    { state, dispatch },
+    { state, dispatch, commit },
     stockTransaction: newStockTransaction
   ) {
     let portfolio: UserPortfolio = state.portfolio;
@@ -62,25 +59,31 @@ const actions: ActionTree<any, any> = {
       console.log("Bruh, you got money to own stocks");
       if (portfolio.ownedStocks[`${stockTransaction.symbol}`]) {
         console.log(`You own ${stockTransaction.symbol}, adding to portfolio`);
+        portfolio = {
+          availableFunds: portfolioClass.calculateBoughtAvailableFunds(),
+          ownedStocks: {
+            [stockTransaction.symbol]: {
+              symbol: stockTransaction.symbol,
+              amountOwned:
+                portfolio.ownedStocks[stockTransaction.symbol].amountOwned +
+                stockTransaction.data.amount,
+            }
+          },
+          portfolioWorth: portfolioClass.calculateBoughtPortfolioWorth()
+        }
         await firebaseData
           .firestore()
           .collection("portfolios")
           .doc(state.uid)
           .set(
             {
-              availableFunds: portfolioClass.calculateBoughtAvailableFunds(),
-              ownedStocks: {
-                [stockTransaction.symbol]: {
-                  symbol: stockTransaction.symbol,
-                  amountOwned:
-                    portfolio.ownedStocks[stockTransaction.symbol].amountOwned +
-                    stockTransaction.data.amount,
-                },
-              },
-              portfolioWorth: portfolioClass.calculateBoughtPortfolioWorth(),
+              availableFunds: portfolio.availableFunds,
+              ownedStocks: portfolio.ownedStocks,
+              portfolioWorth: portfolio.portfolioWorth,
             },
             { merge: true }
           );
+        commit('setUserPortfolio', portfolio)
         dispatch("getAllDBPortfolios", state.uid);
       } else if (
         portfolio.ownedStocks[`${stockTransaction.symbol}`] === undefined
@@ -113,47 +116,56 @@ const actions: ActionTree<any, any> = {
     }
   },
   async sellStock({ commit, rootState }, sellStockTransaction: newStockTransaction) {
+    // * No way to typecast multiple variables 
     let portfolio: UserPortfolio = state.portfolio;
-
-    // let portfolioClass: Portfolio = new Portfolio(portfolio, symbol) 
     if (
       portfolio.ownedStocks[sellStockTransaction.symbol].amountOwned > 0
     ) {
       rootState.marketData.formatedStocks.forEach(async (stock: any) => {
         if (stock.stockData.name === sellStockTransaction.symbol) {
-          portfolio = {
-            availableFunds: portfolio.availableFunds + sellStockTransaction.data.priceAtTransaction,
-            ownedStocks: {
-              [sellStockTransaction.symbol]: {
-                symbol: sellStockTransaction.symbol,
-                amountOwned: portfolio.ownedStocks[sellStockTransaction.symbol].amountOwned - 1,
-              },
-            },
-            portfolioWorth: portfolio.portfolioWorth - sellStockTransaction.data.priceAtTransaction
-          }
           await firebaseData
             .firestore()
             .collection("portfolios")
             .doc(state.uid)
             .set(
               {
-                availableFunds: portfolio.availableFunds,
-                ownedStocks: portfolio.ownedStocks,
-                portfolioWorth: portfolio.portfolioWorth,
+                availableFunds: portfolio.availableFunds + sellStockTransaction.data.priceAtTransaction,
+                ownedStocks: {
+                  [sellStockTransaction.symbol]: {
+                    symbol: sellStockTransaction.symbol,
+                    amountOwned: portfolio.ownedStocks[sellStockTransaction.symbol].amountOwned - 1,
+                  },
+                },
+                portfolioWorth: portfolio.portfolioWorth - sellStockTransaction.data.priceAtTransaction
               },
               { merge: true }
             );
+          await firebaseData
+            .firestore()
+            .collection("portfolios")
+            .doc(state.uid)
+            .get()
+            .then((doc: doc) => {
+              if (doc.exists) {
+                portfolio = doc.data()
+              } else {
+                console.log('bruh')
+              }
+            }).catch((error) => {
+              console.error(error)
+            })
+          console.log(portfolio)
           commit("setUserPortfolio", portfolio);
         }
       });
     }
-      // else if (portfolio.ownedStocks[sellStockTransaction.symbol].amountOwned <= 0) {
-      //   console.log('bruh')
-      //   await firebaseData.firestore().collection("portfolios").doc(state.uid).update({
-      //     ownedStocks[sellStockTransaction.symbol = firebaseData.firestore.FieldValue.delete()
-      //   })
-      //   console.log("Delete")
-      // }
+    // else if (portfolio.ownedStocks[sellStockTransaction.symbol].amountOwned <= 0) {
+    //   console.log('bruh')
+    //   await firebaseData.firestore().collection("portfolios").doc(state.uid).update({
+    //     ownedStocks[sellStockTransaction.symbol = firebaseData.firestore.FieldValue.delete()
+    //   })
+    //   console.log("Delete")
+    // }
     // Todo: Create a little message popup (that doesn't interupt UX) for either insufficient funds to not stocks to sell
   },
 };
