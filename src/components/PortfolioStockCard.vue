@@ -26,9 +26,9 @@ export default Vue.extend({
         data: {
           priceAtTransaction: 215,
           amount: 1,
-          time: new Date()
-        }
-      }
+          time: new Date(),
+        },
+      };
       store.dispatch("portfolio/sellStock", sellStockTransaction);
     },
   },

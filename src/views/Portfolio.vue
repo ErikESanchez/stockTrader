@@ -21,7 +21,23 @@ export default Vue.extend({
   components: {
     PortfolioStockCard,
   },
-  computed: mapGetters({ portfolio: "portfolio/portfolio" }),
+  watch: {
+    portfolio() {
+      let sortedOwnedStocks: any = {};
+      let arraySymbols: Array<string> = [];
+      Object.keys(this.portfolio.ownedStocks).forEach((key) => {
+        arraySymbols.push(key);
+      });
+      let sortedSymbols: Array<string> = arraySymbols.sort();
+      sortedSymbols.forEach((key) => {
+        sortedOwnedStocks[key] = this.portfolio.ownedStocks[key];
+      });
+      this.portfolio.ownedStocks = sortedOwnedStocks;
+    },
+  },
+  computed: {
+    ...mapGetters({ portfolio: "portfolio/portfolio" }),
+  },
 });
 </script>
 
