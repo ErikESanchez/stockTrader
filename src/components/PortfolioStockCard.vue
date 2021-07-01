@@ -17,10 +17,6 @@
 import { newStockTransaction, stockData } from "@/storeModules/portfolio";
 import Vue from "vue";
 import store from "../store";
-interface stock {
-  name: string;
-  value: number;
-}
 export default Vue.extend({
   props: ["stock"],
   methods: {

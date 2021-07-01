@@ -1,7 +1,6 @@
 import Vue from "vue";
 import { ActionTree, GetterTree, MutationTree } from "vuex";
 import { firebaseData } from "@/firebase";
-import { UserPortfolio } from './portfolio'
 import router from '@/router'
 
 const state = {
@@ -51,7 +50,7 @@ const actions: ActionTree<any, any> = {
         .catch(function (error: any) {
           console.error(error.code, error.message);
         });
-      await firebaseData.auth().onAuthStateChanged(async (user: any) => {
+      firebaseData.auth().onAuthStateChanged(async (user: any) => {
         if (user) {
           var uid = user.uid;
           console.log(uid)
@@ -68,6 +67,7 @@ const actions: ActionTree<any, any> = {
         }
       });
     } else {
+      // Todo: Make this a popup window in the top right, (not an alert!!)
       console.log("Please type in a valid username and password");
     }
   },
