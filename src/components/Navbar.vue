@@ -34,7 +34,7 @@
               aria-haspopup="true"
               aria-expanded="false"
             >
-              {{ user.email || user.displayName }}
+              {{  user.displayName || user.email}}
               <img :src="user.photoURL" width="25" height="25" />
             </a>
             <div class="dropdown-menu" aria-labelledby="navbarDropdown">
