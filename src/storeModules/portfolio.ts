@@ -2,6 +2,7 @@ import Vue from "vue";
 import { ActionTree, GetterTree, MutationTree } from "vuex";
 import { firebaseData } from "@/firebase";
 import { Portfolio } from "@/Classes/Portfolio";
+import firebase from "firebase";
 
 const state: State = {
   funds: Number(),
@@ -118,8 +119,9 @@ const actions: ActionTree<any, any> = {
   async sellStock({ commit, rootState }, sellStockTransaction: newStockTransaction) {
     // * No way to typecast multiple variables 
     let portfolio: UserPortfolio = state.portfolio;
+    console.log(portfolio.ownedStocks[sellStockTransaction.symbol].amountOwned)
     if (
-      portfolio.ownedStocks[sellStockTransaction.symbol].amountOwned > 0
+      portfolio.ownedStocks[sellStockTransaction.symbol].amountOwned >= 2
     ) {
       rootState.marketData.formatedStocks.forEach(async (stock: any) => {
         if (stock.stockData.name === sellStockTransaction.symbol) {
@@ -159,16 +161,41 @@ const actions: ActionTree<any, any> = {
         }
       });
     }
-    // else if (portfolio.ownedStocks[sellStockTransaction.symbol].amountOwned <= 0) {
-    //   console.log('bruh')
-    //   await firebaseData.firestore().collection("portfolios").doc(state.uid).update({
-    //     ownedStocks[sellStockTransaction.symbol = firebaseData.firestore.FieldValue.delete()
-    //   })
-    //   console.log("Delete")
-    // }
-    // Todo: Create a little message popup (that doesn't interupt UX) for either insufficient funds to not stocks to sell
-  },
-};
+    // ? Maybe make it 1 
+    else {
+      await firebaseData
+        .firestore()
+        .collection("portfolios")
+        .doc(state.uid)
+        .set(
+          {
+            ownedStocks:
+            {
+              [sellStockTransaction.symbol]: firebase.firestore.FieldValue.delete()
+            }
+          },
+          { merge: true }
+        )
+      await firebaseData
+        .firestore()
+        .collection("portfolios")
+        .doc(state.uid)
+        .get()
+        .then((doc: doc) => {
+          if (doc.exists) {
+            portfolio = doc.data()
+          } else {
+            console.log('bruh')
+          }
+        }).catch((error) => {
+          console.error(error)
+        })
+      commit("setUserPortfolio", portfolio);
+      console.log("Delete")
+    }
+  }
+  // Todo: Create a little message popup (that doesn't interupt UX) for either insufficient funds to not stocks to sell
+}
 
 interface State {
   funds: number;
