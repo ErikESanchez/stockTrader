@@ -34,8 +34,8 @@
               aria-haspopup="true"
               aria-expanded="false"
             >
-              {{  user.displayName || user.email}}
-              <img :src="user.photoURL" width="25" height="25" />
+              {{ user.displayName || user.email }}
+              <img :src="portfolio.photoURL" width="25" height="25" />
             </a>
             <div class="dropdown-menu" aria-labelledby="navbarDropdown">
               <router-link to="/profile" class="dropdown-item"
@@ -67,6 +67,7 @@ export default Vue.extend({
   computed: {
     ...mapGetters("userModule", ["user"]),
     ...mapGetters("portfolio", ["portfolio"]),
+    ...mapGetters("userPublicData", ["profilePictureURL"]),
   },
   methods: {
     signOut() {

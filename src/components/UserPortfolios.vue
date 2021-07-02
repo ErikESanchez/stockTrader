@@ -11,9 +11,10 @@
         </div>
         Funds:
         <div class="text-success" style="display: inline-block">
-          {{ userPortfolio.availableFunds }}$
+          {{ userPortfolio.availableFunds }} $
         </div>
       </h6>
+      <img :src="userPortfolio.photoURL" height="80" width="200"/>
       <pie-chart :portfolioChart="userPortfolio.ownedStocks" />
     </div>
   </div>
@@ -22,6 +23,7 @@
 <script lang="ts">
 import Vue from "vue";
 import UserPortfolioPie from "@/components/UserPortfolioPie.vue";
+import { mapGetters } from "vuex";
 export default Vue.extend({
   props: ["userPortfolio"],
   components: {

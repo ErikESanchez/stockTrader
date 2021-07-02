@@ -10,26 +10,27 @@ import Vue from "vue";
 import Navbar from "./components/Navbar.vue";
 import { firebaseData } from "@/firebase";
 import store from "@/store";
-import {mapGetters} from "vuex"
+import { mapGetters } from "vuex";
 
 export default Vue.extend({
   name: "App",
   components: {
     Navbar,
   },
-   async mounted() {
+  async mounted() {
     if (this.formatedStocks[0] === undefined) {
-      await store.dispatch("marketData/getDatabaseDailyData")
+      await store.dispatch("marketData/getDatabaseDailyData");
     }
   },
-    computed: mapGetters({ formatedStocks: "marketData/formatedStocks" }),
+  computed: mapGetters({ formatedStocks: "marketData/formatedStocks" }),
 
-  async created() {
-    
-    await firebaseData.auth().onAuthStateChanged((user) => {
+  created() {
+    firebaseData.auth().onAuthStateChanged(async (user) => {
       if (user) {
         store.commit("userModule/setUser", user);
-        store.dispatch("portfolio/getAllDBPortfolios", user.uid);
+        await store.dispatch("portfolio/getAllDBPortfolios", user.uid);
+        let userPortfolios = store.getters["portfolio/userPortfolios"];
+        store.dispatch("userPublicData/downloadUserPictures", userPortfolios);
       } else {
         store.commit("userModule/setUser", Object);
         console.log("$$$ Sign Up to get some dolla dolla bills yall $$$");
