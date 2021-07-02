@@ -58,7 +58,8 @@ const actions: ActionTree<any, any> = {
             availableFunds: 10000,
             name: userInput.username,
             ownedStocks: {},
-            portfolioWorth: 0
+            portfolioWorth: 0,
+            photoURL: ""
           })
           router.push('/')
         } else {

@@ -1,42 +1,85 @@
 import { firebaseData } from "@/firebase";
 import Vue from "vue";
 import { ActionTree, GetterTree, MutationTree } from "vuex";
+import { UserPortfolio } from "./portfolio";
 
 const state: State = {
     userPicture: Array(),
-    profilePicitureURL: String()
+    profilePicitureURL: String(),
+    profilePicturesURL: Array<UserPictures>()
 }
 
 const getters: GetterTree<any, any> = {
     profilePictureURL(state: State) {
         return state.profilePicitureURL
+    },
+    profilePicturesURL(state: State) {
+        return state.profilePicturesURL
     }
 }
 
 const mutations: MutationTree<any> = {
     setProfilePictureURL(state: State, url: string) {
         state.profilePicitureURL = url
+    },
+    setProfilePicturesURL(state: State, userPictures: Array<UserPictures>) {
+        state.profilePicturesURL = userPictures
     }
 }
 
 const actions: ActionTree<any, any> = {
-    uploadUserPicture({ rootGetters }, userPicture) {
+    async uploadUserPicture({ rootGetters, dispatch }, userPicture) {
+        let user = rootGetters["userModule/user"];
+        let email: string = user.email
         let uid: string = rootGetters["userModule/user"].uid
-        console.log(rootGetters["userModule/user"].email)
-        firebaseData.storage().ref(`userProfileImages/${uid}`).put(userPicture)
-    },
-    downloadUserPicture({ rootGetters, commit }) {
-        let uid: string = rootGetters["userModule/user"].uid
-        firebaseData.storage().ref(`userProfileImages/${uid}`).getDownloadURL().then((url) => {
-            console.log(typeof url, url)
-            commit('setProfilePictureURL', url)
+        await firebaseData.storage().ref(`userProfileImages/${email}`).put(userPicture).then(async snapshot => {
+            let url: string = await snapshot.ref.getDownloadURL()
+            firebaseData.firestore().collection('portfolios').doc(uid).set({
+                photoURL: url
+            },
+                { merge: true })
         })
+
+    },
+    async downloadUserPictures({ rootGetters, commit }, userPortfolios: Array<UserPortfolio>) {
+        let currentUserEmail: string = rootGetters['userModule/user'].email
+        let userPictures: Array<UserPictures> = []
+        let listOfUsersWithPictures: Array<string> = []
+        await firebaseData.storage().ref('userProfileImages').listAll().then(files => {
+            files.items.forEach((result) => {
+                listOfUsersWithPictures.push(result.name)
+            })
+        })
+        for (const [index, userEmail] of listOfUsersWithPictures.entries()) {
+            await firebaseData.storage().ref(`userProfileImages/${userEmail}`).getDownloadURL().then((url: string) => {
+                // console.log(url)
+                if (currentUserEmail === userEmail) {
+                    userPictures[index] = {
+                        name: userEmail,
+                        file: url
+                    }
+                    commit('setProfilePictureURL', url)
+                } else {
+                    userPictures[index] = {
+                        name: userEmail,
+                        file: url
+                    }
+                }
+            })
+        }
+        commit("setProfilePicturesURL", userPictures)
     }
 }
 
 interface State {
     userPicture: Array<any>
     profilePicitureURL: string
+    profilePicturesURL: Array<UserPictures>;
+}
+
+export interface UserPictures {
+    name: string | undefined,
+    file: any
 }
 
 

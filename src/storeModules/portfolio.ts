@@ -27,8 +27,7 @@ const mutations: MutationTree<any> = {
   },
   setUid(state, uid: string) {
     state.uid = uid
-  }
-
+  },
 };
 const actions: ActionTree<any, any> = {
   async getAllDBPortfolios({ commit }, uid: string) {
@@ -206,9 +205,10 @@ interface State {
 
 export interface UserPortfolio {
   availableFunds: number;
-  name?: String;
+  name?: string;
   ownedStocks: firebaseStockTransaction;
   portfolioWorth: number;
+  photoURL?: string
 }
 
 export interface firebaseStockTransaction {

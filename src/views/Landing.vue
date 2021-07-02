@@ -19,12 +19,30 @@ import UserPortfolios from "@/components/UserPortfolios.vue";
 import store from "@/store";
 import { UserPortfolio } from "@/storeModules/portfolio";
 import { mapGetters } from "vuex";
+import { UserPictures } from "@/storeModules/userPublicData";
 export default Vue.extend({
   name: "landing",
   components: {
     UserPortfolios,
   },
-  computed: mapGetters("portfolio", ["userPortfolios"]),
+  watch: {
+    profilePicturesURL(profilePictures: Array<UserPictures>) {
+      this.userPortfolios.forEach((result: UserPortfolio, index: number) => {
+
+        for (const [index, name] of profilePictures.entries()) {
+          if (result.name === profilePictures[index].name) {
+            console.log('Users with profile pictures', result.name);
+            console.log(result)
+          }
+        }
+        // console.log(profilePictures)
+      });
+    },
+  },
+  computed: {
+    ...mapGetters("portfolio", ["userPortfolios"]),
+    ...mapGetters("userPublicData", ["profilePicturesURL"]),
+  },
 });
 </script>
 
