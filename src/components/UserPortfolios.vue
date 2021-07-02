@@ -11,7 +11,7 @@
         </div>
         Funds:
         <div class="text-success" style="display: inline-block">
-          {{ userPortfolio.availableFunds }}$
+          {{ userPortfolio.availableFunds }} $
         </div>
       </h6>
       <pie-chart :portfolioChart="userPortfolio.ownedStocks" />

@@ -18,7 +18,12 @@
       placeholder="Enter Link"
       v-model="photoURL"
     />
-    <button type="submit" class="btn btn-primary" @click="changeUserPicture">Submit</button>
+    <button type="submit" class="btn btn-primary" @click="changeUserPicture">
+      Submit
+    </button>
+    <input type="file" @change="filePicked" />
+    <button class="btn btn-danger" @click="uploadFile">Upload</button>
+    <img id="photoURL" :src="userPhotoFileURL" :width="70" :height="80"/>
   </div>
 </template>
 
@@ -29,7 +34,9 @@ export default Vue.extend({
   data() {
     return {
       text: String(),
-      photoURL: String()
+      photoURL: String(),
+      userPhotoFile: Array(),
+      userPhotoFileURL: "",
     };
   },
   methods: {
@@ -37,9 +44,25 @@ export default Vue.extend({
     changeUserName() {
       store.dispatch("changeUserName", this.text as string);
     },
-    changeUserPicture(){
-      store.dispatch('userModule/changeUserPicture', this.photoURL as string)
-    }
+    changeUserPicture() {
+      store.dispatch("userModule/changeUserPicture", this.photoURL as string);
+    },
+    filePicked(event: any) {
+      this.userPhotoFile[0] = event.target.files[0];
+      this.dipslayImage(this.userPhotoFile[0]);
+    },
+    uploadFile() {
+      store.dispatch("userPublicData/uploadUserPicture", this.userPhotoFile[0]);
+    },
+    dipslayImage(file: any) {
+      let reader = new FileReader();
+      reader.onload = (e) => {
+        this.userPhotoFileURL = e.target?.result as string;
+      };
+      reader.readAsDataURL(file);
+      // this.userPhotoFileURL! = photoUrl[0] as string;
+      // console.log(photoUrl[0]);
+    },
   },
 });
 </script>
