@@ -11,7 +11,9 @@ import Navbar from "./components/Navbar.vue";
 import { firebaseData } from "@/firebase";
 import store from "@/store";
 import { mapGetters } from "vuex";
-
+// Todo: Create type definiton!
+// @ts-ignore
+import { debounce } from "debounce";
 export default Vue.extend({
   name: "App",
   components: {
@@ -21,6 +23,14 @@ export default Vue.extend({
     if (this.formatedStocks[0] === undefined) {
       await store.dispatch("marketData/getDatabaseDailyData");
     }
+  },
+  destroyed() {
+    window.removeEventListener("resize", this.checkOnWindowSize)
+  },
+  methods: {
+    checkOnWindowSize() {
+      console.log(window.innerWidth);
+    },
   },
   computed: mapGetters({ formatedStocks: "marketData/formatedStocks" }),
 
@@ -36,6 +46,8 @@ export default Vue.extend({
         console.log("$$$ Sign Up to get some dolla dolla bills yall $$$");
       }
     });
+    this.checkOnWindowSize()
+    window.onresize = debounce(this.checkOnWindowSize, 30)
   },
 });
 </script>
