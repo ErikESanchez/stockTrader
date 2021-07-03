@@ -55,64 +55,60 @@ const actions: ActionTree<any, any> = {
   ) {
     let portfolio: UserPortfolio = state.portfolio;
     let portfolioClass: Portfolio = new Portfolio(portfolio, stockTransaction);
-    if (portfolio.availableFunds >= 0) {
-      console.log("Bruh, you got money to own stocks");
-      if (portfolio.ownedStocks[`${stockTransaction.symbol}`]) {
-        console.log(`You own ${stockTransaction.symbol}, adding to portfolio`);
-        portfolio = {
-          availableFunds: portfolioClass.calculateBoughtAvailableFunds(),
-          ownedStocks: {
-            [stockTransaction.symbol]: {
-              symbol: stockTransaction.symbol,
-              amountOwned:
-                portfolio.ownedStocks[stockTransaction.symbol].amountOwned +
-                stockTransaction.data.amount,
-            }
-          },
-          portfolioWorth: portfolioClass.calculateBoughtPortfolioWorth()
-        }
-        await firebaseData
-          .firestore()
-          .collection("portfolios")
-          .doc(state.uid)
-          .set(
-            {
-              availableFunds: portfolio.availableFunds,
-              ownedStocks: portfolio.ownedStocks,
-              portfolioWorth: portfolio.portfolioWorth,
-            },
-            { merge: true }
-          );
-        commit('setUserPortfolio', portfolio)
-        dispatch("getAllDBPortfolios", state.uid);
-      } else if (
-        portfolio.ownedStocks[`${stockTransaction.symbol}`] === undefined
-      ) {
-        console.log(`User does not own a ${stockTransaction.symbol} stock`);
-        console.log(portfolioClass.calculateBoughtPortfolioWorth());
-
-        await firebaseData
-          .firestore()
-          .collection("portfolios")
-          .doc(state.uid as string)
-          // todo: maybe change this to update ╰(*°▽°*)╯
-          .set(
-            {
-              availableFunds: portfolioClass.calculateBoughtAvailableFunds(),
-              ownedStocks: {
-                [stockTransaction.symbol]: {
-                  amountOwned: stockTransaction.data.amount,
-                  symbol: stockTransaction.symbol,
-                },
-              },
-              portfolioWorth: portfolioClass.calculateBoughtPortfolioWorth(),
-            },
-            { merge: true }
-          );
-        dispatch("getAllDBPortfolios", state.uid);
+    console.log("Bruh, you got money to own stocks");
+    if (portfolio.ownedStocks[`${stockTransaction.symbol}`]) {
+      console.log(`You own ${stockTransaction.symbol}, adding to portfolio`);
+      portfolio = {
+        availableFunds: portfolioClass.calculateBoughtAvailableFunds(),
+        ownedStocks: {
+          [stockTransaction.symbol]: {
+            symbol: stockTransaction.symbol,
+            amountOwned:
+              portfolio.ownedStocks[stockTransaction.symbol].amountOwned +
+              stockTransaction.data.amount,
+          }
+        },
+        portfolioWorth: portfolioClass.calculateBoughtPortfolioWorth()
       }
-    } else {
-      console.log("bruh you aint got money");
+      await firebaseData
+        .firestore()
+        .collection("portfolios")
+        .doc(state.uid)
+        .set(
+          {
+            availableFunds: portfolio.availableFunds,
+            ownedStocks: portfolio.ownedStocks,
+            portfolioWorth: portfolio.portfolioWorth,
+          },
+          { merge: true }
+        );
+      commit('setUserPortfolio', portfolio)
+      dispatch("getAllDBPortfolios", state.uid);
+    } else if (
+      portfolio.ownedStocks[`${stockTransaction.symbol}`] === undefined
+    ) {
+      console.log(`User does not own a ${stockTransaction.symbol} stock`);
+      console.log(portfolioClass.calculateBoughtPortfolioWorth());
+
+      await firebaseData
+        .firestore()
+        .collection("portfolios")
+        .doc(state.uid as string)
+        // todo: maybe change this to update ╰(*°▽°*)╯
+        .set(
+          {
+            availableFunds: portfolioClass.calculateBoughtAvailableFunds(),
+            ownedStocks: {
+              [stockTransaction.symbol]: {
+                amountOwned: stockTransaction.data.amount,
+                symbol: stockTransaction.symbol,
+              },
+            },
+            portfolioWorth: portfolioClass.calculateBoughtPortfolioWorth(),
+          },
+          { merge: true }
+        );
+      dispatch("getAllDBPortfolios", state.uid);
     }
   },
   async sellStock({ commit, rootState }, sellStockTransaction: newStockTransaction) {
@@ -172,7 +168,7 @@ const actions: ActionTree<any, any> = {
             ownedStocks:
             {
               [sellStockTransaction.symbol]: firebase.firestore.FieldValue.delete()
-            } 
+            }
           },
           { merge: true }
         )
