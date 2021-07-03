@@ -168,10 +168,11 @@ const actions: ActionTree<any, any> = {
         .doc(state.uid)
         .set(
           {
+            availableFunds: portfolio.availableFunds + sellStockTransaction.data.priceAtTransaction,
             ownedStocks:
             {
               [sellStockTransaction.symbol]: firebase.firestore.FieldValue.delete()
-            }
+            } 
           },
           { merge: true }
         )
