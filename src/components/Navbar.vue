@@ -129,12 +129,17 @@
                     <div class="card-body">
                       <ul class="list-styled font-size-sm ">
                         <li class="list-styled-item">
-                          <router-link to="/profile" class="list-styled-link text-white"
+                          <router-link
+                            to="/profile"
+                            class="list-styled-link text-white"
                             >Profile
                           </router-link>
                         </li>
                         <li class="list-styled-item">
-                          <a class="list-styled-link text-white" @click="signOut()">
+                          <a
+                            class="list-styled-link text-white"
+                            @click="signOut()"
+                          >
                             Sign Out
                           </a>
                         </li>
@@ -180,7 +185,6 @@
 import Vue from "vue";
 import store from "@/store";
 import { mapGetters } from "vuex";
-import { ScreenDimensions } from "@/storeModules/userModule";
 export default Vue.extend({
   computed: {
     ...mapGetters("userModule", ["user", "screenDimensions"]),
@@ -190,11 +194,6 @@ export default Vue.extend({
   methods: {
     signOut() {
       store.dispatch("userModule/signOut");
-    },
-  },
-  watch: {
-    screenDimensions(screenDimensions: ScreenDimensions) {
-      console.log("Event", screenDimensions.width);
     },
   },
 });

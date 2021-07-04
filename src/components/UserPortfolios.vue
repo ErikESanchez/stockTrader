@@ -1,5 +1,5 @@
 <template>
-  <div class="card text-white" style="width: 500px; background-color: #232627">
+  <div class="card text-white" style="width: 500; background-color: #232627">
     <div class="card-body" style="font: 16px Nunito, sans-serif">
       <h5 class="card-title text-center">{{ userPortfolio.name }}</h5>
       <h6 class="card-subtitle mb-2 text-white">
@@ -14,7 +14,7 @@
           {{ userPortfolio.availableFunds }} $
         </div>
       </h6>
-      <img :src="userPortfolio.photoURL" height="80" width="200"/>
+      <img :src="userPortfolio.photoURL" height="30" width="30" v-if="userPortfolio.photoURL != ''"/>
       <pie-chart :portfolioChart="userPortfolio.ownedStocks" />
     </div>
   </div>
