@@ -11,6 +11,7 @@ import Navbar from "./components/Navbar.vue";
 import { firebaseData } from "@/firebase";
 import store from "@/store";
 import { mapGetters } from "vuex";
+import { ScreenDimensions } from "./storeModules/userModule";
 // Todo: Create type definiton!
 // @ts-ignore
 import { debounce } from "debounce";
@@ -25,11 +26,15 @@ export default Vue.extend({
     }
   },
   destroyed() {
-    window.removeEventListener("resize", this.checkOnWindowSize)
+    window.removeEventListener("resize", this.checkOnWindowSize);
   },
   methods: {
     checkOnWindowSize() {
-      console.log(window.innerWidth);
+      let screenDimensions: ScreenDimensions = {
+        width: window.innerWidth,
+        height: window.innerHeight,
+      };
+      store.commit("userModule/setScreenDimensions", screenDimensions);
     },
   },
   computed: mapGetters({ formatedStocks: "marketData/formatedStocks" }),
@@ -46,8 +51,8 @@ export default Vue.extend({
         console.log("$$$ Sign Up to get some dolla dolla bills yall $$$");
       }
     });
-    this.checkOnWindowSize()
-    window.onresize = debounce(this.checkOnWindowSize, 30)
+    this.checkOnWindowSize();
+    window.onresize = debounce(this.checkOnWindowSize, 50);
   },
 });
 </script>

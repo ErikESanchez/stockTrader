@@ -3,20 +3,27 @@ import { ActionTree, GetterTree, MutationTree } from "vuex";
 import { firebaseData } from "@/firebase";
 import router from '@/router'
 
-const state = {
+const state: State = {
   user: Object(),
+  screenDimensions: Object()
 };
 
 const getters: GetterTree<any, any> = {
-  user: (state: state) => {
+  user: (state: State) => {
     return state.user;
   },
+  screenDimensions: (state: State) => {
+    return state.screenDimensions
+  }
 };
 
 const mutations: MutationTree<any> = {
-  setUser(state: state, user: any) {
+  setUser(state: State, user: any) {
     Vue.set(state, "user", user);
   },
+  setScreenDimensions: (state: State, userDimensions: ScreenDimensions) => {
+    Vue.set(state, "screenDimensions", userDimensions)
+  }
 };
 
 const actions: ActionTree<any, any> = {
@@ -96,10 +103,14 @@ const actions: ActionTree<any, any> = {
   }
 };
 
-interface state {
+interface State {
   user: Object;
-  // account: Account;
-  userFetched: Boolean;
+  screenDimensions: ScreenDimensions
+}
+
+export interface ScreenDimensions {
+  width: number;
+  height?: number
 }
 
 export interface UserInput {
