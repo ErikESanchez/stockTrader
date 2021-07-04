@@ -48,7 +48,7 @@ export default Vue.extend({
         },
         responsive: [
           {
-            breakpoint: 480,
+            breakpoint: "100%",
             options: {
               chart: {
                 width: 100,

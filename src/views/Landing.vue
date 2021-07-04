@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <!-- Todo: Figure out a way to use a div instead -->
-    <div class="row" v-if="screenDimensions.width > 800">
+    <div class="row" v-if="screenDimensions.width > 990">
       <user-portfolios
         v-for="(portfolio, index) in userPortfolios"
         :key="index"
