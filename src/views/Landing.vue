@@ -1,12 +1,22 @@
 <template>
   <div class="container">
     <!-- Todo: Figure out a way to use a div instead -->
-    <div class="row">
+    <div class="row" v-if="screenDimensions.width > 800">
       <user-portfolios
         v-for="(portfolio, index) in userPortfolios"
         :key="index"
         class="col-5"
-        style="margin: 5px"
+        style="margin: 5px;"
+        :userPortfolio="portfolio"
+      />
+    </div>
+
+    <div class="" v-else>
+      <user-portfolios
+        v-for="(portfolio, index) in userPortfolios"
+        :key="index"
+        class=""
+        style="margin: 5px;"
         :userPortfolio="portfolio"
       />
     </div>
@@ -16,7 +26,6 @@
 <script lang="ts">
 import Vue from "vue";
 import UserPortfolios from "@/components/UserPortfolios.vue";
-import store from "@/store";
 import { UserPortfolio } from "@/storeModules/portfolio";
 import { mapGetters } from "vuex";
 import { UserPictures } from "@/storeModules/userPublicData";
@@ -28,20 +37,19 @@ export default Vue.extend({
   watch: {
     profilePicturesURL(profilePictures: Array<UserPictures>) {
       this.userPortfolios.forEach((result: UserPortfolio, index: number) => {
-
         for (const [index, name] of profilePictures.entries()) {
           if (result.name === profilePictures[index].name) {
-            console.log('Users with profile pictures', result.name);
-            console.log(result)
+            console.log("Users with profile pictures", result.name);
+            console.log(result);
           }
         }
-        // console.log(profilePictures)
       });
     },
   },
   computed: {
     ...mapGetters("portfolio", ["userPortfolios"]),
     ...mapGetters("userPublicData", ["profilePicturesURL"]),
+    ...mapGetters("userModule", ["screenDimensions"]),
   },
 });
 </script>
