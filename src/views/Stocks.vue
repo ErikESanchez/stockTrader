@@ -8,7 +8,7 @@
   <div class="container">
     <div class="row">
       <stock-card
-        class="col-5"
+        class="col-sm"
         v-for="(stock, index) in formatedStocks"
         :stock="stock"
         :key="index"

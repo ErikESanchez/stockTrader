@@ -1,18 +1,17 @@
 <template>
-  <div
-    class="card bg-dark border-light"
-    style="margin-top: 10px; width: 140px; height: 125px "
-  >
-    <div class="card-body">
-      <router-link :to="stockRoute" class="card-title text-light">
+  <div class="card" style="background-color: #232627">
+    <div class="card-body text-center">
+      <router-link :to="stockRoute" class="card-title  text-white">
         {{ stock["stockData"]["name"] }}
       </router-link>
-      <h5 class="card-title text-success">{{ stock["stockData"]["open"] }}$</h5>
+
+
+      <h5 class="card-text text-success">{{ stock["stockData"]["open"] }}$</h5>
 
       <!-- <p class="card-text text-success"> -->
       <!-- {{ stock["stockData"]["lastRefreshed"] }} -->
       <!-- </p> -->
-      <button class="btn btn-light" @click="buyStock(stock)">
+      <button class="btn btn-light rounded-pill" @click="buyStock(stock)">
         Buy Stock
       </button>
     </div>
