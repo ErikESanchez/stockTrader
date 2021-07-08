@@ -1,12 +1,10 @@
 <template>
-  <div class="container">
-    <!-- Todo: Figure out a way to use a div instead -->
-    <div class="row justify-content-md-center">
+  <div class="container px-4">
+    <div class="row justify-content-lg-center gx-4">
       <user-portfolios
         v-for="(portfolio, index) in userPortfolios"
         :key="index"
-        class="col-md-5"
-        style="margin: 5px;"
+        class="col-lg-auto p-4"
         :userPortfolio="portfolio"
       />
     </div>
