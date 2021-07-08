@@ -1,10 +1,10 @@
 <template>
-  <div class="container px-4">
-    <div class="row justify-content-lg-center gx-4">
+  <div class="container px-2">
+    <div class="row justify-content-lg-center gx-2">
       <user-portfolios
         v-for="(portfolio, index) in userPortfolios"
         :key="index"
-        class="col-lg-auto p-4"
+        class="col-lg-auto p-2"
         :userPortfolio="portfolio"
       />
     </div>

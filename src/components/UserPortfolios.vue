@@ -1,5 +1,5 @@
 <template>
-  <div class="card text-white" style=" background-color: #232627">
+  <div class="card text-white" style=" background-color: #232627; margin-bottom: 5px">
     <div class="card-body" style="font: 16px Nunito, sans-serif">
       <h5 class="card-title text-center">{{ userPortfolio.name }}</h5>
       <h6 class="card-subtitle mb-2 text-white">
