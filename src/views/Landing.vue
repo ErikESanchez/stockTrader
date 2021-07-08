@@ -1,21 +1,11 @@
 <template>
-  <div class="container">
+  <div class="container flex">
     <!-- Todo: Figure out a way to use a div instead -->
-    <div class="row" v-if="screenDimensions.width > 990">
+    <div class="row">
       <user-portfolios
         v-for="(portfolio, index) in userPortfolios"
         :key="index"
-        class="col-5"
-        style="margin: 5px;"
-        :userPortfolio="portfolio"
-      />
-    </div>
-
-    <div class="" v-else>
-      <user-portfolios
-        v-for="(portfolio, index) in userPortfolios"
-        :key="index"
-        class=""
+        class="col-sm-5.1"
         style="margin: 5px;"
         :userPortfolio="portfolio"
       />
@@ -49,7 +39,6 @@ export default Vue.extend({
   computed: {
     ...mapGetters("portfolio", ["userPortfolios"]),
     ...mapGetters("userPublicData", ["profilePicturesURL"]),
-    ...mapGetters("userModule", ["screenDimensions"]),
   },
 });
 </script>

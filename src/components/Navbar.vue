@@ -1,22 +1,50 @@
 <template>
   <div>
+    <!-- Can either be fixed top or smoooth animation, i'll have to see -->
     <nav
-      v-if="screenDimensions.width > 990"
-      class="navbar navbar-expand-lg navbar-dark navbar-toggler"
+      class="navbar navbar-expand-md navbar-dark"
       style="background-color: #232627"
-      data-toggle="collapse"
     >
-      <router-link to="/" class="navbar-brand"> Stock Trader </router-link>
-      <ul class="navbar-nav mr-auto" style="margin-right: 0">
-        <li class="nav-item active">
-          <router-link to="/stocks" class="nav-link">Stocks</router-link>
-        </li>
-        <li class="nav-item active">
-          <router-link to="/portfolio" class="nav-link">Portfolio</router-link>
-        </li>
-      </ul>
-      <div class="" id="navbarSupportedContent">
-        <ul class="navbar-nav mr-auto"></ul>
+      <!-- Img tag -->
+      <router-link to="/" class="navbar-brand"> Stock Trader </router-link
+      ><img src="" />
+      <button
+        type="button"
+        class="navbar-toggler bg-light"
+        data-toggle="collapse"
+        data-target="#nav"
+      >
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse justify-content-between" id="nav">
+        <ul class="navbar-nav">
+          <li class="nav-item">
+            <router-link
+              to="/stocks"
+              class="nav-link text-light font-weight-bold px-3"
+            >
+              Stocks
+            </router-link>
+          </li>
+          <li class="nav-item">
+            <router-link
+              to="/portfolio"
+              class="nav-link text-light font-weight-bold px-3"
+              >Portfolio</router-link
+            >
+          </li>
+        </ul>
+
+        <!-- Search bar for future use -->
+
+        <!-- <form class="form-inline ml-3">
+          <div class="input-group">
+            <input type="text" class="form-control " placeholder="Search" />
+
+            <button type="submit"><i class="fa fa-search"></i></button>
+          </div>
+        </form> -->
+
         <form class="form-inline my-2 my-lg-0" v-if="user.email">
           <ul class="navbar-nav mr-auto">
             <li class="nav-item active">
@@ -59,125 +87,6 @@
         </form>
       </div>
     </nav>
-    <div v-else>
-      <nav class="navbar navbar-expand-lg navbar-dark">
-        <div class="container">
-          <router-link to="/" class="navbar-brand"> Stock Trader </router-link>
-          <div class="d-flex ml-auto">
-            <button
-              class="navbar-toggler"
-              type="button"
-              data-toggle="collapse"
-              data-target="#globalNavbar"
-              aria-controls="globalNavbar"
-              aria-expanded="true"
-              aria-label="Toggle navigation"
-            >
-              <span class="navbar-toggler-icon" style=""></span>
-            </button>
-          </div>
-          <div class="navbar-collapse collapse" id="globalNavbar" style="">
-            <!-- <form
-              class="form-inline form-navbar my-2 my-lg-0 order-2"
-              action="https://themes.getbootstrap.com/shop/"
-            >
-              <input
-                class="form-control"
-                name="s"
-                type="text"
-                placeholder="Search"
-              />
-            </form> -->
-
-            <ul class="navbar-nav d-lg-none" v-if="user.email">
-              <li class="nav-item-divider"></li>
-              <li class="nav-item">
-                <ul class="navbar-nav mr-auto order-1">
-                  <li class="nav-item dropdown">
-                    <router-link to="/stocks" class="nav-link text-white"
-                      >Stocks</router-link
-                    >
-                  </li>
-                  <li class="nav-item">
-                    <router-link to="/portfolio" class="nav-link text-white"
-                      >Portfolio</router-link
-                    >
-                  </li>
-                </ul>
-              </li>
-              <div
-                class="nav-link text-success"
-                style="font: 18px Nunito, sans-serif; margin-top: 5px"
-              >
-                {{ portfolio.availableFunds }}$
-              </div>
-              <li class="nav-item dropleft dropdown">
-                <a
-                  class="nav-link dropdown-toggle text-light"
-                  href="#"
-                  id="navbarDropdown"
-                  role="button"
-                  data-toggle="dropdown"
-                  aria-haspopup="true"
-                  aria-expanded="false"
-                >
-                  {{ user.displayName || user.email }}
-                  <img :src="portfolio.photoURL" width="25" height="25" />
-                </a>
-                <div class="dropdown-menu bg-dark">
-                  <div class="card card-lg bg-dark">
-                    <div class="card-body">
-                      <ul class="list-styled font-size-sm ">
-                        <li class="list-styled-item">
-                          <router-link
-                            to="/profile"
-                            class="list-styled-link text-white"
-                            >Profile
-                          </router-link>
-                        </li>
-                        <li class="list-styled-item">
-                          <a
-                            class="list-styled-link text-white"
-                            @click="signOut()"
-                          >
-                            Sign Out
-                          </a>
-                        </li>
-                      </ul>
-                    </div>
-                  </div>
-                </div>
-                <div
-                  class="dropdown-menu"
-                  aria-labelledby="navbarDropdown"
-                ></div>
-              </li>
-            </ul>
-            <ul class="navbar-nav d-lg-none" v-else>
-              <li class="nav-item">
-                <ul class="navbar-nav mr auto order-1">
-                  <li class="nav-item">
-                    <router-link
-                      to="signin"
-                      class="btn btn-outline-light my-2 my-sm-0"
-                      >Sign In
-                    </router-link>
-                  </li>
-                  <li class="nav-item">
-                    <router-link
-                      to="signup"
-                      class="btn btn-outline-light my-2 my-sm-0"
-                    >
-                      Sign Up
-                    </router-link>
-                  </li>
-                </ul>
-              </li>
-            </ul>
-          </div>
-        </div>
-      </nav>
-    </div>
   </div>
 </template>
 
@@ -187,7 +96,7 @@ import store from "@/store";
 import { mapGetters } from "vuex";
 export default Vue.extend({
   computed: {
-    ...mapGetters("userModule", ["user", "screenDimensions"]),
+    ...mapGetters("userModule", ["user"]),
     ...mapGetters("portfolio", ["portfolio"]),
     ...mapGetters("userPublicData", ["profilePictureURL"]),
   },

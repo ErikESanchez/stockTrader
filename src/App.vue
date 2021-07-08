@@ -25,18 +25,6 @@ export default Vue.extend({
       await store.dispatch("marketData/getDatabaseDailyData");
     }
   },
-  destroyed() {
-    window.removeEventListener("resize", this.checkOnWindowSize);
-  },
-  methods: {
-    checkOnWindowSize() {
-      let screenDimensions: ScreenDimensions = {
-        width: window.innerWidth,
-        height: window.innerHeight,
-      };
-      store.commit("userModule/setScreenDimensions", screenDimensions);
-    },
-  },
   computed: mapGetters({ formatedStocks: "marketData/formatedStocks" }),
 
   created() {
@@ -51,8 +39,6 @@ export default Vue.extend({
         console.log("$$$ Sign Up to get some dolla dolla bills yall $$$");
       }
     });
-    this.checkOnWindowSize();
-    window.onresize = debounce(this.checkOnWindowSize, 50);
   },
 });
 </script>
