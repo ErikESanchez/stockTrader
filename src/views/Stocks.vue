@@ -1,10 +1,4 @@
 <template>
-  <!-- <b-button
-      @click="APIData('AAPL'); APIData('GOOGL'); APIData('MSFT'); APIData('AMZN'); APIData('FB'); APIData('INTC');"
-    >Get API Data</b-button>-->
-  <!-- Create a grid system, like the one on landing! -->
-  <!-- Make it more stylistic -->
-  <!-- Might need v-if -->
   <div class="container">
     <div class="row">
       <stock-card
