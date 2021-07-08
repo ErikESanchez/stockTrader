@@ -1,10 +1,10 @@
 <template>
   <div>
-    <div class="card mb-2 bg-dark text-white border-white m-2">
-      <div class="card-body">
+    <div class="card bg-dark text-white" style="margin-bottom: 5px">
+      <div class="card-body text-center">
         <h5 class="card-title">{{ stock.symbol }}</h5>
         <p class="card-text">Amount Of Stock Owned: {{ stock.amountOwned }}</p>
-        <button class="btn btn-primary" @click="sellStock(stock)">
+        <button class="btn btn-light rounded-pill" @click="sellStock(stock)">
           Sell Stock
         </button>
       </div>

@@ -2,7 +2,7 @@
   <div class="container">
     <div class="row">
       <portfolio-stock-card
-        class="col-5"
+        class="col-sm"
         v-for="(stock, index) in portfolio.ownedStocks"
         :stock="stock"
         :key="index"
