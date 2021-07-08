@@ -1,11 +1,11 @@
 <template>
-  <div class="container flex">
+  <div class="container">
     <!-- Todo: Figure out a way to use a div instead -->
-    <div class="row">
+    <div class="row justify-content-md-center">
       <user-portfolios
         v-for="(portfolio, index) in userPortfolios"
         :key="index"
-        class="col-sm-5.1"
+        class="col-md-5"
         style="margin: 5px;"
         :userPortfolio="portfolio"
       />
