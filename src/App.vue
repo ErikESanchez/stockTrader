@@ -28,10 +28,6 @@ export default Vue.extend({
     if (this.formatedStocks[0] === undefined) {
       await store.dispatch("marketData/getDatabaseDailyData");
     }
-  },
-  computed: mapGetters({ formatedStocks: "marketData/formatedStocks" }),
-
-  created() {
     firebaseData.auth().onAuthStateChanged(async (user) => {
       if (user) {
         store.commit("userModule/setUser", user);
@@ -44,6 +40,8 @@ export default Vue.extend({
       }
     });
   },
+  computed: mapGetters({ formatedStocks: "marketData/formatedStocks" }),
+
 });
 </script>
 

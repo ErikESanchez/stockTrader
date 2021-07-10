@@ -2,6 +2,7 @@ import Vue from "vue";
 import { ActionTree, GetterTree, MutationTree } from "vuex";
 import { firebaseData } from "@/firebase";
 import router from '@/router'
+import { UserPortfolio } from "./portfolio";
 
 const state: State = {
   user: Object(),
@@ -72,10 +73,11 @@ const actions: ActionTree<any, any> = {
       console.log("Please type in a valid username and password");
     }
   },
-  changeUserName({ state }, userChanges: string) {
+  changeUserName({ state }, newUsername: string) {
+    state.user.displayName = newUsername
     state.user
       .updateProfile({
-        displayName: userChanges,
+        displayName: newUsername,
       })
       .then(function () {
         // Update successful.
@@ -86,6 +88,7 @@ const actions: ActionTree<any, any> = {
       });
   },
   changeUserPicture({ state }, userLink: string) {
+    state.user.photoURL = userLink
     state.user.updateProfile({
       photoURL: userLink
     }).then(function () {
