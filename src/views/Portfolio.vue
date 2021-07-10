@@ -15,6 +15,10 @@
 import Vue from "vue";
 import PortfolioStockCard from "@/components/PortfolioStockCard.vue";
 import { mapGetters } from "vuex";
+import {
+  firebaseStockTransaction,
+  UserPortfolio,
+} from "@/storeModules/portfolio";
 
 export default Vue.extend({
   name: "portfolio",

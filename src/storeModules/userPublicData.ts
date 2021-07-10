@@ -32,8 +32,10 @@ const actions: ActionTree<any, any> = {
         let user = rootGetters["userModule/user"];
         let email: string = user.email
         let uid: string = rootGetters["userModule/user"].uid
+        let userPortfolio: UserPortfolio = rootGetters['portfolio/portfolio']
         await firebaseData.storage().ref(`userProfileImages/${email}`).put(userPicture).then(async snapshot => {
             let url: string = await snapshot.ref.getDownloadURL()
+            userPortfolio.photoURL = url;
             firebaseData.firestore().collection('portfolios').doc(uid).set({
                 photoURL: url
             },

@@ -1,29 +1,66 @@
 <template>
-  <div>
-    <h5>Change your user name</h5>
-    <input
-      class="form-control"
-      type="text"
-      placeholder="Enter your name"
-      v-model="text"
+  <div class="container">
+    <div class="input-group mb-3 d-flex justify-content-center px-5">
+      <input
+        type="text"
+        class="form-control text-white bg-dark"
+        placeholder="New Username"
+        aria-label="Recipient's username"
+        aria-describedby="button-addon2"
+        v-model="userNameText"
+      />
+      <button
+        class="btn btn-dark btn-outline-light"
+        type="button"
+        id="button-addon2"
+        @click="changeUserName"
+      >
+        Submit
+      </button>
+    </div>
+    <div class="input-group mb-3 d-flex justify-content-center px-5">
+      <input
+        type="text"
+        class="form-control text-white bg-dark"
+        placeholder="Enter Link"
+        aria-label="Recipient's username"
+        aria-describedby="button-addon2"
+        v-model="photoURL"
+      />
+      <button
+        class="btn btn-dark btn-outline-light"
+        type="button"
+        id="button-addon2"
+        @click="changeUserPicture"
+      >
+        Submit
+      </button>
+    </div>
+    <p class="text-center text-white">Pick and upload picture</p>
+
+    <div class="input-group mb-3 d-flex justify-content-center px-5">
+      <label
+        for="file-upload"
+        class="input-group-text custom-file-upload bg-dark"
+      >
+        <i class="bi bi-image text-white"></i>
+      </label>
+      <input id="file-upload" type="file" @change="filePicked" />
+      <button
+        class="input-group-text bg-dark text-white"
+        for="inputGroupFile02"
+        @click="uploadFile"
+      >
+        <i class="bi bi-upload text-white" @click="uploadFile"></i>
+      </button>
+    </div>
+    <img
+      v-if="userPhotoFileURL"
+      class="mx-auto d-block"
+      style="max-width: 20%"
+      :src="userPhotoFileURL"
+      alt="..."
     />
-    <div class="mt-2">Value: {{ text }}</div>
-    <button type="submit" class="btn btn-primary" @click="changeUserName">
-      Submit
-    </button>
-    <h5 class="text-white">Change your user profile, input the picture link</h5>
-    <input
-      class="form-control"
-      type="text"
-      placeholder="Enter Link"
-      v-model="photoURL"
-    />
-    <button type="submit" class="btn btn-primary" @click="changeUserPicture">
-      Submit
-    </button>
-    <input type="file" @change="filePicked" />
-    <button class="btn btn-danger" @click="uploadFile">Upload</button>
-    <img id="photoURL" :src="userPhotoFileURL" :width="70" :height="80"/>
   </div>
 </template>
 
@@ -33,7 +70,7 @@ import store from "@/store";
 export default Vue.extend({
   data() {
     return {
-      text: String(),
+      userNameText: String(),
       photoURL: String(),
       userPhotoFile: Array(),
       userPhotoFileURL: "",
@@ -42,7 +79,7 @@ export default Vue.extend({
   methods: {
     //   Todo: Whenever this function is called, make sure to set a timer to stop too many changes
     changeUserName() {
-      store.dispatch("changeUserName", this.text as string);
+      store.dispatch("userModule/changeUserName", this.userNameText as string);
     },
     changeUserPicture() {
       store.dispatch("userModule/changeUserPicture", this.photoURL as string);
@@ -67,4 +104,21 @@ export default Vue.extend({
 });
 </script>
 
-<style></style>
+<style>
+input[type="file"] {
+  display: none;
+}
+
+.custom-file-upload {
+  border: 1px solid #ccc;
+  display: inline-block;
+  padding: 6px 12px;
+  cursor: pointer;
+}
+
+::placeholder {
+  /* Chrome, Firefox, Opera, Safari 10.1+ */
+  color: white !important;
+  opacity: 1; /* Firefox */
+}
+</style>
