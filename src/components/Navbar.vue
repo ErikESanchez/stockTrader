@@ -38,7 +38,7 @@
                   class="nav-link text-success"
                   style="font: 18px Nunito, sans-serif; margin-top: 5px"
                 >
-                  {{ portfolio.availableFunds }}$
+                  {{ portfolio.availableFunds }} $
                 </div>
               </li>
 
@@ -62,12 +62,19 @@
                       style="background-color: #181a1b;"
                     >
                       <li class="dropdown-item text-center">
-                        <router-link to="/profile" class="text-white"
+                        <router-link to="/profile" class="nav-link text-white"
                           >Profile
+                          <i class="bi bi-person-fill text-white"></i>
                         </router-link>
                       </li>
-                      <li class="dropdown-item text-center" @click="signOut()">
-                        Sign Out
+                      <li
+                        class="dropdown-item nav-link text-center"
+                        @click="signOut()"
+                      >
+                        <router-link to="/" class="nav-link text-white"
+                          >Sign Out
+                          <i class="bi bi-box-arrow-right text-white"></i>
+                        </router-link>
                       </li>
                     </ul>
                   </li>
@@ -80,14 +87,14 @@
               <li class="nav-item">
                 <router-link
                   to="signin"
-                  class="btn btn btn-outline-secondary rounded-pill text-white"
+                  class="nav-link btn btn btn-outline-secondary rounded-pill text-white"
                   >Sign In
                 </router-link>
               </li>
               <li class="nav-item">
                 <router-link
                   to="signup"
-                  class="btn btn btn-outline-secondary rounded-pill text-white"
+                  class="nav-link btn btn btn-outline-secondary rounded-pill text-white"
                 >
                   Sign Up
                 </router-link>

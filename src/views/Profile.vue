@@ -1,10 +1,5 @@
 <template>
-  <div>
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css"
-    />
-
+  <div class="container">
     <div class="input-group mb-3 d-flex justify-content-center px-5">
       <input
         type="text"
@@ -47,21 +42,25 @@
       <label
         for="file-upload"
         class="input-group-text custom-file-upload bg-dark"
-        @change="filePicked"
       >
         <i class="bi bi-image text-white"></i>
       </label>
-      <input id="file-upload" type="file" />
+      <input id="file-upload" type="file" @change="filePicked" />
       <button
         class="input-group-text bg-dark text-white"
         for="inputGroupFile02"
         @click="uploadFile"
       >
-        <i class="bi bi-upload text-white"></i>
+        <i class="bi bi-upload text-white" @click="uploadFile"></i>
       </button>
     </div>
-
-    <!-- <img class="img-thumbnail" :src="userPhotoFileURL" alt="..." /> -->
+    <img
+      v-if="userPhotoFileURL"
+      class="mx-auto d-block"
+      style="max-width: 20%"
+      :src="userPhotoFileURL"
+      alt="..."
+    />
   </div>
 </template>
 
