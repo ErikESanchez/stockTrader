@@ -16,7 +16,7 @@
           <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
-          <ul class="navbar-nav text-center ms-auto">
+          <ul class="navbar-nav ms-auto">
             <li class="nav-item">
               <router-link to="/stocks" class="nav-link text-white">
                 Stocks
@@ -30,7 +30,7 @@
           </ul>
           <form class="d-flex " v-if="user.email">
             <ul
-              class="navbar-nav text-center ms-auto form-control"
+              class="navbar-nav ms-auto form-control"
               style="background-color: #181a1b; border-color: #181a1b;"
             >
               <li class="nav-item">

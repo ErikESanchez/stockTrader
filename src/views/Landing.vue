@@ -22,18 +22,6 @@ export default Vue.extend({
   components: {
     UserPortfolios,
   },
-  watch: {
-    profilePicturesURL(profilePictures: Array<UserPictures>) {
-      this.userPortfolios.forEach((result: UserPortfolio, index: number) => {
-        for (const [index, name] of profilePictures.entries()) {
-          if (result.name === profilePictures[index].name) {
-            console.log("Users with profile pictures", result.name);
-            console.log(result);
-          }
-        }
-      });
-    },
-  },
   computed: {
     ...mapGetters("portfolio", ["userPortfolios"]),
     ...mapGetters("userPublicData", ["profilePicturesURL"]),
