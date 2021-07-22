@@ -1,10 +1,7 @@
 import Vue from "vue";
 import { ActionTree, GetterTree, MutationTree } from "vuex";
-// import { apikey } from "../apikey";
 import { firebaseData } from "../firebase";
 import moment from "moment";
-import axios from "axios";
-const marketDataUrl = "https://www.alphavantage.co/query";
 
 const state = {
   monthStockData: [],
@@ -50,21 +47,14 @@ const mutations: MutationTree<any> = {
     });
     state.monthStockData = newMonthObject;
   },
-  formatDatabaseData(state, stockPayload: any) {
-    // ? The functions runs fine once, but runs another four times for some reason?
-    // ? Have to redeclare formated stocks as an empty array because it will keep the old stock data
-    // ? when i push in new data
-    state.formatedStocks = []
-    Object.keys(stockPayload).forEach((symbol) => {
-      // Todo: Make interfaces for all the Objects
-      let dates: Array<string> = Object.getOwnPropertyNames(
-        stockPayload[symbol]["timeSeriesData"]
-      );
-      let formatedDate: string = dates.reduce((a: string, b: string) => {
-        return new Date(a) > new Date(b) ? a : b;
-      });
-      let metaData = stockPayload[symbol]["metaData(Daily)"];
-      let priceData = stockPayload[symbol]["timeSeriesData"][formatedDate];
+  formatDatabaseData(state, stockPayload: StockData) {
+    state.formatedStocks = [];
+    Object.keys(stockPayload).forEach((symbol: string) => {
+      let mostRecentTradingDay: string =
+        stockPayload[symbol]["Meta Data"]["3. Last Refreshed"];
+      let metaData: MetaData = stockPayload[symbol]["Meta Data"];
+      let priceData: TimeSeriesData =
+        stockPayload[symbol]["Time Series(Daily)"][mostRecentTradingDay];
       let formatedLocalData: stockDataFormat = {
         stockData: {
           name: symbol,
@@ -96,7 +86,7 @@ export const actions: ActionTree<any, any> = {
           console.log(doc.data());
         }
       })
-      .catch(function (error: any) {
+      .catch(function(error: any) {
         console.error(error);
       });
     return state.monthStockData;
@@ -186,87 +176,108 @@ export const actions: ActionTree<any, any> = {
   //     });
   //   });
   // },
-  async getStockQuote({ commit }, payload: TIME_SERIES) {
-    return await axios.get(marketDataUrl, {
-      params: {
-        function: payload.function,
-        symbol: payload.symbol,
-        interval: payload.interval,
-        apikey: payload.apikey,
-        outputsize: payload.outputsize,
-      },
-    });
-  },
+
   async getDatabaseDailyData({ commit }) {
     // TODO: Figure out how to use an interface and to be able dynamically name a variable
-    let stockData: stockData = Object();
-    let dateOfMonth: Object = moment().subtract(1, "month");
+    let stockData: StockData = Object();
     let formatedDateOfMonth: string = moment("2020-04").format("YYYY-MM");
     await firebaseData
       .firestore()
       .collection("stocks")
       .get()
-      .then(function (querySnapshot: any) {
-        querySnapshot.forEach((doc: doc) => {
-          // console.log(doc.id, "=>", doc.data());
-          stockData[doc.id] = {
-            "metaData(Daily)": doc.data()["metaData(Daily)"],
-          };
-          return stockData;
-        });
+      .then(function(querySnapshot: any) {
+        querySnapshot.forEach(
+          (TimeSeriesDailyResponse: TimeSeriesDailyResponse) => {
+            if (TimeSeriesDailyResponse.data()) {
+              let TimeSeriesDaily: TimeSeriesDaily = TimeSeriesDailyResponse.data();
+              let symbol: string =
+                TimeSeriesDaily["Meta Data(Daily)"]["2. Symbol"];
+              stockData[symbol] = {
+                ["Meta Data"]: TimeSeriesDaily["Meta Data(Daily)"],
+                ["Time Series(Daily)"]: {},
+              };
+              return stockData;
+            } else {
+              return undefined;
+            }
+          }
+        );
       })
-      .catch(function (error: any) {
+      .catch(function(error: any) {
         console.error("Error getting documents", error);
       });
-
     Object.keys(stockData).forEach(
-      async (symbol: string, key: number, arr: any) => {
-        return await firebaseData
+      async (symbol: string, index: number, symbolArray: Array<string>) => {
+        await firebaseData
           .firestore()
           .collection("stocks")
           .doc(symbol)
           .collection("Time Series(Daily)")
-          .doc(formatedDateOfMonth)
+          .doc("2021-07")
           .get()
-          .then((doc: doc) => {
-            if (
-              doc.exists &&
-              stockData[symbol]["timeSeriesData"] === undefined
-            ) {
-              stockData[symbol]["timeSeriesData"] = doc.data().priceData;
-              if (Object.is(arr.length - 1, key)) {
-                // console.log(
-                //   `Last callback call at ${key} with value ${symbol}`
-                // );
-                commit("formatDatabaseData", stockData);
-              }
-              // ? Might not be the best place to put this
+          .then((TimeSeriesDailyData) => {
+            if (TimeSeriesDailyData.data() as TimeSeriesDailyDataResponse) {
+              let TimeSeriesDaily = TimeSeriesDailyData.data() as TimeSeriesDailyData;
+              stockData[symbol]["Time Series(Daily)"] = TimeSeriesDaily;
             } else {
               console.log("Document doesn't exist");
             }
           })
-          .catch(function (error: any) {
+          .catch(function(error: any) {
             console.error("Error getting document:", error);
           });
+        if (Object.is(symbolArray.length - 1, index)) {
+          console.log(stockData);
+
+          commit("formatDatabaseData", stockData);
+        }
       }
     );
   },
 };
 
-interface doc {
-  [id: string]: any;
+interface TimeSeriesDailyResponse {
+  data(): TimeSeriesDaily;
+  id: string;
 }
 
-interface time {
-  [time: string]: number;
+interface TimeSeriesDailyDataResponse {
+  data(): TimeSeriesDailyData;
 }
+
+interface TimeSeriesDaily {
+  "Meta Data(Daily)": MetaData;
+  "Time Series (Daily)": TimeSeriesDailyData;
+}
+
+interface MetaData {
+  "1. Information": string;
+  "2. Symbol": string;
+  "3. Last Refreshed": string;
+  "4. Output Size": string;
+  "5. Time Zone": string;
+}
+
+interface TimeSeriesDailyData {
+  [day: string]: TimeSeriesData;
+}
+
+interface TimeSeriesData {
+  "1. open": string;
+  "2. high": string;
+  "3. low": string;
+  "4. close": string;
+  "5. volume": string;
+}
+
 export interface MonthData {
   [date: string]: any;
 }
-interface stockData {
-  // I don't know why this works
-  [metaData: string]: any;
-  timeSeriesData: Object;
+interface StockData {
+  [symbol: string]: {
+    "Meta Data": MetaData;
+    "Time Series(Daily)": TimeSeriesDailyData;
+  };
 }
 
 export interface TIME_SERIES {

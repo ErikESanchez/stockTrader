@@ -27,6 +27,11 @@ export default Vue.extend({
   //     console.log('bruh')
   //   }
   // },
+  watch: {
+    formatedStocks(event) {
+      console.log(event)
+    }
+  },
   computed: mapGetters({ formatedStocks: "marketData/formatedStocks" }),
   methods: {
     async getDatabaseDailyData() {
