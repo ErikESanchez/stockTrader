@@ -8,6 +8,7 @@
           </router-link>
         </h5>
         <p class="card-text text-success">{{ stock["stockData"]["open"] }}$</p>
+        <p class="card-text text-white">{{stock['stockData']['lastRefreshed']}}</p>
         <button class="btn btn-light rounded-pill" @click="buyStock(stock)">
           Buy Stock
         </button>

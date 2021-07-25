@@ -3,49 +3,47 @@ import { ActionTree, GetterTree, MutationTree } from "vuex";
 import { firebaseData } from "../firebase";
 import moment from "moment";
 
-const state = {
+const state: State = {
   monthStockData: [],
-  stocks: Array(),
+  stocks: [],
   formatedStocks: [],
   lastRefreshed: String(),
+  allStockData: Object()
 };
 
 const getters: GetterTree<any, any> = {
-  formatedStocks: (state) => {
+  formatedStocks: state => {
     return state.formatedStocks;
   },
-  getMonthData: (state) => {
+  getMonthData: state => {
     return state.monthStockData;
   },
-  getLastRefreshed: (state) => {
+  getLastRefreshed: state => {
     console.log(state.lastRefreshed);
     return state.lastRefreshed;
   },
+  allStockData: state => {
+    return state.allStockData;
+  }
 };
 
 const mutations: MutationTree<any> = {
+  setAllStockData(state: State, allStocks: MonthData) {
+    state.allStockData = allStocks;
+  },
   addDataToStock(state, newStock) {
     state.stocks.push(newStock);
   },
-  formatMonthData(state, monthPayload) {
+  formatMonthData(state: State, symbol: string) {
     let newMonthObject: MonthData = {};
-    const currentMonthDates = new Array(
-      moment("2020-04-01", "YYYY-MM-DD").daysInMonth()
-    )
-      .fill(null)
-      .map((x, i) =>
-        moment("2020-04-01", "YYYY-MM-DD")
-          .startOf("month")
-          .add(i, "days")
-      );
-    currentMonthDates.forEach((data, index) => {
-      index;
-      let orderedDates: string = data.format("YYYY-MM-DD");
-      if (monthPayload.priceData[orderedDates] !== undefined) {
-        newMonthObject[orderedDates] = monthPayload.priceData[orderedDates];
-      }
-    });
-    state.monthStockData = newMonthObject;
+    console.log(symbol);
+    
+    // console.log(state.allStockData);
+
+    // if (monthPayload.priceData[orderedDates] !== undefined) {
+    //   newMonthObject[orderedDates] = monthPayload.priceData[orderedDates];
+    // }
+    // state.monthStockData = newMonthObject;
   },
   formatDatabaseData(state, stockPayload: StockData) {
     state.formatedStocks = [];
@@ -63,38 +61,21 @@ const mutations: MutationTree<any> = {
           low: Number(priceData["3. low"]),
           close: Number(priceData["4. close"]),
           volume: Number(priceData["5. volume"]),
-          lastRefreshed: metaData["3. Last Refreshed"],
-        },
+          lastRefreshed: metaData["3. Last Refreshed"]
+        }
       };
       state.formatedStocks.push(formatedLocalData);
     });
-  },
+  }
 };
 
 export const actions: ActionTree<any, any> = {
-  async getMonthData({ state, commit }, symbol: string) {
-    await firebaseData
-      .firestore()
-      .collection("stocks")
-      .doc(symbol)
-      .collection("Time Series(Daily)")
-      .doc("2020-04")
-      .get()
-      .then((doc: any) => {
-        if (doc) {
-          commit("formatMonthData", doc.data());
-          console.log(doc.data());
-        }
-      })
-      .catch(function(error: any) {
-        console.error(error);
-      });
-    return state.monthStockData;
+  async getMonthData({ state, getters }, symbol: string) {
+    return getters.allStockData[symbol]
   },
   async getDatabaseDailyData({ commit }) {
     // TODO: Figure out how to use an interface and to be able dynamically name a variable
     let stockData: StockData = Object();
-    let formatedDateOfMonth: string = moment("2020-04").format("YYYY-MM");
     await firebaseData
       .firestore()
       .collection("stocks")
@@ -108,7 +89,7 @@ export const actions: ActionTree<any, any> = {
                 TimeSeriesDaily["Meta Data(Daily)"]["2. Symbol"];
               stockData[symbol] = {
                 ["Meta Data"]: TimeSeriesDaily["Meta Data(Daily)"],
-                ["Time Series(Daily)"]: {},
+                ["Time Series(Daily)"]: {}
               };
               return stockData;
             } else {
@@ -127,9 +108,9 @@ export const actions: ActionTree<any, any> = {
           .collection("stocks")
           .doc(symbol)
           .collection("Time Series(Daily)")
-          .doc("2021-07")
+          .doc(moment(new Date()).format("YYYY-MM"))
           .get()
-          .then((TimeSeriesDailyData) => {
+          .then(TimeSeriesDailyData => {
             if (TimeSeriesDailyData.data() as TimeSeriesDailyDataResponse) {
               let TimeSeriesDaily = TimeSeriesDailyData.data() as TimeSeriesDailyData;
               stockData[symbol]["Time Series(Daily)"] = TimeSeriesDaily;
@@ -141,13 +122,12 @@ export const actions: ActionTree<any, any> = {
             console.error("Error getting document:", error);
           });
         if (Object.is(symbolArray.length - 1, index)) {
-          console.log(stockData);
-
+          commit("setAllStockData", stockData);
           commit("formatDatabaseData", stockData);
         }
       }
     );
-  },
+  }
 };
 
 interface TimeSeriesDailyResponse {
@@ -159,12 +139,12 @@ interface TimeSeriesDailyDataResponse {
   data(): TimeSeriesDailyData;
 }
 
-interface TimeSeriesDaily {
+export interface TimeSeriesDaily {
   "Meta Data(Daily)": MetaData;
-  "Time Series (Daily)": TimeSeriesDailyData;
+  "Time Series(Daily)": TimeSeriesDailyData;
 }
 
-interface MetaData {
+export interface MetaData {
   "1. Information": string;
   "2. Symbol": string;
   "3. Last Refreshed": string;
@@ -172,11 +152,11 @@ interface MetaData {
   "5. Time Zone": string;
 }
 
-interface TimeSeriesDailyData {
+export interface TimeSeriesDailyData {
   [day: string]: TimeSeriesData;
 }
 
-interface TimeSeriesData {
+export interface TimeSeriesData {
   "1. open": string;
   "2. high": string;
   "3. low": string;
@@ -214,10 +194,18 @@ export interface stockDataFormat {
   };
 }
 
+interface State {
+  monthStockData: [];
+  stocks: [];
+  formatedStocks: [];
+  lastRefreshed: string;
+  allStockData: {};
+}
+
 export default {
   namespaced: true,
   actions,
   mutations,
   getters,
-  state,
+  state
 };
