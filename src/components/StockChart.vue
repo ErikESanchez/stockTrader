@@ -59,7 +59,7 @@ export default Vue.extend({
       this.chartOptions = {
         chart: {
           height: 350,
-          type: "area",
+          type: "line",
         },
         colors: ["#E91E63"],
         dataLabels: {
