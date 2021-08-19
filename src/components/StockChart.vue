@@ -1,12 +1,13 @@
 <template>
   <div>
-    <apexchart :series="series" :options="chartOptions" width="99%" />
+    <apexchart :series="series" :options="chartOptions" width="100%" />
   </div>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
 import VueApexCharts from "vue-apexcharts";
+import moment from "moment";
 export default Vue.extend({
   components: {
     apexchart: VueApexCharts,
@@ -31,9 +32,23 @@ export default Vue.extend({
           type: String(),
           categories: [] as Array<string>,
           labels: {
+            show: Boolean(),
             style: {
               colors: [] as Array<string>,
             },
+            format: String()
+            // datetimeFormatter: {
+            //   year: String(),
+            //   month: String(),
+            //   day: String(),
+            //   hour: String(),
+            // },
+          },
+          crosshairs: {
+            show: Boolean(),
+          },
+          tooltip: {
+            enabled: Boolean(),
           },
         },
         yaxis: {
@@ -42,20 +57,37 @@ export default Vue.extend({
               colors: [] as Array<string>,
             },
           },
+          crosshairs: {
+            show: Boolean(),
+          },
+          tooltip: {
+            enabled: Boolean(),
+          },
         },
         grid: {
           show: Boolean(),
+        },
+        tooltip: {
+          // enabled: Boolean(),
+          // shared: Boolean(),
+          // followCursor: Boolean(),
+          x: {
+            format: String()
+          }
         },
       },
     };
   },
   watch: {
     stockData(): void {
-      this.series.push(this.stockData.datasets[0]);
+      this.series[0] = this.stockData.datasets[0];
       let colorArray: Array<string> = [];
-      this.stockData.labels.forEach((date: string) => {
+      for (let i = 0; i < this.stockData.labels.length; i++) {
+        this.stockData.labels[i] = moment(this.stockData.labels[i]).format(
+          "MMM DD"
+        );
         colorArray.push("white");
-      });
+      }
       this.chartOptions = {
         chart: {
           height: 350,
@@ -72,9 +104,24 @@ export default Vue.extend({
           type: "datetime",
           categories: this.stockData.labels as Array<string>,
           labels: {
+            show: true,
             style: {
               colors: colorArray as Array<string>,
             },
+            format: 'MMM DD'
+            // ? May not need to loop the dates and instead need this
+            // datetimeFormatter: {
+            //   year: "yyyy MM",
+            //   month: "MMM dd",
+            //   day: "dd",
+            //   hour: "HH:mm",
+            // },
+          },
+          crosshairs: {
+            show: true,
+          },
+          tooltip: {
+            enabled: false,
           },
         },
         yaxis: {
@@ -83,9 +130,24 @@ export default Vue.extend({
               colors: colorArray as Array<string>,
             },
           },
+          crosshairs: {
+            show: true,
+          },
+          tooltip: {
+            enabled: false,
+          },
         },
+      
         grid: {
           show: false,
+        },
+        tooltip: {
+          // enabled: true,
+          // shared: false,
+          // followCursor: true,
+          x: {
+            format: 'dd MMM'
+          }
         },
       };
     },

@@ -8,23 +8,23 @@ const state: State = {
   stocks: [],
   formatedStocks: [],
   lastRefreshed: String(),
-  allStockData: Object()
+  allStockData: Object(),
 };
 
 const getters: GetterTree<any, any> = {
-  formatedStocks: state => {
+  formatedStocks: (state) => {
     return state.formatedStocks;
   },
-  getMonthData: state => {
+  getMonthData: (state) => {
     return state.monthStockData;
   },
-  getLastRefreshed: state => {
+  getLastRefreshed: (state) => {
     console.log(state.lastRefreshed);
     return state.lastRefreshed;
   },
-  allStockData: state => {
+  allStockData: (state) => {
     return state.allStockData;
-  }
+  },
 };
 
 const mutations: MutationTree<any> = {
@@ -37,7 +37,7 @@ const mutations: MutationTree<any> = {
   formatMonthData(state: State, symbol: string) {
     let newMonthObject: MonthData = {};
     console.log(symbol);
-    
+
     // console.log(state.allStockData);
 
     // if (monthPayload.priceData[orderedDates] !== undefined) {
@@ -61,17 +61,17 @@ const mutations: MutationTree<any> = {
           low: Number(priceData["3. low"]),
           close: Number(priceData["4. close"]),
           volume: Number(priceData["5. volume"]),
-          lastRefreshed: metaData["3. Last Refreshed"]
-        }
+          lastRefreshed: metaData["3. Last Refreshed"],
+        },
       };
       state.formatedStocks.push(formatedLocalData);
     });
-  }
+  },
 };
 
 export const actions: ActionTree<any, any> = {
   async getMonthData({ state, getters }, symbol: string) {
-    return getters.allStockData[symbol]
+    return getters.allStockData[symbol];
   },
   async getDatabaseDailyData({ commit }) {
     // TODO: Figure out how to use an interface and to be able dynamically name a variable
@@ -89,7 +89,7 @@ export const actions: ActionTree<any, any> = {
                 TimeSeriesDaily["Meta Data(Daily)"]["2. Symbol"];
               stockData[symbol] = {
                 ["Meta Data"]: TimeSeriesDaily["Meta Data(Daily)"],
-                ["Time Series(Daily)"]: {}
+                ["Time Series(Daily)"]: {},
               };
               return stockData;
             } else {
@@ -101,6 +101,11 @@ export const actions: ActionTree<any, any> = {
       .catch(function(error: any) {
         console.error("Error getting documents", error);
       });
+    let currentMonth: string = moment(new Date()).format("YYYY-MM");
+    let lastMonth: string = moment(
+      new Date().setMonth(new Date().getMonth() - 1)
+    ).format("YYYY-MM");
+    let TimeSeriesDaily: TimeSeriesDailyData = {};
     Object.keys(stockData).forEach(
       async (symbol: string, index: number, symbolArray: Array<string>) => {
         await firebaseData
@@ -108,26 +113,55 @@ export const actions: ActionTree<any, any> = {
           .collection("stocks")
           .doc(symbol)
           .collection("Time Series(Daily)")
-          .doc(moment(new Date()).format("YYYY-MM"))
+          .doc(currentMonth)
           .get()
-          .then(TimeSeriesDailyData => {
+          .then((TimeSeriesDailyData) => {
             if (TimeSeriesDailyData.data() as TimeSeriesDailyDataResponse) {
-              let TimeSeriesDaily = TimeSeriesDailyData.data() as TimeSeriesDailyData;
+              TimeSeriesDaily = TimeSeriesDailyData.data() as TimeSeriesDailyData;
               stockData[symbol]["Time Series(Daily)"] = TimeSeriesDaily;
             } else {
-              console.log("Document doesn't exist");
+              console.log("This document doesn't exist");
             }
           })
           .catch(function(error: any) {
             console.error("Error getting document:", error);
           });
-        if (Object.is(symbolArray.length - 1, index)) {
-          commit("setAllStockData", stockData);
-          commit("formatDatabaseData", stockData);
+        if (Object.keys(stockData[symbol]["Time Series(Daily)"]).length < 30) {
+          Object.keys(stockData).forEach(
+            async (
+              symbol: string,
+              index: number,
+              symbolArray: Array<string>
+            ) => {
+              await firebaseData
+                .firestore()
+                .collection("stocks")
+                .doc(symbol)
+                .collection("Time Series(Daily)")
+                .doc(lastMonth)
+                .get()
+                .then((TimeSeriesDailyData) => {
+                  if (
+                    TimeSeriesDailyData.data() as TimeSeriesDailyDataResponse
+                  ) {
+                    stockData[symbol]["Time Series(Daily)"] = Object.assign(
+                      TimeSeriesDaily,
+                      TimeSeriesDailyData.data()
+                    );
+                  } else {
+                    console.log("This document doesn't exist");
+                  }
+                });
+              if (Object.is(symbolArray.length - 1, index)) {
+                commit("setAllStockData", stockData);
+                commit("formatDatabaseData", stockData);
+              }
+            }
+          );
         }
       }
     );
-  }
+  },
 };
 
 interface TimeSeriesDailyResponse {
@@ -207,5 +241,5 @@ export default {
   actions,
   mutations,
   getters,
-  state
+  state,
 };

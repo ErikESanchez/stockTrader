@@ -14,10 +14,8 @@
 <script lang="ts">
 import Vue from "vue";
 import StockCard from "../components/StockCard.vue";
-import { Market } from "@/Classes/Market";
 import store from "@/store";
 import { mapGetters } from "vuex";
-import moment from "moment";
 
 export default Vue.extend({
   name: "stocksView",
@@ -27,12 +25,12 @@ export default Vue.extend({
   //     console.log('bruh')
   //   }
   // },
-  watch: {
-    formatedStocks(event) {
-      console.log(event)
-    }
-  },
-  computed: mapGetters({ formatedStocks: "marketData/formatedStocks" }),
+  // watch: {
+  //   formatedStocks(event) {
+  //     console.log(event);
+  //   },
+  // },
+  computed: { ...mapGetters({ formatedStocks: "marketData/formatedStocks" }) },
   methods: {
     async getDatabaseDailyData() {
       await store.dispatch("marketData/getDatabaseDailyData");

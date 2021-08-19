@@ -1,6 +1,44 @@
 <template>
-  <div>
-    <stock-chart :stockData="chartData" class="container-fluid" />
+  <div class="container-fluid">
+    <stock-chart :stockData="chartData" />
+    <div
+      class="btn-group"
+      role="group"
+      aria-label="Basic radio toggle button group"
+    >
+      <input
+        type="radio"
+        class="btn-check"
+        name="btnradio"
+        id="btnradio1"
+        autocomplete="off"
+        checked
+      />
+      <label class="btn btn-outline-primary" for="btnradio1"></label>
+
+      <input
+        type="radio"
+        class="btn-check"
+        name="btnradio"
+        id="btnradio2"
+        autocomplete="off"
+      />
+      <label
+        class="btn btn-outline-primary"
+        for="btnradio2"
+        @click="chartDataFormat(25)"
+        >1 Week</label
+      >
+
+      <input
+        type="radio"
+        class="btn-check"
+        name="btnradio"
+        id="btnradio3"
+        autocomplete="off"
+      />
+      <label class="btn btn-outline-primary" for="btnradio3" @click="chartDataFormat(12)">1 Month</label>
+    </div>
   </div>
 </template>
 <script lang="ts">
@@ -9,32 +47,31 @@ import StockChart from "../components/StockChart.vue";
 import store from "@/store";
 import { MonthData, TimeSeriesDaily } from "@/storeModules/marketData";
 import { mapGetters } from "vuex";
-import moment from "moment";
-import { log } from "async";
 // import { ChartData, ChartOptions } from "@/components/LineChart.vue";
 export default Vue.extend({
   name: "singleStock",
   components: {
     StockChart,
   },
+  props: ["stockData"],
   data() {
     return {
-      loaded: false,
+      loaded: Boolean(),
       chartData: Object(),
     };
   },
-  created() {
-    this.monthChart()
+  mounted() {
+    this.chartDataFormat(12);
   },
   watch: {
     allStocks() {
-      this.monthChart();
+      this.chartDataFormat(12);
     },
   },
   methods: {
-    async monthChart(): Promise<void> {
+    async chartDataFormat(days: number): Promise<void> {
       const symbol: string = this.$router.currentRoute.params.stockName;
-      let dataCollection: any = {
+      let dataCollection: DataCollection = {
         labels: [],
         datasets: [
           {
@@ -43,6 +80,7 @@ export default Vue.extend({
           },
         ],
       };
+      console.log("bruh");
       await store
         .dispatch("marketData/getMonthData", symbol)
         .then((monthData: TimeSeriesDaily) => {
@@ -62,14 +100,16 @@ export default Vue.extend({
             });
             orderedDates.forEach(
               (date: string, index: number, dateArray: Array<string>) => {
-
-                if (monthData["Time Series(Daily)"][date] != undefined) {
-                  console.log("bruh");
+                if (
+                  monthData["Time Series(Daily)"][date] != undefined &&
+                  index > days
+                ) {
                   dataCollection.datasets[0].data.push(
-                    monthData["Time Series(Daily)"][date]["1. open"]
+                    monthData["Time Series(Daily)"][date]["4. close"]
                   );
                   dataCollection.labels.push(date);
                   if (index === dateArray.length - 1) {
+                    console.log(this.chartData);
                     this.chartData = dataCollection;
                     this.loaded = true;
                   }
@@ -82,5 +122,15 @@ export default Vue.extend({
   },
   computed: { ...mapGetters({ allStocks: "marketData/allStockData" }) },
 });
+
+interface DataCollection {
+  labels: Array<string>;
+  datasets: [
+    {
+      name: string;
+      data: Array<string>;
+    }
+  ];
+}
 </script>
 <style lang="sass" scoped></style>
