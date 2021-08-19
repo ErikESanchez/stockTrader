@@ -105,7 +105,6 @@ export const actions: ActionTree<any, any> = {
     let lastMonth: string = moment(
       new Date().setMonth(new Date().getMonth() - 1)
     ).format("YYYY-MM");
-    let TimeSeriesDaily: TimeSeriesDailyData = {};
     Object.keys(stockData).forEach(
       async (symbol: string, index: number, symbolArray: Array<string>) => {
         await firebaseData
@@ -117,7 +116,7 @@ export const actions: ActionTree<any, any> = {
           .get()
           .then((TimeSeriesDailyData) => {
             if (TimeSeriesDailyData.data() as TimeSeriesDailyDataResponse) {
-              TimeSeriesDaily = TimeSeriesDailyData.data() as TimeSeriesDailyData;
+              let TimeSeriesDaily: TimeSeriesDailyData = TimeSeriesDailyData.data() as TimeSeriesDailyData;
               stockData[symbol]["Time Series(Daily)"] = TimeSeriesDaily;
             } else {
               console.log("This document doesn't exist");
@@ -126,41 +125,40 @@ export const actions: ActionTree<any, any> = {
           .catch(function(error: any) {
             console.error("Error getting document:", error);
           });
-        if (Object.keys(stockData[symbol]["Time Series(Daily)"]).length < 30) {
-          Object.keys(stockData).forEach(
-            async (
-              symbol: string,
-              index: number,
-              symbolArray: Array<string>
-            ) => {
-              await firebaseData
-                .firestore()
-                .collection("stocks")
-                .doc(symbol)
-                .collection("Time Series(Daily)")
-                .doc(lastMonth)
-                .get()
-                .then((TimeSeriesDailyData) => {
-                  if (
-                    TimeSeriesDailyData.data() as TimeSeriesDailyDataResponse
-                  ) {
-                    stockData[symbol]["Time Series(Daily)"] = Object.assign(
-                      TimeSeriesDaily,
-                      TimeSeriesDailyData.data()
-                    );
-                  } else {
-                    console.log("This document doesn't exist");
-                  }
-                });
-              if (Object.is(symbolArray.length - 1, index)) {
-                commit("setAllStockData", stockData);
-                commit("formatDatabaseData", stockData);
-              }
-            }
-          );
-        }
+        // if (symbolArray.length === index + 1) {
+        //   commit("setAllStockData", stockData);
+        //   commit("formatDatabaseData", stockData);
+        // }
       }
     );
+    if (Object.keys(stockData["AAPL"]["Time Series(Daily)"]).length < 30) {
+      Object.keys(stockData).forEach(
+        async (symbol: string, index: number, symbolArray: Array<string>) => {
+          await firebaseData
+            .firestore()
+            .collection("stocks")
+            .doc(symbol)
+            .collection("Time Series(Daily)")
+            .doc(lastMonth)
+            .get()
+            .then((TimeSeriesDailyData) => {
+              if (TimeSeriesDailyData.data() as TimeSeriesDailyData) {
+                let TimeSeriesDailyPreviousMonth: TimeSeriesDailyData = TimeSeriesDailyData.data() as TimeSeriesDailyData;
+                stockData[symbol]["Time Series(Daily)"] = Object.assign(
+                  TimeSeriesDailyPreviousMonth,
+                  stockData[symbol]["Time Series(Daily)"]
+                );
+              } else {
+                console.log("This document doesn't exist");
+              }
+            });
+          if (symbolArray.length === index + 1) {
+            commit("setAllStockData", stockData);
+            commit("formatDatabaseData", stockData);
+          }
+        }
+      );
+    }
   },
 };
 
