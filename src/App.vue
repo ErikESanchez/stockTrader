@@ -41,7 +41,6 @@ export default Vue.extend({
     });
   },
   computed: mapGetters({ formatedStocks: "marketData/formatedStocks" }),
-
 });
 </script>
 

@@ -80,7 +80,6 @@ export default Vue.extend({
           },
         ],
       };
-      console.log("bruh");
       await store
         .dispatch("marketData/getMonthData", symbol)
         .then((monthData: TimeSeriesDaily) => {

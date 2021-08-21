@@ -53,9 +53,16 @@ const mutations: MutationTree<any> = {
       let metaData: MetaData = stockPayload[symbol]["Meta Data"];
       let priceData: TimeSeriesData =
         stockPayload[symbol]["Time Series(Daily)"][mostRecentTradingDay];
+      let companyOverview: CompanyOverview =
+        stockPayload[symbol]["Company Overview"];
       let formatedLocalData: stockDataFormat = {
         stockData: {
-          name: symbol,
+          name: companyOverview["Name"],
+          country: companyOverview["Country"],
+          description: companyOverview["Description"],
+          exchange: companyOverview["Exchange"],
+          sector: companyOverview["Sector"],
+          symbol: companyOverview["Symbol"],
           open: Number(priceData["1. open"]),
           high: Number(priceData["2. high"]),
           low: Number(priceData["3. low"]),
@@ -70,7 +77,8 @@ const mutations: MutationTree<any> = {
 };
 
 export const actions: ActionTree<any, any> = {
-  async getMonthData({ state, getters }, symbol: string) {
+  async getMonthData({ getters }, symbol: string) {
+    console.log(getters.allStockData);
     return getters.allStockData[symbol];
   },
   async getDatabaseDailyData({ commit }) {
@@ -81,22 +89,20 @@ export const actions: ActionTree<any, any> = {
       .collection("stocks")
       .get()
       .then(function(querySnapshot: any) {
-        querySnapshot.forEach(
-          (TimeSeriesDailyResponse: TimeSeriesDailyResponse) => {
-            if (TimeSeriesDailyResponse.data()) {
-              let TimeSeriesDaily: TimeSeriesDaily = TimeSeriesDailyResponse.data();
-              let symbol: string =
-                TimeSeriesDaily["Meta Data(Daily)"]["2. Symbol"];
-              stockData[symbol] = {
-                ["Meta Data"]: TimeSeriesDaily["Meta Data(Daily)"],
-                ["Time Series(Daily)"]: {},
-              };
-              return stockData;
-            } else {
-              return undefined;
-            }
+        querySnapshot.forEach((companyDataResponse: CompanyDataResponse) => {
+          if (companyDataResponse.data()) {
+            let companyData: CompanyData = companyDataResponse.data();
+            let name: string = companyData["Company Overview"]["Name"];
+            stockData[name] = {
+              ["Meta Data"]: companyData["Meta Data(Daily)"],
+              ["Company Overview"]: companyData["Company Overview"],
+              ["Time Series(Daily)"]: {},
+            };
+            return stockData;
+          } else {
+            return undefined;
           }
-        );
+        });
       })
       .catch(function(error: any) {
         console.error("Error getting documents", error);
@@ -105,35 +111,34 @@ export const actions: ActionTree<any, any> = {
     let lastMonth: string = moment(
       new Date().setMonth(new Date().getMonth() - 1)
     ).format("YYYY-MM");
-    Object.keys(stockData).forEach(
-      async (symbol: string, index: number, symbolArray: Array<string>) => {
-        await firebaseData
-          .firestore()
-          .collection("stocks")
-          .doc(symbol)
-          .collection("Time Series(Daily)")
-          .doc(currentMonth)
-          .get()
-          .then((TimeSeriesDailyData) => {
-            if (TimeSeriesDailyData.data() as TimeSeriesDailyDataResponse) {
-              let TimeSeriesDaily: TimeSeriesDailyData = TimeSeriesDailyData.data() as TimeSeriesDailyData;
-              stockData[symbol]["Time Series(Daily)"] = TimeSeriesDaily;
-            } else {
-              console.log("This document doesn't exist");
-            }
-          })
-          .catch(function(error: any) {
-            console.error("Error getting document:", error);
-          });
-        // if (symbolArray.length === index + 1) {
-        //   commit("setAllStockData", stockData);
-        //   commit("formatDatabaseData", stockData);
-        // }
-      }
-    );
-    if (Object.keys(stockData["AAPL"]["Time Series(Daily)"]).length < 30) {
+    Object.keys(stockData).forEach(async (name: string) => {
+      let symbol: string = stockData[name]["Meta Data"]["2. Symbol"];
+      await firebaseData
+        .firestore()
+        .collection("stocks")
+        .doc(symbol)
+        .collection("Time Series(Daily)")
+        .doc(currentMonth)
+        .get()
+        .then((TimeSeriesDailyData) => {
+          if (TimeSeriesDailyData.data() as TimeSeriesDailyDataResponse) {
+            let TimeSeriesDaily: TimeSeriesDailyData = TimeSeriesDailyData.data() as TimeSeriesDailyData;
+            stockData[name]["Time Series(Daily)"] = TimeSeriesDaily;
+          } else {
+            console.log("This document doesn't exist");
+          }
+        })
+        .catch(function(error: any) {
+          console.error("Error getting document:", error);
+        });
+    });
+    if (
+      Object.keys(stockData[Object.keys(stockData)[0]]["Time Series(Daily)"])
+        .length < 30
+    ) {
       Object.keys(stockData).forEach(
-        async (symbol: string, index: number, symbolArray: Array<string>) => {
+        async (name: string, index: number, nameArray: Array<string>) => {
+          let symbol: string = stockData[name]["Meta Data"]["2. Symbol"];
           await firebaseData
             .firestore()
             .collection("stocks")
@@ -144,15 +149,15 @@ export const actions: ActionTree<any, any> = {
             .then((TimeSeriesDailyData) => {
               if (TimeSeriesDailyData.data() as TimeSeriesDailyData) {
                 let TimeSeriesDailyPreviousMonth: TimeSeriesDailyData = TimeSeriesDailyData.data() as TimeSeriesDailyData;
-                stockData[symbol]["Time Series(Daily)"] = Object.assign(
+                stockData[name]["Time Series(Daily)"] = Object.assign(
                   TimeSeriesDailyPreviousMonth,
-                  stockData[symbol]["Time Series(Daily)"]
+                  stockData[name]["Time Series(Daily)"]
                 );
               } else {
                 console.log("This document doesn't exist");
               }
             });
-          if (symbolArray.length === index + 1) {
+          if (nameArray.length === index + 1) {
             commit("setAllStockData", stockData);
             commit("formatDatabaseData", stockData);
           }
@@ -202,6 +207,7 @@ export interface MonthData {
 interface StockData {
   [symbol: string]: {
     "Meta Data": MetaData;
+    "Company Overview": CompanyOverview;
     "Time Series(Daily)": TimeSeriesDailyData;
   };
 }
@@ -216,7 +222,12 @@ export interface TIME_SERIES {
 
 export interface stockDataFormat {
   stockData: {
+    symbol: string;
     name: string;
+    description: string;
+    exchange: string;
+    country: string;
+    sector: string;
     open: number;
     high: number;
     low: number;
@@ -224,6 +235,77 @@ export interface stockDataFormat {
     volume: number;
     lastRefreshed: string;
   };
+}
+
+interface CompanyDataResponse {
+  data(): CompanyData;
+}
+
+interface CompanyData {
+  "Company Overview": CompanyOverview;
+  "Meta Data(Daily)": MetaData;
+}
+
+interface CompanyOverview {
+  Symbol: string;
+  AssetType: string;
+  Name: string;
+  Description: string;
+  CIK: string;
+  Exchange: string;
+  Currency: string;
+  Country: string;
+  Sector: string;
+  Industry: string;
+  Address: string;
+  FiscalYearEnd: string;
+  LatestQuarter: string;
+  MarketCapitalization: string;
+  EBITDA: string;
+  PERatio: string;
+  PEGRatio: string;
+  BookValue: string;
+  DividendPerShare: string;
+  DividendYield: string;
+  EPS: string;
+  RevenuePerShareTTM: string;
+  ProfitMargin: string;
+  OperatingMarginTTM: string;
+  ReturnOnAssetsTTM: string;
+  ReturnOnEquityTTM: string;
+  RevenueTTM: string;
+  GrossProfitTTM: string;
+  DilutedEPSTTM: string;
+  QuarterlyEarningsGrowthYOY: string;
+  QuarterlyRevenueGrowthYOY: string;
+  AnalystTargetPrice: string;
+  TrailingPE: string;
+  ForwardPE: string;
+  PriceToSalesRatioTTM: string;
+  PriceToBookRatio: string;
+  EVToRevenue: string;
+  EVToEBITDA: string;
+  Beta: string;
+  "52WeekHigh": string;
+  "52WeekLow": string;
+  "50DayMovingAverage": string;
+  "200DayMovingAverage": string;
+  SharesOutstanding: string;
+  SharesFloat: string;
+  SharesShort: string;
+  SharesShortPriorMonth: string;
+  ShortRatio: string;
+  ShortPercentOutstanding: string;
+  ShortPercentFloat: string;
+  PercentInsiders: string;
+  PercentInstitutions: string;
+  ForwardAnnualDividendRate: string;
+  ForwardAnnualDividendYield: string;
+  PayoutRatio: string;
+  DividendDate: string;
+  ExDividendDate: string;
+  LastSplitFactor: string;
+  LastSplitDate: string;
 }
 
 interface State {
