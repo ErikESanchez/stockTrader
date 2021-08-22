@@ -45,7 +45,7 @@ const mutations: MutationTree<any> = {
     // }
     // state.monthStockData = newMonthObject;
   },
-  formatDatabaseData(state, stockPayload: StockData) {
+  formatDatabaseData(state, stockPayload: StockDataSymbol) {
     state.formatedStocks = [];
     Object.keys(stockPayload).forEach((symbol: string) => {
       let mostRecentTradingDay: string =
@@ -78,12 +78,11 @@ const mutations: MutationTree<any> = {
 
 export const actions: ActionTree<any, any> = {
   async getMonthData({ getters }, symbol: string) {
-    console.log(getters.allStockData);
     return getters.allStockData[symbol];
   },
   async getDatabaseDailyData({ commit }) {
     // TODO: Figure out how to use an interface and to be able dynamically name a variable
-    let stockData: StockData = Object();
+    let stockData: StockDataSymbol = Object();
     await firebaseData
       .firestore()
       .collection("stocks")
@@ -204,12 +203,14 @@ export interface TimeSeriesData {
 export interface MonthData {
   [date: string]: any;
 }
-interface StockData {
-  [symbol: string]: {
-    "Meta Data": MetaData;
-    "Company Overview": CompanyOverview;
-    "Time Series(Daily)": TimeSeriesDailyData;
-  };
+export interface StockDataSymbol {
+  [symbol: string]: StockData;
+}
+
+export interface StockData {
+  "Meta Data": MetaData;
+  "Company Overview": CompanyOverview;
+  "Time Series(Daily)": TimeSeriesDailyData;
 }
 
 export interface TIME_SERIES {
@@ -246,7 +247,7 @@ interface CompanyData {
   "Meta Data(Daily)": MetaData;
 }
 
-interface CompanyOverview {
+export interface CompanyOverview {
   Symbol: string;
   AssetType: string;
   Name: string;
