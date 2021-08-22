@@ -66,6 +66,7 @@ const actions: ActionTree<any, any> = {
             amountOwned:
               portfolio.ownedStocks[stockTransaction.symbol].amountOwned +
               stockTransaction.data.amount,
+            name: stockTransaction.name,
           },
         },
         portfolioWorth: portfolioClass.calculateBoughtPortfolioWorth(),
@@ -99,6 +100,7 @@ const actions: ActionTree<any, any> = {
               [stockTransaction.symbol]: {
                 amountOwned: stockTransaction.data.amount,
                 symbol: stockTransaction.symbol,
+                name: stockTransaction.name
               },
             },
             portfolioWorth: portfolioClass.calculateBoughtPortfolioWorth(),
@@ -112,13 +114,15 @@ const actions: ActionTree<any, any> = {
     { commit, rootState, getters },
     sellStockTransaction: newStockTransaction
   ) {
+    console.log(sellStockTransaction)
+    console.log(state.portfolio.ownedStocks[sellStockTransaction.symbol].amountOwned)
     // * No way to typecast multiple variables
-
     let userPortfolios: Array<UserPortfolio> = getters.userPortfolios;
     let portfolio: UserPortfolio = state.portfolio;
     if (portfolio.ownedStocks[sellStockTransaction.symbol].amountOwned >= 2) {
       rootState.marketData.formatedStocks.forEach(async (stock: any) => {
-        if (stock.stockData.name === sellStockTransaction.symbol) {
+        console.log(stock.stockData.symbol)
+        if (stock.stockData.symbol === sellStockTransaction.symbol) {
           portfolio = {
             availableFunds:
               portfolio.availableFunds +
@@ -129,6 +133,7 @@ const actions: ActionTree<any, any> = {
                 amountOwned:
                   portfolio.ownedStocks[sellStockTransaction.symbol]
                     .amountOwned - 1,
+                name: sellStockTransaction.name,
               },
             },
             portfolioWorth:
@@ -236,12 +241,14 @@ export interface firebaseStockTransaction {
   [symbol: string]: {
     symbol: string;
     amountOwned: number;
+    name: string;
   };
 }
 
 export interface newStockTransaction {
   symbol: string;
   data: stockTransactionData;
+  name: string;
 }
 
 interface stockTransactionData {
@@ -253,6 +260,7 @@ interface stockTransactionData {
 export interface stockData {
   amountOwned: number;
   symbol: string;
+  name: string;
 }
 
 interface doc {

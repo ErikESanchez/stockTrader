@@ -36,12 +36,13 @@ export default Vue.extend({
       let portfolio: UserPortfolio = store.getters["portfolio/portfolio"];
       if (portfolio.availableFunds > stock.stockData.high) {
         let boughtStockTransaction: newStockTransaction = {
-          symbol: stock.stockData.name,
+          symbol: stock.stockData.symbol,
           data: {
             priceAtTransaction: stock.stockData.high,
             amount: this.amountToBuy,
             time: new Date(),
           },
+          name:  stock.stockData.name
         };
         store.dispatch("portfolio/buyStock", boughtStockTransaction);
       }

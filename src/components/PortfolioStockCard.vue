@@ -2,7 +2,7 @@
   <div>
     <div class="card bg-dark text-white" style="margin-bottom: 5px">
       <div class="card-body text-center">
-        <h5 class="card-title">{{ stock.symbol }}</h5>
+        <h5 class="card-title">{{ stock.name }}</h5>
         <p class="card-text">Amount Of Stock Owned: {{ stock.amountOwned }}</p>
         <button class="btn btn-light rounded-pill" @click="sellStock(stock)">
           Sell Stock
@@ -20,6 +20,7 @@ import store from "../store";
 export default Vue.extend({
   props: ["stock"],
   methods: {
+    // * Need to make this work with the stock symbol instead of the name
     sellStock(stock: stockData) {
       let sellStockTransaction: newStockTransaction = {
         symbol: stock.symbol,
@@ -28,6 +29,8 @@ export default Vue.extend({
           amount: 1,
           time: new Date(),
         },
+        // * I might import the name from elsewhere 
+        name: stock.name
       };
       store.dispatch("portfolio/sellStock", sellStockTransaction);
     },

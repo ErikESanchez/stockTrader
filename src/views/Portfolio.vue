@@ -29,6 +29,7 @@ export default Vue.extend({
     portfolio() {
       let sortedOwnedStocks: any = {};
       let arraySymbols: Array<string> = [];
+      console.log(this.portfolio.ownedStocks)
       Object.keys(this.portfolio.ownedStocks).forEach((key) => {
         arraySymbols.push(key);
       });
