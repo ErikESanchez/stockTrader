@@ -16,7 +16,7 @@
           <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
-          <ul class="navbar-nav ms-auto">
+          <ul class="navbar-nav ms-auto" v-if="user.email">
             <li class="nav-item">
               <router-link to="/stocks" class="nav-link text-white">
                 Stocks
@@ -82,8 +82,8 @@
               </div>
             </ul>
           </form>
-          <form class="d-flex" v-else>
-            <ul class="navbar-nav mx-auto">
+          <form class="d-flex ms-auto" v-else>
+            <ul class="navbar-nav">
               <li class="nav-item">
                 <router-link
                   to="signin"
