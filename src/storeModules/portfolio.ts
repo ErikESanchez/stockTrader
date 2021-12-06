@@ -114,14 +114,10 @@ const actions: ActionTree<any, any> = {
     { commit, rootState, getters },
     sellStockTransaction: newStockTransaction
   ) {
-    console.log(sellStockTransaction)
-    console.log(state.portfolio.ownedStocks[sellStockTransaction.symbol].amountOwned)
-    // * No way to typecast multiple variables
     let userPortfolios: Array<UserPortfolio> = getters.userPortfolios;
     let portfolio: UserPortfolio = state.portfolio;
     if (portfolio.ownedStocks[sellStockTransaction.symbol].amountOwned >= 2) {
       rootState.marketData.formatedStocks.forEach(async (stock: any) => {
-        console.log(stock.stockData.symbol)
         if (stock.stockData.symbol === sellStockTransaction.symbol) {
           portfolio = {
             availableFunds:

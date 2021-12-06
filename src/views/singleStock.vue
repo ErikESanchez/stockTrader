@@ -14,9 +14,14 @@
             <h6 class="card-subtitle mb-2 text-white">
               {{ stockData["Time Series(Daily)"][latestDate]["2. high"] }}
             </h6>
-            <p class="card-text">
-              Shares: {{ portfolio.ownedStocks[symbol]["amountOwned"] }}
-            </p>
+            <div v-if="portfolio.ownedStocks">
+              <p
+                class="card-text"
+                v-if="portfolio.ownedStocks[symbol] !== undefined"
+              >
+                Shares: {{ portfolio.ownedStocks[symbol]["amountOwned"] }}
+              </p>
+            </div>
             <!-- ⬇ Move buying and selling functionality -->
             <button
               type="button"

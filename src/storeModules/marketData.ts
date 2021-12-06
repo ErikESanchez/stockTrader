@@ -238,6 +238,21 @@ export interface stockDataFormat {
   };
 }
 
+export interface FormatedStock {
+  symbol: string;
+  name: string;
+  description: string;
+  exchange: string;
+  country: string;
+  sector: string;
+  open: number;
+  high: number;
+  low: number;
+  close: number;
+  volume: number;
+  lastRefreshed: string;
+}
+
 interface CompanyDataResponse {
   data(): CompanyData;
 }
