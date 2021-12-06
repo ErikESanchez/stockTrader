@@ -50,6 +50,7 @@ export default Vue.extend({
 #app {
   font: 17px Poppins Helvetica, sans-serif !important;
   background: #181a1b !important;
+  color: white
 }
 html {
   font: 17px Poppins Helvetica, sans-serif !important;

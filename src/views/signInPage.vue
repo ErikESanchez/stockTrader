@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <div class="form-group">
+  <div class="container col-sm-4">
+    <div class="form-group ">
       <label for="exampleInputEmail1">Email address</label>
       <input
         type="email"

@@ -1,6 +1,5 @@
 <template>
-  <div>
-    <div>
+    <div class="container col-sm-4">
       <div class="form-group">
         <label for="exampleInputEmail1">Email address</label>
         <input
@@ -27,7 +26,6 @@
         Sign Up
       </button>
     </div>
-  </div>
 </template>
 
 <script lang="ts">
