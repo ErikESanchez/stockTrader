@@ -1,12 +1,15 @@
 <template>
   <div class="container px-2">
-    <div class="row justify-content-lg-center gx-2">
+    <div class="row justify-content-lg-center gx-2" v-if="user.email">
       <user-portfolios
         v-for="(portfolio, index) in userPortfolios"
         :key="index"
         class="col-lg-auto p-2"
         :userPortfolio="portfolio"
       />
+    </div>
+    <div v-else>
+      <img src="../assets/welcome.jpeg" class="img-fluid" alt="...">
     </div>
   </div>
 </template>
@@ -22,7 +25,12 @@ export default Vue.extend({
   components: {
     UserPortfolios,
   },
+  mounted() {
+    console.log("Bruh moments");
+    console.log(this.user);
+  },
   computed: {
+    ...mapGetters("userModule", ["user"]),
     ...mapGetters("portfolio", ["userPortfolios"]),
     ...mapGetters("userPublicData", ["profilePicturesURL"]),
   },
