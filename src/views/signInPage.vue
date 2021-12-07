@@ -1,6 +1,6 @@
 <template>
   <div class="container col-sm-4">
-    <div class="form-group ">
+    <div class="form-group">
       <label for="exampleInputEmail1">Email address</label>
       <input
         type="email"
@@ -33,12 +33,23 @@ import Vue from "vue";
 import { firebaseData } from "../firebase";
 import store from "@/store";
 import { UserInput } from "../storeModules/userModule";
+import { mapGetters } from "vuex";
+
 export default Vue.extend({
+  name: 'signin',
   data() {
     return {
       username: String(),
       password: String(),
     };
+  },
+  computed: {
+    ...mapGetters("userModule", ["user"]),
+  },
+  watch: {
+    user(event) {
+      this.$router.push('/')
+    },
   },
   methods: {
     login(username: string, password: string) {

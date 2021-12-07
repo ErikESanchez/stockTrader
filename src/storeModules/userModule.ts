@@ -21,11 +21,13 @@ const mutations: MutationTree<any> = {
 };
 
 const actions: ActionTree<any, any> = {
-  async signIn({ state }, userInput: UserInput) {
+  async signIn({ commit }, userInput: UserInput) {
     if (userInput.username !== "" && userInput.password !== "") {
       await firebaseData
         .auth()
-        .signInWithEmailAndPassword(userInput.username, userInput.password)
+        .signInWithEmailAndPassword(userInput.username, userInput.password).then((user) => {
+        commit("setUser", user);
+        })
         .catch(function (error: any) {
           console.log(error.code, error.message);
         });
