@@ -91,15 +91,16 @@ export default Vue.extend({
   methods: {
     login() {
       store.commit("userModule/setErrorMessageForAuth", null);
-      store.dispatch("userModule/signIn", this.userInput).then((successful) => {
-        ((successful: boolean) => {
+      store
+        .dispatch("userModule/signIn", this.userInput)
+        .then((successful: boolean) => {
           if (successful) {
-            let modalBackdrop =
-              document.getElementsByClassName("modal-backdrop")[0];
+            let modalBackdrop = document.getElementsByClassName(
+              "modal-backdrop"
+            )[0];
             modalBackdrop.remove();
           }
-        })
-      })
+        });
     },
   },
 });
