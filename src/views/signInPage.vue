@@ -7,7 +7,7 @@
         class="form-control"
         id="exampleInputEmail1"
         aria-describedby="emailHelp"
-        v-model.trim="username"
+        v-model.trim="userInput.username"
       />
       <small id="emailHelp" class="form-text text-muted"
         >We'll never share your email with anyone else.</small
@@ -19,49 +19,94 @@
         type="password"
         class="form-control"
         id="exampleInputPassword1"
-        v-model.trim="password"
+        v-model.trim="userInput.password"
       />
     </div>
-    <button class="btn btn-primary" @click="login(username, password)">
-      Submit
+    <!-- Button trigger modal -->
+    <button
+      type="button"
+      class="btn btn-primary"
+      data-bs-toggle="modal"
+      data-bs-target="#exampleModal"
+      @click="login()"
+    >
+      Sign In
     </button>
+    <!-- Modal -->
+    <div
+      class="modal fade"
+      id="exampleModal"
+      tabindex="-1"
+      aria-labelledby="exampleModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5
+              class="modal-title"
+              id="exampleModalLabel"
+              v-if="getErrorMessageForAuth == null"
+            >
+              Success, taking you to the money!
+            </h5>
+            <h5 class="modal-title" id="exampleModalLabel" v-else>
+              Sign Up Error!
+            </h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body" v-if="getErrorMessageForAuth != null">
+            {{ getErrorMessageForAuth }}
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
-import { firebaseData } from "../firebase";
 import store from "@/store";
 import { UserInput } from "../storeModules/userModule";
 import { mapGetters } from "vuex";
 
 export default Vue.extend({
-  name: 'signin',
+  name: "signin",
   data() {
     return {
-      username: String(),
-      password: String(),
+      userInput: {
+        username: String(),
+        password: String(),
+      },
     };
   },
   computed: {
-    ...mapGetters("userModule", ["user"]),
-  },
-  watch: {
-    user(event) {
-      this.$router.push('/')
-    },
+    ...mapGetters("userModule", ["getErrorMessageForAuth"]),
   },
   methods: {
-    login(username: string, password: string) {
-      let userInput: UserInput = {
-        username: username,
-        password: password,
-      };
-      console.log("userINput", userInput);
-      store.dispatch("userModule/signIn", userInput);
+    login() {
+      store.commit("userModule/setErrorMessageForAuth", null);
+      store.dispatch("userModule/signIn", this.userInput).then((successful) => {
+        ((successful: boolean) => {
+          if (successful) {
+            let modalBackdrop =
+              document.getElementsByClassName("modal-backdrop")[0];
+            modalBackdrop.remove();
+          }
+        })
+      })
     },
   },
 });
 </script>
 
-<style></style>
+<style>
+.modal-content {
+  background: #181a1b !important;
+}
+</style>

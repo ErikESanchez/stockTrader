@@ -6,31 +6,48 @@ import { UserPortfolio } from "./portfolio";
 
 const state: State = {
   user: Object(),
+  errorMessageForAuth: null,
 };
 
 const getters: GetterTree<any, any> = {
   user: (state: State) => {
     return state.user;
   },
+  getErrorMessageForAuth: (state: State) => {
+    return state.errorMessageForAuth
+  }
 };
 
 const mutations: MutationTree<any> = {
   setUser(state: State, user: any) {
     Vue.set(state, "user", user);
   },
+  setErrorMessageForAuth(state: State, errorMessageForAuth: any) {
+    Vue.set(state, "errorMessageForAuth", errorMessageForAuth)
+  }
 };
 
 const actions: ActionTree<any, any> = {
   async signIn({ commit }, userInput: UserInput) {
+
     if (userInput.username !== "" && userInput.password !== "") {
-      await firebaseData
+      let successful: boolean;
+      let signInCall: any = await firebaseData
         .auth()
         .signInWithEmailAndPassword(userInput.username, userInput.password).then((user) => {
-        commit("setUser", user);
+          commit("setUser", user)
+          router.push("/");
+          successful = true
+          return successful
+
         })
         .catch(function (error: any) {
-          console.log(error.code, error.message);
+          commit('setErrorMessageForAuth', error.message)
+          successful = false
+          return signInCall
+
         });
+      return signInCall
     }
   },
   async signOut({ state }) {
@@ -47,14 +64,18 @@ const actions: ActionTree<any, any> = {
   },
   async createNewUser({ commit }, userInput: UserInput) {
     if (userInput.username != "" && userInput.password != "") {
-      firebaseData
+      let successful: boolean;
+      let signUpCall = firebaseData
         .auth()
         .createUserWithEmailAndPassword(userInput.username, userInput.password)
         .catch(function (error: any) {
+          successful = false
+          commit('setErrorMessageForAuth', error.message)
           console.error(error.code, error.message);
         });
       firebaseData.auth().onAuthStateChanged(async (user: any) => {
         if (user) {
+          successful = true
           var uid = user.uid;
           console.log(uid)
           await firebaseData.firestore().collection('portfolios').doc(uid).set({
@@ -70,9 +91,11 @@ const actions: ActionTree<any, any> = {
           // ...
         }
       });
+      return signUpCall
     } else {
       // Todo: Make this a popup window in the top right, (not an alert!!)
-      console.log("Please type in a valid username and password");
+      let successful = false
+      commit('setErrorMessageForAuth', "Please type in a valid username and password")
     }
   },
   changeUserName({ state }, newUsername: string) {
@@ -103,6 +126,7 @@ const actions: ActionTree<any, any> = {
 
 interface State {
   user: Object;
+  errorMessageForAuth: any
 }
 
 export interface ScreenDimensions {
