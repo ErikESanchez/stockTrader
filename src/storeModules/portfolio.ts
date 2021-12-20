@@ -2,8 +2,7 @@ import Vue from "vue";
 import { ActionTree, GetterTree, MutationTree } from "vuex";
 import { firebaseData } from "@/firebase";
 import { Portfolio } from "@/Classes/Portfolio";
-import firebase from "firebase";
-
+import firebase from "firebase/compat/app";
 const state: State = {
   funds: Number(),
   portfolio: Object(),
@@ -100,7 +99,7 @@ const actions: ActionTree<any, any> = {
               [stockTransaction.symbol]: {
                 amountOwned: stockTransaction.data.amount,
                 symbol: stockTransaction.symbol,
-                name: stockTransaction.name
+                name: stockTransaction.name,
               },
             },
             portfolioWorth: portfolioClass.calculateBoughtPortfolioWorth(),
@@ -193,7 +192,8 @@ const actions: ActionTree<any, any> = {
           {
             availableFunds: portfolio.availableFunds,
             ownedStocks: {
-              [sellStockTransaction.symbol]: firebase.firestore.FieldValue.delete(),
+              [sellStockTransaction.symbol]:
+                firebase.firestore.FieldValue.delete(),
             },
             portfolioWorth: portfolio.portfolioWorth,
           },

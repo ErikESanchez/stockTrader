@@ -1,7 +1,8 @@
 import Vue from "vue";
+// @ts-ignore
 import { ActionTree, GetterTree, MutationTree } from "vuex";
 import { firebaseData } from "@/firebase";
-import router from '@/router'
+import router from "@/router";
 import { UserPortfolio } from "./portfolio";
 
 const state: State = {
@@ -13,9 +14,6 @@ const getters: GetterTree<any, any> = {
   user: (state: State) => {
     return state.user;
   },
-  getErrorMessageForAuth: (state: State) => {
-    return state.errorMessageForAuth
-  }
 };
 
 const mutations: MutationTree<any> = {
@@ -23,84 +21,83 @@ const mutations: MutationTree<any> = {
     Vue.set(state, "user", user);
   },
   setErrorMessageForAuth(state: State, errorMessageForAuth: any) {
-    Vue.set(state, "errorMessageForAuth", errorMessageForAuth)
-  }
+    Vue.set(state, "errorMessageForAuth", errorMessageForAuth);
+  },
 };
 
 const actions: ActionTree<any, any> = {
-  async signIn({ commit }, userInput: UserInput) {
-
+  async signIn({ commit }: { commit: Function }, userInput: UserInput) {
     if (userInput.username !== "" && userInput.password !== "") {
-      let successful: boolean;
-      let signInCall: any = await firebaseData
-        .auth()
-        .signInWithEmailAndPassword(userInput.username, userInput.password).then((user) => {
-          commit("setUser", user)
-          router.push("/");
-          successful = true
-          return successful
-
-        })
-        .catch(function (error: any) {
-          commit('setErrorMessageForAuth', error.message)
-          successful = false
-          return signInCall
-
-        });
-      return signInCall
+      new Promise((resolve, reject) => {
+        firebaseData
+          .auth()
+          .signInWithEmailAndPassword(userInput.username, userInput.password)
+          .then((user) => {
+            commit("setUser", user);
+            router.push("/");
+            return resolve(resolve);
+          })
+          .catch(function (error: any) {
+            return reject(error.message);
+          });
+      });
     }
   },
-  async signOut({ state }) {
+  async signOut({ state }: { state: State }) {
     firebaseData
       .auth()
       .signOut()
       .then(() => {
-        console.log("Signed Out");
+        // console.log("Signed Out");
+        Vue.set(state, "user", Object());
         state.user = Object();
       })
       .catch(function (error: any) {
-        console.log("Oops... an error occured", error);
+        // console.log("Oops... an error occured", error);
       });
   },
-  async createNewUser({ commit }, userInput: UserInput) {
+  async createNewUser({ commit }: { commit: Function }, userInput: UserInput) {
     if (userInput.username != "" && userInput.password != "") {
-      let successful: boolean;
-      let signUpCall = firebaseData
-        .auth()
-        .createUserWithEmailAndPassword(userInput.username, userInput.password)
-        .catch(function (error: any) {
-          successful = false
-          commit('setErrorMessageForAuth', error.message)
-          console.error(error.code, error.message);
-        });
-      firebaseData.auth().onAuthStateChanged(async (user: any) => {
-        if (user) {
-          successful = true
-          var uid = user.uid;
-          console.log(uid)
-          await firebaseData.firestore().collection('portfolios').doc(uid).set({
-            availableFunds: 10000,
-            name: userInput.username,
-            ownedStocks: {},
-            portfolioWorth: 0,
-            photoURL: ""
+      new Promise((resolve, reject) => {
+        firebaseData
+          .auth()
+          .createUserWithEmailAndPassword(
+            userInput.username,
+            userInput.password
+          )
+          .then(() => {
+            return resolve("resolve");
           })
-          router.push('/')
-        } else {
-          // User is signed out
-          // ...
-        }
+          .catch(function (error: any) {
+            // console.error(error.code, error.message);
+            return reject(error.message);
+          });
+      }).then(() => {
+        firebaseData.auth().onAuthStateChanged(async (user: any) => {
+          if (user) {
+            var uid = user.uid;
+            await firebaseData
+              .firestore()
+              .collection("portfolios")
+              .doc(uid)
+              .set({
+                availableFunds: 10000,
+                name: userInput.username,
+                ownedStocks: {},
+                portfolioWorth: 0,
+                photoURL: "",
+              });
+            router.push("/");
+          }
+        });
+        return Promise.resolve();
       });
-      return signUpCall
-    } else {
-      // Todo: Make this a popup window in the top right, (not an alert!!)
-      let successful = false
-      commit('setErrorMessageForAuth', "Please type in a valid username and password")
     }
   },
-  changeUserName({ state }, newUsername: string) {
-    state.user.displayName = newUsername
+  changeUserName({ state }: { state: State }, newUsername: string) {
+    state.user.displayName = newUsername;
     state.user
+      // @ts-ignore
       .updateProfile({
         displayName: newUsername,
       })
@@ -112,26 +109,33 @@ const actions: ActionTree<any, any> = {
         // An error happened.
       });
   },
-  changeUserPicture({ state }, userLink: string) {
-    state.user.photoURL = userLink
-    state.user.updateProfile({
-      photoURL: userLink
-    }).then(function () {
-      // Update succcessful
-    }).catch(function (error: any) {
-      console.error(error)
-    })
-  }
+  changeUserPicture({ state }: { state: State }, userLink: string) {
+    state.user.photoURL = userLink;
+    state.user
+      // @ts-ignore
+      .updateProfile({
+        photoURL: userLink,
+      })
+      .then(function () {
+        // Update succcessful
+      })
+      .catch(function (error: any) {
+        console.error(error);
+      });
+  },
 };
 
 interface State {
-  user: Object;
-  errorMessageForAuth: any
+  user: {
+    displayName: string;
+    photoURL: string;
+  };
+  errorMessageForAuth: any;
 }
 
 export interface ScreenDimensions {
   width: number;
-  height?: number
+  height?: number;
 }
 
 export interface UserInput {

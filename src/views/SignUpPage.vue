@@ -45,7 +45,7 @@
             <h5
               class="modal-title"
               id="exampleModalLabel"
-              v-if="getErrorMessageForAuth === null"
+              v-if="errorMessage === ''"
             >
               Success, taking you to the money!
             </h5>
@@ -59,8 +59,8 @@
               aria-label="Close"
             ></button>
           </div>
-          <div class="modal-body" v-if="getErrorMessageForAuth !== null">
-            {{ getErrorMessageForAuth }}
+          <div class="modal-body" v-if="errorMessage !== ''">
+            {{ errorMessage }}
           </div>
           <div class="modal-footer"></div>
         </div>
@@ -81,22 +81,20 @@ export default Vue.extend({
         username: String(),
         password: String(),
       },
+      errorMessage: String(),
     };
   },
-  computed: {
-    ...mapGetters("userModule", ["getErrorMessageForAuth"]),
-  },
   methods: {
-    createNewUser() {
-      store.commit("userModule/setErrorMessageForAuth", null);
-      store
+    async createNewUser() {
+      await store
         .dispatch("userModule/createNewUser", this.userInput)
-        .then((successful: boolean) => {
-          if (successful) {
-            let modalBackdrop =
-              document.getElementsByClassName("modal-backdrop")[0];
-            modalBackdrop.remove();
-          }
+        .then(() => {
+          let modalBackdrop =
+            document.getElementsByClassName("modal-backdrop")[0];
+          modalBackdrop.remove();
+        })
+        .catch((error) => {
+          this.errorMessage = error;
         });
     },
   },
