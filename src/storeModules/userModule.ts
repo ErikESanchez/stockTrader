@@ -5,8 +5,10 @@ import {
   getAuth,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
+  signOut,
 } from "firebase/auth";
 import router from "@/router";
+import { auth } from "@/firebase";
 
 const state: State = {
   user: Object(),
@@ -27,8 +29,6 @@ const mutations: MutationTree<any> = {
 const actions: ActionTree<any, any> = {
   async signIn({ commit, getters }, userInput: UserInput) {
     if (userInput.username !== "" && userInput.password !== "") {
-      const auth = getAuth();
-      console.log("auth", auth);
       new Promise((resolve, reject) => {
         signInWithEmailAndPassword(auth, userInput.username, userInput.password)
           .then((userCredential) => {
@@ -43,13 +43,10 @@ const actions: ActionTree<any, any> = {
     }
   },
   async signOut({ state }: { state: State }) {
-    firebaseData
-      .auth()
-      .signOut()
+    signOut(auth)
       .then(() => {
         // console.log("Signed Out");
         Vue.set(state, "user", Object());
-        state.user = Object();
       })
       .catch(function (error: any) {
         // console.log("Oops... an error occured", error);
