@@ -2,10 +2,10 @@ import Vue from "vue";
 // @ts-ignore
 import { ActionTree, GetterTree, MutationTree } from "vuex";
 import {
-  getAuth,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signOut,
+  updateProfile,
 } from "firebase/auth";
 import router from "@/router";
 import { auth } from "@/firebase";
@@ -27,7 +27,7 @@ const mutations: MutationTree<any> = {
 };
 
 const actions: ActionTree<any, any> = {
-  async signIn({ commit, getters }, userInput: UserInput) {
+  async signIn({ commit }, userInput: UserInput) {
     if (userInput.username !== "" && userInput.password !== "") {
       return new Promise((resolve, reject) => {
         signInWithEmailAndPassword(auth, userInput.username, userInput.password)
@@ -64,34 +64,36 @@ const actions: ActionTree<any, any> = {
       });
     }
   },
-  changeUserName({ state }: { state: State }, newUsername: string) {
-    state.user.displayName = newUsername;
-    state.user
-      // @ts-ignore
-      .updateProfile({
+  changeUserName({ state }, newUsername: string) {
+    if (auth.currentUser) {
+      updateProfile(auth.currentUser, {
         displayName: newUsername,
       })
-      .then(function () {
-        // Update successful.
-      })
-      .catch(function (error: any) {
-        console.error(error);
-        // An error happened.
-      });
+        .then(function () {
+          // Update successful.
+        })
+        .catch(function (error: any) {
+          console.error(error);
+          // An error happened.
+        });
+    }
   },
-  changeUserPicture({ state }: { state: State }, userLink: string) {
-    state.user.photoURL = userLink;
-    state.user
-      // @ts-ignore
-      .updateProfile({
+  changeUserPicture({ state, getters }, userLink: string) {
+    if(auth.currentUser){
+      console.log(userLink)
+      updateProfile(auth.currentUser, {
+        // ? Isn't changing or updating photoURL firebase-side
         photoURL: userLink,
       })
       .then(function () {
+        console.log('bruh')
         // Update succcessful
       })
       .catch(function (error: any) {
         console.error(error);
       });
+    }
+    
   },
 };
 
