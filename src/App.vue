@@ -37,6 +37,7 @@ export default Vue.extend({
       if (user) {
         store.commit("userModule/setUser", user);
         await store.dispatch("portfolio/getAllDBPortfolios", user.uid);
+        await store.dispatch("marketData/getDatabaseDailyData")
       } else {
         // user is signed out
       }
