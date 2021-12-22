@@ -1,65 +1,76 @@
-import { firebaseData } from "@/firebase";
-import store from "@/store";
+import { initializeApp } from "firebase/app";
+
+const app = initializeApp({
+  apiKey: "AIzaSyCOR6Tbv6KkHGejJVPGYiGbWM8Av4m42nk",
+  authDomain: "stock-trader-fa865.firebaseapp.com",
+  databaseURL: "https://stock-trader-fa865.firebaseio.com",
+  projectId: "stock-trader-fa865",
+  storageBucket: "stock-trader-fa865.appspot.com",
+  messagingSenderId: "502197568222",
+  appId: "1:502197568222:web:fdce89b9bb9cf526d8b84f",
+  measurementId: "G-CGXD9V37XZ",
+});
+
+const db = getFirestore(app);
+
 // import { apikey } from "@/apikey";
 import moment from "moment";
 
+import {
+  getFirestore,
+  collection,
+  getDocs,
+  query,
+} from "firebase/firestore/lite";
 export class MarketData {
   async getDatabaseDailyData() {
     // TODO: Figure out how to use an interface and to be able dynamically name a variable
     let stockData: stockData = Object();
     let formatedDateOfMonth: string = moment(moment()).format("YYYY-MM");
+    let stocksCollection = collection(db, "stocks");
+    let stocksSnap = await getDocs(stocksCollection);
+    const stocksList = stocksSnap.docs.map((doc: doc) => {
+      stockData[doc.id] = {
+        "metaData(Daily)": doc.data()["metaData(Daily)"],
+      };
+    });
+    console.log(stockData);
+
     // * Bruh, this is all I had to do, to wait
-    await Promise.resolve(
-      firebaseData
-        .firestore()
-        .collection("stocks")
-        .get()
-        .then(function(querySnapshot) {
-          querySnapshot.forEach((doc: doc) => {
-            // console.log(doc.id, "=>", doc.data());
-            stockData[doc.id] = {
-              "metaData(Daily)": doc.data()["metaData(Daily)"],
-            };
-            return stockData;
-          });
-        })
-        .catch(function(error) {
-          console.error("Error getting documents", error);
-        })
-    );
-    await Promise.resolve(
-      Object.keys(stockData).forEach(
-        (symbol: string, key: number, arr: any) => {
-          return firebaseData
-            .firestore()
-            .collection("stocks")
-            .doc(symbol)
-            .collection("Time Series(Daily)")
-            .doc(formatedDateOfMonth)
-            .get()
-            .then(function(doc: doc) {
-              if (
-                doc.exists &&
-                stockData[symbol]["timeSeriesData"] === undefined
-              ) {
-                stockData[symbol]["timeSeriesData"] = doc.data().priceData;
-                if (Object.is(arr.length - 1, key)) {
-                  console.log(
-                    `Last callback call at ${key} with value ${symbol}`
-                  );
-                  store.commit("formatDatabaseData", stockData);
-                }
-                // ? Might not be the best place to put this
-              } else {
-                console.log("Document doesn't exist");
-              }
-            })
-            .catch(function(error) {
-              console.error("Error getting document:", error);
-            });
-        }
-      )
-    );
+
+    // await Promise.resolve(
+    //   Object.keys(stockData).forEach(
+    //     (symbol: string, key: number, arr: any) => {
+    //       return firebaseData
+    //         .firestore()
+    //         .collection("stocks")
+    //         .doc(symbol)
+    //         .collection("Time Series(Daily)")
+    //         .doc(formatedDateOfMonth)
+    //         .get()
+    //         .then(function(doc: doc) {
+    //           if (
+    //             doc.exists &&
+    //             stockData[symbol]["timeSeriesData"] === undefined
+    //           ) {
+    //             stockData[symbol]["timeSeriesData"] = doc.data().priceData;
+    //             if (Object.is(arr.length - 1, key)) {
+    //               console.log(
+    //                 `Last callback call at ${key} with value ${symbol}`
+    //               );
+    //               store.commit("formatDatabaseData", stockData);
+    //             }
+    //             // ? Might not be the best place to put this
+    //           } else {
+    //             console.log("Document doesn't exist");
+    //           }
+    //         })
+    //         .catch(function(error) {
+    //           console.error("Error getting document:", error);
+    //         });
+    //     }
+    //   )
+    // );
   }
 }
 

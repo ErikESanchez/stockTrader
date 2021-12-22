@@ -1,7 +1,23 @@
-import Vue from "vue";
 import { ActionTree, GetterTree, MutationTree } from "vuex";
-import * as firebase from "@/firebase";
 import moment from "moment";
+import {
+  getFirestore,
+  collection,
+  getDocs,
+  query,
+} from "firebase/firestore/lite";
+import { initializeApp } from "firebase/app";
+const app = initializeApp({
+  apiKey: "AIzaSyCOR6Tbv6KkHGejJVPGYiGbWM8Av4m42nk",
+  authDomain: "stock-trader-fa865.firebaseapp.com",
+  databaseURL: "https://stock-trader-fa865.firebaseio.com",
+  projectId: "stock-trader-fa865",
+  storageBucket: "stock-trader-fa865.appspot.com",
+  messagingSenderId: "502197568222",
+  appId: "1:502197568222:web:fdce89b9bb9cf526d8b84f",
+  measurementId: "G-CGXD9V37XZ",
+});
+const db = getFirestore(app);
 
 const state: State = {
   monthStockData: [],
@@ -83,88 +99,12 @@ export const actions: ActionTree<any, any> = {
   async getDatabaseDailyData({ commit }) {
     // TODO: Figure out how to use an interface and to be able dynamically name a variable
     let stockData: StockDataSymbol = Object();
-    await firebaseData
-      .firestore()
-      .collection("stocks")
-      .get()
-      .then(function (querySnapshot: any) {
-        querySnapshot.forEach((companyDataResponse: CompanyDataResponse) => {
-          if (companyDataResponse.data()) {
-            let companyData: CompanyData = companyDataResponse.data();
-            let name: string = companyData["Company Overview"]["Name"];
-            stockData[name] = {
-              ["Meta Data"]: companyData["Meta Data(Daily)"],
-              ["Company Overview"]: companyData["Company Overview"],
-              ["Time Series(Daily)"]: {},
-            };
-            return stockData;
-          } else {
-            return undefined;
-          }
-        });
-      })
-      .catch(function (error: any) {
-        console.error("Error getting documents", error);
-      });
-    let currentMonth: string = moment(new Date()).format("YYYY-MM");
-    let lastMonth: string = moment(
-      new Date().setMonth(new Date().getMonth() - 1)
-    ).format("YYYY-MM");
-    Object.keys(stockData).forEach(async (name: string) => {
-      let symbol: string = stockData[name]["Meta Data"]["2. Symbol"];
-      await firebaseData
-        .firestore()
-        .collection("stocks")
-        .doc(symbol)
-        .collection("Time Series(Daily)")
-        .doc(currentMonth)
-        .get()
-        .then((TimeSeriesDailyData) => {
-          if (TimeSeriesDailyData.data() as TimeSeriesDailyDataResponse) {
-            let TimeSeriesDaily: TimeSeriesDailyData =
-              TimeSeriesDailyData.data() as TimeSeriesDailyData;
-            stockData[name]["Time Series(Daily)"] = TimeSeriesDaily;
-          } else {
-            console.log("This document doesn't exist");
-          }
-        })
-        .catch(function (error: any) {
-          console.error("Error getting document:", error);
-        });
+    let stocksCollection = collection(db, "stocks");
+    let stocksSnap = await getDocs(stocksCollection);
+    const stocksList = stocksSnap.docs.map((doc) => {
+      doc.data();
     });
-    if (
-      Object.keys(stockData[Object.keys(stockData)[0]]["Time Series(Daily)"])
-        .length < 30
-    ) {
-      Object.keys(stockData).forEach(
-        async (name: string, index: number, nameArray: Array<string>) => {
-          let symbol: string = stockData[name]["Meta Data"]["2. Symbol"];
-          await firebaseData
-            .firestore()
-            .collection("stocks")
-            .doc(symbol)
-            .collection("Time Series(Daily)")
-            .doc(lastMonth)
-            .get()
-            .then((TimeSeriesDailyData) => {
-              if (TimeSeriesDailyData.data() as TimeSeriesDailyData) {
-                let TimeSeriesDailyPreviousMonth: TimeSeriesDailyData =
-                  TimeSeriesDailyData.data() as TimeSeriesDailyData;
-                stockData[name]["Time Series(Daily)"] = Object.assign(
-                  TimeSeriesDailyPreviousMonth,
-                  stockData[name]["Time Series(Daily)"]
-                );
-              } else {
-                console.log("This document doesn't exist");
-              }
-            });
-          if (nameArray.length === index + 1) {
-            commit("setAllStockData", stockData);
-            commit("formatDatabaseData", stockData);
-          }
-        }
-      );
-    }
+    return Promise.resolve(stocksList);
   },
 };
 
