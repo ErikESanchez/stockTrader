@@ -3,7 +3,6 @@ import { ActionTree, GetterTree, MutationTree } from "vuex";
 import { firestore } from "@/firebase";
 import { collection, getDocs } from "firebase/firestore";
 const state: State = {
-  funds: Number(),
   portfolio: Object(),
   userPortfolios: [],
   uid: String(),
@@ -228,7 +227,6 @@ const actions: ActionTree<any, any> = {
 };
 
 interface State {
-  funds: number;
   portfolio: UserPortfolio;
   userPortfolios: Object;
   uid: string;

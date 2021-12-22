@@ -51,7 +51,6 @@ const mutations: MutationTree<any> = {
 
 export const actions: ActionTree<any, any> = {
   async getDatabaseDailyData({ commit }) {
-    // TODO: Figure out how to use an interface and to be able dynamically name a variable
     let stockData: StockDataSymbol = {};
     const stocksSnapshotInfo = await getDocs(collection(firestore, "stocks"));
     stocksSnapshotInfo.forEach((stockInfo) => {

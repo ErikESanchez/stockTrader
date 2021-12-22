@@ -23,21 +23,11 @@ export default Vue.extend({
     Navbar,
   },
   async mounted() {
-    // if (this.formatedStocks[0] === undefined) {
-    // await store
-    //   .dispatch("marketData/getDatabaseDailyData")
-    //   .then((res) => {
-    //     console.log(res);
-    //   })
-    //   .catch((err) => {
-    //     console.error(err);
-    //   });
-    // }
     onAuthStateChanged(auth, async (user) => {
       if (user) {
         store.commit("userModule/setUser", user);
         await store.dispatch("portfolio/getAllDBPortfolios", user.uid);
-        await store.dispatch("marketData/getDatabaseDailyData")
+        await store.dispatch("marketData/getDatabaseDailyData");
       } else {
         // user is signed out
       }
