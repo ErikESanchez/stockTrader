@@ -29,7 +29,7 @@ const mutations: MutationTree<any> = {
 const actions: ActionTree<any, any> = {
   async signIn({ commit, getters }, userInput: UserInput) {
     if (userInput.username !== "" && userInput.password !== "") {
-      new Promise((resolve, reject) => {
+      return new Promise((resolve, reject) => {
         signInWithEmailAndPassword(auth, userInput.username, userInput.password)
           .then((userCredential) => {
             commit("setUser", userCredential.user);
@@ -37,42 +37,32 @@ const actions: ActionTree<any, any> = {
             return resolve(resolve);
           })
           .catch(function (error: any) {
-            return reject(error.message);
+            // console.log(error.code, error.message);
+            return reject(error.code);
           });
       });
     }
   },
-  async signOut({ state }: { state: State }) {
+  async signOut({ commit }) {
     signOut(auth)
       .then(() => {
-        // console.log("Signed Out");
-        Vue.set(state, "user", Object());
+        commit("setUser", Object());
       })
-      .catch(function (error: any) {
-        // console.log("Oops... an error occured", error);
-      });
+      .catch(function (error: any) {});
   },
-  async createNewUser({ commit }: { commit: Function }, userInput: UserInput) {
-    if (userInput.username != "" && userInput.password != "") {
-      new Promise((resolve, reject) => {}).then(() => {});
-      let suc = true;
-      const auth = getAuth();
-      await createUserWithEmailAndPassword(
-        auth,
-        userInput.username,
-        userInput.password
-      )
-        .then(() => {
-          console.log("IT WORKED");
-        })
-        .catch((error: any) => {
-          suc = false;
-        });
-
-      if (suc) return Promise.resolve("KEKW");
-      return Promise.reject("KEKK WWWW");
+  async createNewUser({ commit }, input: UserInput) {
+    if (input.username != "" && input.password != "") {
+      return new Promise((resolve, reject) => {
+        createUserWithEmailAndPassword(auth, input.username, input.password)
+          .then(() => {
+            router.push("/");
+            return resolve(resolve);
+          })
+          .catch((error: any) => {
+            return reject(error);
+          });
+      });
     }
-    return Promise.reject("KEKK WWWW");
   },
   changeUserName({ state }: { state: State }, newUsername: string) {
     state.user.displayName = newUsername;
