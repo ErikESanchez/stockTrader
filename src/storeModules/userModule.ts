@@ -1,17 +1,19 @@
 import Vue from "vue";
 // @ts-ignore
 import { ActionTree, GetterTree, MutationTree } from "vuex";
-import { firebaseData } from "@/firebase";
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+} from "firebase/auth";
 import router from "@/router";
-import { UserPortfolio } from "./portfolio";
 
 const state: State = {
   user: Object(),
-  errorMessageForAuth: null,
 };
 
 const getters: GetterTree<any, any> = {
-  user: (state: State) => {
+  getUser: (state: State) => {
     return state.user;
   },
 };
@@ -20,20 +22,20 @@ const mutations: MutationTree<any> = {
   setUser(state: State, user: any) {
     Vue.set(state, "user", user);
   },
-  setErrorMessageForAuth(state: State, errorMessageForAuth: any) {
-    Vue.set(state, "errorMessageForAuth", errorMessageForAuth);
-  },
 };
 
 const actions: ActionTree<any, any> = {
-  async signIn({ commit }: { commit: Function }, userInput: UserInput) {
+  async signIn(
+    { commit, getters }: { commit: Function; getters: Getters },
+    userInput: UserInput
+  ) {
     if (userInput.username !== "" && userInput.password !== "") {
+      const auth = getAuth()
+      console.log("auth", auth);
       new Promise((resolve, reject) => {
-        firebaseData
-          .auth()
-          .signInWithEmailAndPassword(userInput.username, userInput.password)
-          .then((user) => {
-            commit("setUser", user);
+        signInWithEmailAndPassword(auth, userInput.username, userInput.password)
+          .then((userCredential) => {
+            commit("setUser", userCredential.user);
             router.push("/");
             return resolve(resolve);
           })
@@ -130,7 +132,10 @@ interface State {
     displayName: string;
     photoURL: string;
   };
-  errorMessageForAuth: any;
+}
+
+interface Getters {
+  getUser(): string;
 }
 
 export interface ScreenDimensions {

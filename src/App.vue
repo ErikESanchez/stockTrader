@@ -12,13 +12,11 @@
 <script lang="ts">
 import Vue from "vue";
 import Navbar from "./components/Navbar.vue";
-import { firebaseData } from "@/firebase";
+import auth from "@/firebase";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 import store from "@/store";
 import { mapGetters } from "vuex";
-import { ScreenDimensions } from "./storeModules/userModule";
 // Todo: Create type definiton!
-// @ts-ignore
-import { debounce } from "debounce";
 export default Vue.extend({
   name: "App",
   components: {
@@ -28,7 +26,8 @@ export default Vue.extend({
     if (this.formatedStocks[0] === undefined) {
       await store.dispatch("marketData/getDatabaseDailyData");
     }
-    firebaseData.auth().onAuthStateChanged(async (user) => {
+    onAuthStateChanged(auth, async (user) => {
+      console.log('bruh')
       if (user) {
         store.commit("userModule/setUser", user);
         await store.dispatch("portfolio/getAllDBPortfolios", user.uid);
@@ -50,7 +49,7 @@ export default Vue.extend({
 #app {
   font: 17px Poppins Helvetica, sans-serif !important;
   background: #181a1b !important;
-  color: white
+  color: white;
 }
 html {
   font: 17px Poppins Helvetica, sans-serif !important;

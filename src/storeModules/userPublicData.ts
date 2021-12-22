@@ -31,7 +31,7 @@ const actions: ActionTree<any, any> = {
     async uploadUserPicture({ rootGetters, dispatch }, userPicture) {
         let user = rootGetters["userModule/user"];
         let email: string = user.email
-        let uid: string = rootGetters["userModule/user"].uid
+        let uid: string = rootGetters["userModule/getUser"].uid
         let userPortfolio: UserPortfolio = rootGetters['portfolio/portfolio']
         await firebaseData.storage().ref(`userProfileImages/${email}`).put(userPicture).then(async snapshot => {
             let url: string = await snapshot.ref.getDownloadURL()
@@ -44,7 +44,7 @@ const actions: ActionTree<any, any> = {
 
     },
     async downloadUserPictures({ rootGetters, commit }, userPortfolios: Array<UserPortfolio>) {
-        let currentUserEmail: string = rootGetters['userModule/user'].email
+        let currentUserEmail: string = rootGetters['userModule/getUser'].email
         let userPictures: Array<UserPictures> = []
         let listOfUsersWithPictures: Array<string> = []
         await firebaseData.storage().ref('userProfileImages').listAll().then(files => {

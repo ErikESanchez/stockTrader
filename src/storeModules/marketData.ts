@@ -1,6 +1,6 @@
 import Vue from "vue";
 import { ActionTree, GetterTree, MutationTree } from "vuex";
-import { firebaseData } from "../firebase";
+import * as firebase from "@/firebase";
 import moment from "moment";
 
 const state: State = {
@@ -87,7 +87,7 @@ export const actions: ActionTree<any, any> = {
       .firestore()
       .collection("stocks")
       .get()
-      .then(function(querySnapshot: any) {
+      .then(function (querySnapshot: any) {
         querySnapshot.forEach((companyDataResponse: CompanyDataResponse) => {
           if (companyDataResponse.data()) {
             let companyData: CompanyData = companyDataResponse.data();
@@ -103,7 +103,7 @@ export const actions: ActionTree<any, any> = {
           }
         });
       })
-      .catch(function(error: any) {
+      .catch(function (error: any) {
         console.error("Error getting documents", error);
       });
     let currentMonth: string = moment(new Date()).format("YYYY-MM");
@@ -121,13 +121,14 @@ export const actions: ActionTree<any, any> = {
         .get()
         .then((TimeSeriesDailyData) => {
           if (TimeSeriesDailyData.data() as TimeSeriesDailyDataResponse) {
-            let TimeSeriesDaily: TimeSeriesDailyData = TimeSeriesDailyData.data() as TimeSeriesDailyData;
+            let TimeSeriesDaily: TimeSeriesDailyData =
+              TimeSeriesDailyData.data() as TimeSeriesDailyData;
             stockData[name]["Time Series(Daily)"] = TimeSeriesDaily;
           } else {
             console.log("This document doesn't exist");
           }
         })
-        .catch(function(error: any) {
+        .catch(function (error: any) {
           console.error("Error getting document:", error);
         });
     });
@@ -147,7 +148,8 @@ export const actions: ActionTree<any, any> = {
             .get()
             .then((TimeSeriesDailyData) => {
               if (TimeSeriesDailyData.data() as TimeSeriesDailyData) {
-                let TimeSeriesDailyPreviousMonth: TimeSeriesDailyData = TimeSeriesDailyData.data() as TimeSeriesDailyData;
+                let TimeSeriesDailyPreviousMonth: TimeSeriesDailyData =
+                  TimeSeriesDailyData.data() as TimeSeriesDailyData;
                 stockData[name]["Time Series(Daily)"] = Object.assign(
                   TimeSeriesDailyPreviousMonth,
                   stockData[name]["Time Series(Daily)"]

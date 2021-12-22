@@ -1,6 +1,12 @@
-import firebase from 'firebase/compat/app'
+import fb from "firebase/compat/app";
+import { initializeApp } from "firebase/app";
+import { getFirestore } from "firebase/firestore";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
+import "firebase/compat/firestore";
+import "firebase/compat/auth";
+
 // Your web app's Firebase configuration
-let firebaseConfig = {
+const firebaseConfig = {
   apiKey: "AIzaSyCOR6Tbv6KkHGejJVPGYiGbWM8Av4m42nk",
   authDomain: "stock-trader-fa865.firebaseapp.com",
   databaseURL: "https://stock-trader-fa865.firebaseio.com",
@@ -11,7 +17,8 @@ let firebaseConfig = {
   measurementId: "G-CGXD9V37XZ",
 };
 
-
+const app = initializeApp(firebaseConfig);
+// const firestore = getFirestore(app);
+// const auth = getAuth();
+export default {};
 // Initialize Firebase
-let firebaseData = firebase.initializeApp(firebaseConfig);
-export { firebaseData };

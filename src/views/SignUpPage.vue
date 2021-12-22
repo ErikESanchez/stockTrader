@@ -71,9 +71,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { firebaseData } from "../firebase";
 import store from "@/store";
-import { mapGetters } from "vuex";
 export default Vue.extend({
   data() {
     return {

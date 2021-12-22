@@ -2,7 +2,7 @@ import Vue from "vue";
 import { ActionTree, GetterTree, MutationTree } from "vuex";
 import { firebaseData } from "@/firebase";
 import { Portfolio } from "@/Classes/Portfolio";
-import firebase from "firebase/compat/app";
+import firebase from "firebase/app";
 const state: State = {
   funds: Number(),
   portfolio: Object(),
