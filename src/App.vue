@@ -13,7 +13,7 @@
 import Vue from "vue";
 import Navbar from "./components/Navbar.vue";
 import auth from "@/firebase";
-import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { onAuthStateChanged } from "firebase/auth";
 import store from "@/store";
 import { mapGetters } from "vuex";
 // Todo: Create type definiton!
@@ -27,7 +27,7 @@ export default Vue.extend({
       await store.dispatch("marketData/getDatabaseDailyData");
     }
     onAuthStateChanged(auth, async (user) => {
-      console.log('bruh')
+      console.log("bruh");
       if (user) {
         store.commit("userModule/setUser", user);
         await store.dispatch("portfolio/getAllDBPortfolios", user.uid);

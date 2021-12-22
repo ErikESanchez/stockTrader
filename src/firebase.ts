@@ -1,4 +1,4 @@
-import fb from "firebase/compat/app";
+// import fb from "firebase/compat/app";
 import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
@@ -18,7 +18,9 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
-// const firestore = getFirestore(app);
-// const auth = getAuth();
-export default {};
+
+const firestore = getFirestore(app);
+const auth = getAuth();
+
+export default { firestore, auth };
 // Initialize Firebase
