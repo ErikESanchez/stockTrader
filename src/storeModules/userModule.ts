@@ -7,7 +7,6 @@ import {
   signInWithEmailAndPassword,
 } from "firebase/auth";
 import router from "@/router";
-import { getUA } from "firebase/node_modules/@firebase/util";
 
 const state: State = {
   user: Object(),
@@ -37,7 +36,7 @@ const actions: ActionTree<any, any> = {
             router.push("/");
             return resolve(resolve);
           })
-          .catch(function(error: any) {
+          .catch(function (error: any) {
             return reject(error.message);
           });
       });
@@ -52,7 +51,7 @@ const actions: ActionTree<any, any> = {
         Vue.set(state, "user", Object());
         state.user = Object();
       })
-      .catch(function(error: any) {
+      .catch(function (error: any) {
         // console.log("Oops... an error occured", error);
       });
   },
@@ -85,10 +84,10 @@ const actions: ActionTree<any, any> = {
       .updateProfile({
         displayName: newUsername,
       })
-      .then(function() {
+      .then(function () {
         // Update successful.
       })
-      .catch(function(error: any) {
+      .catch(function (error: any) {
         console.error(error);
         // An error happened.
       });
@@ -100,10 +99,10 @@ const actions: ActionTree<any, any> = {
       .updateProfile({
         photoURL: userLink,
       })
-      .then(function() {
+      .then(function () {
         // Update succcessful
       })
-      .catch(function(error: any) {
+      .catch(function (error: any) {
         console.error(error);
       });
   },

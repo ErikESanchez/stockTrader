@@ -14,23 +14,35 @@ import Vue from "vue";
 import Navbar from "./components/Navbar.vue";
 import store from "@/store";
 import { mapGetters } from "vuex";
-// Todo: Create type definiton!
+import { auth } from "@/firebase";
+import { onAuthStateChanged } from "@firebase/auth";
+
 export default Vue.extend({
   name: "App",
   components: {
     Navbar,
   },
   async mounted() {
-    if (this.formatedStocks[0] === undefined) {
-      await store
-        .dispatch("marketData/getDatabaseDailyData")
-        .then((res) => {
-          console.log(res);
-        })
-        .catch((err) => {
-          console.error(err);
-        });
-    }
+    // if (this.formatedStocks[0] === undefined) {
+    // await store
+    //   .dispatch("marketData/getDatabaseDailyData")
+    //   .then((res) => {
+    //     console.log(res);
+    //   })
+    //   .catch((err) => {
+    //     console.error(err);
+    //   });
+    // }
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        store.commit("userModule/setUser", user);
+        await store.dispatch("portfolio/getAllDBPortfolios", user.uid);
+        // let userPortfolios = store.getters["portfolio/userPortfolios"];
+        // store.dispatch("userPublicData/downloadUserPictures", userPortfolios);
+      } else {
+        // user is signed out
+      }
+    });
   },
   computed: mapGetters({ formatedStocks: "marketData/formatedStocks" }),
 });

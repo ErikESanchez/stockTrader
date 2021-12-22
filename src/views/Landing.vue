@@ -9,7 +9,7 @@
       />
     </div>
     <div v-else>
-      <img src="../assets/welcome.jpeg" class="img-fluid" alt="...">
+      <img src="../assets/welcome.jpeg" class="img-fluid" alt="..." />
     </div>
   </div>
 </template>
@@ -17,22 +17,19 @@
 <script lang="ts">
 import Vue from "vue";
 import UserPortfolios from "@/components/UserPortfolios.vue";
-import { UserPortfolio } from "@/storeModules/portfolio";
 import { mapGetters } from "vuex";
-import { UserPictures } from "@/storeModules/userPublicData";
 export default Vue.extend({
   name: "landing",
   components: {
     UserPortfolios,
   },
   mounted() {
-    console.log("Bruh moments");
-    console.log(this.user);
+    console.log(this.userPortfolios);
   },
   computed: {
     ...mapGetters("userModule", ["user"]),
     ...mapGetters("portfolio", ["userPortfolios"]),
-    ...mapGetters("userPublicData", ["profilePicturesURL"]),
+    // ...mapGetters("userPublicData", ["profilePicturesURL"]),
   },
 });
 </script>

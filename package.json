@@ -10,7 +10,7 @@
   "dependencies": {
     "@babel/compat-data": "^7.8.0",
     "@babel/runtime": "^7.10.4",
-    "@firebase/firestore": "^2.3.7",
+    "@firebase/firestore": "^3.4.1",
     "@popperjs/core": "^2.11.0",
     "@types/async": "^3.2.1",
     "@types/moment": "^2.13.0",
@@ -35,7 +35,6 @@
     "popper.js": "^1.16.1",
     "sass": "^1.44.0",
     "trim-newlines": "^4.0.2",
-    "v-click-outside": "^3.1.2",
     "vue": "^2.6.12",
     "vue-apexcharts": "^1.6.1",
     "vue-router": "^3.1.6",

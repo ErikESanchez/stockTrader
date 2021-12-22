@@ -41,9 +41,6 @@ export default Vue.extend({
   components: {
     pieChart: UserPortfolioPie,
   },
-  mounted() {
-    console.log(Object.entries(this.userPortfolio.ownedStocks).length);
-  },
 });
 </script>
 

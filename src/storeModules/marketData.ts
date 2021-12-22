@@ -1,23 +1,7 @@
 import { ActionTree, GetterTree, MutationTree } from "vuex";
 import moment from "moment";
-import {
-  getFirestore,
-  collection,
-  getDocs,
-  query,
-} from "firebase/firestore/lite";
-import { initializeApp } from "firebase/app";
-const app = initializeApp({
-  apiKey: "AIzaSyCOR6Tbv6KkHGejJVPGYiGbWM8Av4m42nk",
-  authDomain: "stock-trader-fa865.firebaseapp.com",
-  databaseURL: "https://stock-trader-fa865.firebaseio.com",
-  projectId: "stock-trader-fa865",
-  storageBucket: "stock-trader-fa865.appspot.com",
-  messagingSenderId: "502197568222",
-  appId: "1:502197568222:web:fdce89b9bb9cf526d8b84f",
-  measurementId: "G-CGXD9V37XZ",
-});
-const db = getFirestore(app);
+import { collection, getDocs } from "firebase/firestore";
+import { firestore } from "@/firebase";
 
 const state: State = {
   monthStockData: [],
@@ -105,6 +89,12 @@ export const actions: ActionTree<any, any> = {
       doc.data();
     });
     return Promise.resolve(stocksList);
+  },
+  async getAllDBPortfolios({ commit }) {
+    const querySnapshot = await getDocs(collection(firestore, "portfolios"));
+    querySnapshot.forEach((doc) => {
+      console.log(`${doc.id} => ${doc.data()}`);
+    });
   },
 };
 
