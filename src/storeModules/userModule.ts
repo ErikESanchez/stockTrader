@@ -11,7 +11,7 @@ import router from "@/router";
 import { auth } from "@/firebase";
 
 const state: State = {
-  user: Object(),
+  user: Object(), // interface userInterface | null
 };
 
 const getters: GetterTree<any, any> = {
@@ -36,19 +36,19 @@ const actions: ActionTree<any, any> = {
             router.push("/");
             return resolve(resolve);
           })
-          .catch(function (error: any) {
+          .catch((error: any) => {
             // console.log(error.code, error.message);
             return reject(error.code);
           });
       });
-    }
+    } else return Promise.reject();
   },
   async signOut({ commit }) {
-    signOut(auth)
+    await signOut(auth)
       .then(() => {
         commit("setUser", Object());
       })
-      .catch(function (error: any) {});
+      .catch(function(error: any) {});
   },
   async createNewUser({ commit }, input: UserInput) {
     if (input.username != "" && input.password != "") {
@@ -64,36 +64,35 @@ const actions: ActionTree<any, any> = {
       });
     }
   },
-  changeUserName({ state }, newUsername: string) {
+  async changeUserName({ state }, newUsername: string) {
     if (auth.currentUser) {
       updateProfile(auth.currentUser, {
         displayName: newUsername,
       })
-        .then(function () {
+        .then(function() {
           // Update successful.
         })
-        .catch(function (error: any) {
+        .catch(function(error: any) {
           console.error(error);
           // An error happened.
         });
     }
   },
   changeUserPicture({ state, getters }, userLink: string) {
-    if(auth.currentUser){
-      console.log(userLink)
+    if (auth.currentUser) {
+      console.log(userLink);
       updateProfile(auth.currentUser, {
         // ? Isn't changing or updating photoURL firebase-side
         photoURL: userLink,
       })
-      .then(function () {
-        console.log('bruh')
-        // Update succcessful
-      })
-      .catch(function (error: any) {
-        console.error(error);
-      });
+        .then(function() {
+          console.log("bruh");
+          // Update succcessful
+        })
+        .catch(function(error: any) {
+          console.error(error);
+        });
     }
-    
   },
 };
 

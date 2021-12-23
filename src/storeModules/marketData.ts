@@ -23,11 +23,14 @@ const mutations: MutationTree<any> = {
       let mostRecentTradingDay: string =
         stockPayload[symbol]["Meta Data"]["3. Last Refreshed"];
       let metaData: MetaData = stockPayload[symbol]["Meta Data"];
+
       let priceData: TimeSeriesData =
         stockPayload[symbol]["Time Series(Daily)"][mostRecentTradingDay];
+
       let companyOverview: CompanyOverview =
         stockPayload[symbol]["Company Overview"];
       console.log(priceData);
+      // Could convert this into a function in the same file of
       let formatedLocalData: stockDataFormat = {
         stockData: {
           name: companyOverview["Name"],
@@ -71,23 +74,23 @@ export const actions: ActionTree<any, any> = {
     // let lastMonth: string = moment(
     //   new Date().setMonth(new Date().getMonth() - 1)
     // ).format("YYYY-MM");
+
+    // ! MIGHT ERRR
+    // for of loop instead
     Object.keys(stockData).forEach(async (symbol, idx, arr) => {
-      let stockSnapshotData = await getDoc(
-        doc(
-          collection(
-            doc(collection(firestore, "stocks"), symbol),
-            "Time Series(Daily)"
-          ),
-          currentMonth
-        )
-      );
+      let stocksCollection = collection(firestore, "stocks");
+      let symbolDoc = doc(stocksCollection, symbol);
+      let symbolCollectionSeries = collection(symbolDoc, "Time Series(Daily)");
+      let symbolDocMonth = doc(symbolCollectionSeries, currentMonth);
+
+      let stockSnapshotData = await getDoc(symbolDocMonth);
+
       if (idx === arr.length - 1 && stockSnapshotData.exists()) {
         stockData[symbol]["Time Series(Daily)"] = stockSnapshotData.data();
         commit("formatDatabaseData", stockData);
       }
-      if (stockSnapshotData.exists()) {
+      if (stockSnapshotData.exists())
         stockData[symbol]["Time Series(Daily)"] = stockSnapshotData.data();
-      }
     });
   },
 };

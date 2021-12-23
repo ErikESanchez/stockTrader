@@ -119,6 +119,7 @@ export default Vue.extend({
   },
   methods: {
     signOut() {
+      // loading screen
       store.dispatch("userModule/signOut");
     },
   },

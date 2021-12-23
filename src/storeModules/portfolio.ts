@@ -69,6 +69,7 @@ const actions: ActionTree<any, any> = {
           timeOfTransaction: stockTransaction.data.time,
           quantity: stockTransaction.data.amount
         }
+        
         transaction.update(portfolioFirebase, {
           ownedStocks: {
             owned: portfolioDoc.data().ownedStocks.owned + stockTransaction.data.amount,
