@@ -46,42 +46,41 @@ const actions: ActionTree<any, any> = {
     commit("setAllUserPortfolios", localUserPortfolios as Array<UserPortfolio>);
   },
   async buyStock(
-    { commit, rootGetters },
+    { commit, rootGetters, getters },
     stockTransaction: newStockTransaction
   ) {
-    let portfolio: UserPortfolio = state.portfolio;
     let uid: string = rootGetters["userModule/user"].uid;
-    let portfolioClass: Portfolio = new Portfolio(portfolio, stockTransaction);
-    // * let portfolioSnapshot = await getDoc(doc(collection(firestore, "portfolios"), uid));
-
-    const portfolioFirebase = doc(collection(firestore, "portfolios"), uid);
+    let localPortfolio: UserPortfolio = getters.portfolio;
+    let portfolioCollection = collection(firestore, "portfolios");
+    let portfolioUserDocument = doc(portfolioCollection, uid);
     // * Updating firebase values
-    try {
-      runTransaction(firestore, async (transaction) => {
-        const portfolioDoc = await transaction.get(portfolioFirebase);
-        if (!portfolioDoc.exists()) {
-          throw "Document does not exist";
-        }
-        // const newTransactionArray = sfDoc.data();
-        console.log(portfolioDoc.data() as UserPortfolio)
-        let tran: FirebaseStockTransactions = {
-          priceAtTransaction: stockTransaction.data.priceAtTransaction,
-          timeOfTransaction: stockTransaction.data.time,
-          quantity: stockTransaction.data.amount
-        }
-        
-        transaction.update(portfolioFirebase, {
-          ownedStocks: {
-            owned: portfolioDoc.data().ownedStocks.owned + stockTransaction.data.amount,
-            transactions: portfolioDoc.data().ownedStocks.transactions
-            .push(tran)
-          }
-        })
-        // transaction.update(portfolioFirebase, { funds: 4 });
-      });
-    } catch (e) {
-      console.log(e);
-    }
+
+    console.log(stockTransaction);
+    setDoc(
+      portfolioUserDocument,
+      {
+        ownedStocks: {
+          [stockTransaction.symbol]: {
+            owned:
+              localPortfolio.ownedStocks[stockTransaction.symbol].owned +
+              stockTransaction.data.amount,
+            transctions: {
+              [stockTransaction.data.time]: {
+                amount: stockTransaction.data.amount,
+                priceAtTransaction: stockTransaction.data.priceAtTransaction,
+              },
+            },
+          },
+        },
+      },
+      { merge: true }
+    );
+
+    // let tran: FirebaseStockTransactions = {
+    //   priceAtTransaction: stockTransaction.data.priceAtTransaction,
+    //   timeOfTransaction: stockTransaction.data.time,
+    //   quantity: stockTransaction.data.amount
+    // }
 
     //       doc(collection(firestore, "portfolios")state.uid)
     //       .doc(state.uid as string)
@@ -280,7 +279,7 @@ export interface newStockTransaction {
 interface stockTransactionData {
   priceAtTransaction: number;
   amount: number;
-  time: Date;
+  time: string;
 }
 
 export interface stockData {

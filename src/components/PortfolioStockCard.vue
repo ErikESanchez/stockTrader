@@ -40,18 +40,18 @@ export default Vue.extend({
       let latestDate: string =
         stock["allStockData"]["Meta Data"]["3. Last Refreshed"];
       console.log(latestDate);
-      let sellStockTransaction: newStockTransaction = {
-        symbol: stock.allStockData["Meta Data"]["2. Symbol"],
-        data: {
-          priceAtTransaction: Number(
-            stock.allStockData["Time Series(Daily)"][latestDate]["2. high"]
-          ),
-          amount: 1,
-          time: new Date(),
-        },
-        name: stock.allStockData["Company Overview"].Name,
-      };
-      store.dispatch("portfolio/sellStock", sellStockTransaction);
+      // let sellStockTransaction: newStockTransaction = {
+      // symbol: stock.allStockData["Meta Data"]["2. Symbol"],
+      // data: {
+      //   priceAtTransaction: Number(
+      //     stock.allStockData["Time Series(Daily)"][latestDate]["2. high"]
+      //   ),
+      //   amount: 1,
+      //   // time: new Date(),
+      // },
+      // name: stock.allStockData["Company Overview"].Name,
+      // };
+      // store.dispatch("portfolio/sellStock", sellStockTransaction);
     },
   },
 });

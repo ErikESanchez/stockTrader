@@ -49,7 +49,7 @@ export default Vue.extend({
           data: {
             priceAtTransaction: stock.stockData.high,
             amount: this.amountToBuy,
-            time: new Date(),
+            time: new Date().toString(),
           },
         };
         store.dispatch("portfolio/buyStock", boughtStockTransaction);
