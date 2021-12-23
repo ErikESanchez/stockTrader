@@ -24,7 +24,7 @@
 
 <script lang="ts">
 /* eslint-disable */
-import { newStockTransaction, stockData } from "@/storeModules/portfolio";
+import { stockData } from "@/storeModules/portfolio";
 import Vue from "vue";
 import store from "../store";
 export default Vue.extend({

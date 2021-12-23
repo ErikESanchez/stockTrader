@@ -29,8 +29,8 @@
 <script lang="ts">
 import Vue from "vue";
 import store from "@/store";
-import { newStockTransaction, UserPortfolio } from "@/storeModules/portfolio";
 import { stockDataFormat } from "@/storeModules/marketData";
+import { newStockTransaction, UserPortfolio } from "@/interfaces/global.interface";
 
 export default Vue.extend({
   props: ["stock"],

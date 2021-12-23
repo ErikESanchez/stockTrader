@@ -9,7 +9,12 @@ import {
   setDoc,
   runTransaction,
 } from "firebase/firestore";
-import { Portfolio } from "@/Classes/Portfolio";
+import { portfolioTransactionUpdate } from "@/interfaces/portfolio.interface";
+import {
+  newStockTransaction,
+  UserPortfolio,
+} from "@/interfaces/global.interface";
+import store from "@/store";
 const state: State = {
   portfolio: Object(),
   userPortfolios: [],
@@ -50,88 +55,27 @@ const actions: ActionTree<any, any> = {
     stockTransaction: newStockTransaction
   ) {
     let uid: string = rootGetters["userModule/user"].uid;
+    let symbol: string = stockTransaction.symbol;
     let localPortfolio: UserPortfolio = getters.portfolio;
     let portfolioCollection = collection(firestore, "portfolios");
     let portfolioUserDocument = doc(portfolioCollection, uid);
     // * Updating firebase values
-
-    console.log(stockTransaction);
+    let updatedPortfolio = portfolioTransactionUpdate(
+      localPortfolio,
+      stockTransaction
+    );
+    let updatedOwnedStock = updatedPortfolio.ownedStocks[symbol];
     setDoc(
       portfolioUserDocument,
       {
         ownedStocks: {
-          [stockTransaction.symbol]: {
-            owned:
-              localPortfolio.ownedStocks[stockTransaction.symbol].owned +
-              stockTransaction.data.amount,
-            transctions: {
-              [stockTransaction.data.time]: {
-                amount: stockTransaction.data.amount,
-                priceAtTransaction: stockTransaction.data.priceAtTransaction,
-              },
-            },
-          },
+          [symbol]: updatedOwnedStock,
         },
       },
       { merge: true }
-    );
-
-    // let tran: FirebaseStockTransactions = {
-    //   priceAtTransaction: stockTransaction.data.priceAtTransaction,
-    //   timeOfTransaction: stockTransaction.data.time,
-    //   quantity: stockTransaction.data.amount
-    // }
-
-    //       doc(collection(firestore, "portfolios")state.uid)
-    //       .doc(state.uid as string)
-    //       // todo: maybe change this to update ╰(*°▽°*)╯
-    //       .set(
-    //         {
-    //           availableFunds: portfolioClass.calculateBoughtAvailableFunds(),
-    //           ownedStocks: {
-    //             [stockTransaction.symbol]: {
-    //               amountOwned: stockTransaction.data.amount,
-    //               symbol: stockTransaction.symbol,
-    //               name: stockTransaction.name,
-    //             },
-    //           },
-    //           portfolioWorth: portfolioClass.calculateBoughtPortfolioWorth(),
-    //         },
-    //         { merge: true }
-    //       );
-    // if (portfolio.ownedStocks[`${stockTransaction.symbol}`]) {
-    //   console.log(`You own ${stockTransaction.symbol}, adding to portfolio`);
-    //   portfolio = {
-    //     availableFunds: portfolioClass.calculateBoughtAvailableFunds(),
-    //     ownedStocks: {
-    //       [stockTransaction.symbol]: {
-    //         symbol: stockTransaction.symbol,
-    //         amountOwned:
-    //           portfolio.ownedStocks[stockTransaction.symbol].amountOwned +
-    //           stockTransaction.data.amount,
-    //       },
-    //     },
-    //     portfolioWorth: portfolioClass.calculateBoughtPortfolioWorth(),
-    //   };
-    //   await firebaseData
-    //     .firestore()
-    //     .collection("portfolios")
-    //     .doc(state.uid)
-    //     .set(
-    //       {
-    //         availableFunds: portfolio.availableFunds,
-    //         ownedStocks: portfolio.ownedStocks,
-    //         portfolioWorth: portfolio.portfolioWorth,
-    //       },
-    //       { merge: true }
-    //     );
-    //   commit("setUserPortfolio", portfolio);
-    //   dispatch("getAllDBPortfolios", state.uid);
-    // } else if (
-    //   portfolio.ownedStocks[`${stockTransaction.symbol}`] === undefined
-    // ) {
-
-    //   dispatch("getAllDBPortfolios", state.uid);
+    ).then(() => {
+      commit("setUserPortfolio", updatedPortfolio);
+    });
   },
   // async sellStock(
   //   { commit, rootState, getters },
@@ -246,40 +190,8 @@ interface State {
   userPortfolios: Object;
 }
 
-export interface UserPortfolio {
-  funds: number;
-  name?: string;
-  ownedStocks: FirebaseStockInfo;
-  portfolioWorth: number;
-  photoURL?: string;
-}
-
 interface UserPortfoliosDoc {
   [id: string]: any;
-}
-
-export interface FirebaseStockInfo {
-  [symbol: string]: {
-    owned: number;
-    transactions: Array<FirebaseStockTransactions>;
-  };
-}
-
-interface FirebaseStockTransactions {
-  priceAtTransaction: number;
-  quantity: number;
-  timeOfTransaction: Date;
-}
-
-export interface newStockTransaction {
-  symbol: string;
-  data: stockTransactionData;
-}
-
-interface stockTransactionData {
-  priceAtTransaction: number;
-  amount: number;
-  time: string;
 }
 
 export interface stockData {
