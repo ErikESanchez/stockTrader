@@ -13,7 +13,6 @@
 import Vue from "vue";
 import Navbar from "./components/Navbar.vue";
 import store from "@/store";
-import { mapGetters } from "vuex";
 import { auth } from "@/firebase";
 import { onAuthStateChanged } from "@firebase/auth";
 
@@ -26,14 +25,13 @@ export default Vue.extend({
     onAuthStateChanged(auth, async (user) => {
       if (user) {
         store.commit("userModule/setUser", user);
-        await store.dispatch("portfolio/getAllDBPortfolios", user.uid);
+        await store.dispatch("portfolio/getAllPortfolios", user.uid);
         await store.dispatch("marketData/getDatabaseDailyData");
       } else {
         // user is signed out
       }
     });
   },
-  computed: mapGetters({ formatedStocks: "marketData/formatedStocks" }),
 });
 </script>
 

@@ -19,17 +19,6 @@ import { mapGetters } from "vuex";
 
 export default Vue.extend({
   name: "stocksView",
-  // async mounted() {
-  //   if (this.formatedStocks[0] === undefined) {
-  //     await this.getDatabaseDailyData();
-  //     console.log('bruh')
-  //   }
-  // },
-  // watch: {
-  //   formatedStocks(event) {
-  //     console.log(event);
-  //   },
-  // },
   computed: { ...mapGetters({ formatedStocks: "marketData/formatedStocks" }) },
   methods: {
     async getDatabaseDailyData() {

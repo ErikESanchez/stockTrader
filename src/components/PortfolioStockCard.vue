@@ -25,7 +25,6 @@
 <script lang="ts">
 /* eslint-disable */
 import { newStockTransaction, stockData } from "@/storeModules/portfolio";
-import { OwnedAndMarketStocks, SingleOwnedMarketAndStocks } from "@/views/Portfolio.vue";
 import Vue from "vue";
 import store from "../store";
 export default Vue.extend({
@@ -36,14 +35,17 @@ export default Vue.extend({
     };
   },
   methods: {
-    sellStock(stock: SingleOwnedMarketAndStocks) {
+    sellStock(stock: any) {
       // *Change selling logic to conform with all the data in the stock parameter
-      let latestDate: string = stock["allStockData"]["Meta Data"]["3. Last Refreshed"];
-      console.log(latestDate)
+      let latestDate: string =
+        stock["allStockData"]["Meta Data"]["3. Last Refreshed"];
+      console.log(latestDate);
       let sellStockTransaction: newStockTransaction = {
         symbol: stock.allStockData["Meta Data"]["2. Symbol"],
         data: {
-          priceAtTransaction: Number(stock.allStockData["Time Series(Daily)"][latestDate]["2. high"]),
+          priceAtTransaction: Number(
+            stock.allStockData["Time Series(Daily)"][latestDate]["2. high"]
+          ),
           amount: 1,
           time: new Date(),
         },
@@ -53,8 +55,6 @@ export default Vue.extend({
     },
   },
 });
-
-
 </script>
 
 <style></style>

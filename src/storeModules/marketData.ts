@@ -90,12 +90,6 @@ export const actions: ActionTree<any, any> = {
       }
     });
   },
-  async getAllDBPortfolios({ commit }) {
-    const querySnapshot = await getDocs(collection(firestore, "portfolios"));
-    querySnapshot.forEach((doc) => {
-      console.log(`${doc.id} => ${doc.data()}`);
-    });
-  },
 };
 
 export interface TimeSeriesDaily {

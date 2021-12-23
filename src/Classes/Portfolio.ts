@@ -10,7 +10,7 @@ export class Portfolio {
   }
   calculateBoughtAvailableFunds(): number {
     const newFunds: number =
-      this.portfolio.availableFunds -
+      this.portfolio.funds -
       this.stockTransaction.data.priceAtTransaction;
     return Number(Math.round(parseFloat(newFunds + "e" + 2)) + "e-" + 2);
   }
@@ -21,7 +21,7 @@ export class Portfolio {
     return Number(Math.round(parseFloat(newWorth + "e" + 2)) + "e-" + 2);
   }
   calculateSoldAvailableFunds(): number {
-    const newFunds: number = this.portfolio.availableFunds;
+    const newFunds: number = this.portfolio.funds;
     return Number(Math.round(parseFloat(newFunds + "e" + 2)) + "e-" + 2);
   }
 }
