@@ -3,42 +3,43 @@ import {
   FirebaseStockTransactions,
   newStockTransaction,
   UserPortfolio,
-  stockTransactionData,
 } from "./global.interface";
 
-export function portfolioTransactionUpdate(
+export function buyTransactionUpdate(
   localPortfolio: UserPortfolio,
   stockTransaction: newStockTransaction
-  //   todo Export both updated portfolio & ownedStock or just updated portfolio ???
 ): UserPortfolio {
   let symbol: string = stockTransaction.symbol;
-  let transactionData: stockTransactionData = stockTransaction.data;
   let transaction: FirebaseStockTransactions = {
-    [transactionData.time]: {
-      quantity: transactionData.amount,
-      priceAtTransaction: transactionData.priceAtTransaction,
+    [stockTransaction.time]: {
+      quantity: stockTransaction.amount,
+      priceAtTransaction: stockTransaction.priceAtTransaction,
     },
   };
-  let ownedStock: FirebaseStockInfo;
+//   console.log(localPortfolio);
   if (localPortfolio.ownedStocks[symbol]) {
     let newAmountOfOwned: number =
-      localPortfolio.ownedStocks[symbol].owned + transactionData.amount;
-    ownedStock = {
+      localPortfolio.ownedStocks[symbol].owned + stockTransaction.amount;
+    localPortfolio.ownedStocks = {
       [symbol]: {
         owned: newAmountOfOwned,
-        transactions: transaction,
       },
     };
-    localPortfolio.ownedStocks = ownedStock;
     return localPortfolio;
   } else {
-    ownedStock = {
+    localPortfolio.ownedStocks = {
       [symbol]: {
-        owned: transactionData.amount,
-        transactions: transaction,
+        owned: stockTransaction.amount,
       },
     };
-    localPortfolio.ownedStocks = ownedStock;
     return localPortfolio;
   }
+}
+
+export function sellTransactionUpdate(
+  localPortfolio: UserPortfolio,
+  sellStockTransaction: newStockTransaction
+) {
+  console.log(sellStockTransaction);
+  let symbol: string = sellStockTransaction.symbol;
 }

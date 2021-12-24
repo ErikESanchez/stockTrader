@@ -9,7 +9,6 @@ export interface UserPortfolio {
 export interface FirebaseStockInfo {
   [symbol: string]: {
     owned: number;
-    transactions: FirebaseStockTransactions;
   };
 }
 
@@ -22,10 +21,6 @@ export interface FirebaseStockTransactions {
 
 export interface newStockTransaction {
   symbol: string;
-  data: stockTransactionData;
-}
-
-export interface stockTransactionData {
   priceAtTransaction: number;
   amount: number;
   time: string;

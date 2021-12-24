@@ -1,15 +1,10 @@
 import { ActionTree, GetterTree, MutationTree } from "vuex";
 import { auth, firestore } from "@/firebase";
+import { collection, getDocs, getDoc, doc, setDoc } from "firebase/firestore";
 import {
-  collection,
-  getDocs,
-  getDoc,
-  doc,
-  updateDoc,
-  setDoc,
-  runTransaction,
-} from "firebase/firestore";
-import { portfolioTransactionUpdate } from "@/interfaces/portfolio.interface";
+  buyTransactionUpdate,
+  sellTransactionUpdate,
+} from "@/interfaces/portfolio.interface";
 import {
   newStockTransaction,
   UserPortfolio,
@@ -59,130 +54,55 @@ const actions: ActionTree<any, any> = {
     let localPortfolio: UserPortfolio = getters.portfolio;
     let portfolioCollection = collection(firestore, "portfolios");
     let portfolioUserDocument = doc(portfolioCollection, uid);
+    let portfolioTransactionsCollection = collection(
+      portfolioUserDocument,
+      "transactions"
+    );
+    let portfolioTransactionDocument = doc(
+      portfolioTransactionsCollection,
+      symbol
+    );
     // * Updating firebase values
-    let updatedPortfolio = portfolioTransactionUpdate(
+    let updatedPortfolio = buyTransactionUpdate(
       localPortfolio,
       stockTransaction
     );
     let updatedOwnedStock = updatedPortfolio.ownedStocks[symbol];
-    setDoc(
-      portfolioUserDocument,
-      {
-        ownedStocks: {
-          [symbol]: updatedOwnedStock,
-        },
-      },
-      { merge: true }
-    ).then(() => {
-      commit("setUserPortfolio", updatedPortfolio);
-    });
+    const transactionSnapshot = await getDoc(portfolioUserDocument);
+    const portfolioSnapshot = await getDoc(portfolioTransactionDocument);
+// 
+    // if (portfolioSnapshot.exists()) {
+      console.log(portfolioSnapshot.data());
+    // } else {
+      // console.log("Does not exist");
+    // }
+    // setDoc(
+    //   portfolioUserDocument,
+    //   {
+    //     ownedStocks: {
+    //       [symbol]: updatedOwnedStock,
+    //     },
+    //   },
+    //   { merge: true }
+    // ).then(() => {
+    //   commit("setUserPortfolio", updatedPortfolio);
+    // });
   },
-  // async sellStock(
-  //   { commit, rootState, getters },
-  //   sellStockTransaction: newStockTransaction
-  // ) {
-  //   let userPortfolios: Array<UserPortfolio> = getters.userPortfolios;
-  //   let portfolio: UserPortfolio = state.portfolio;
-  //   if (portfolio.ownedStocks[sellStockTransaction.symbol].amountOwned >= 2) {
-  //     rootState.marketData.formatedStocks.forEach(async (stock: any) => {
-  //       if (stock.stockData.symbol === sellStockTransaction.symbol) {
-  //         portfolio = {
-  //           availableFunds:
-  //             portfolio.availableFunds +
-  //             sellStockTransaction.data.priceAtTransaction,
-  //           ownedStocks: {
-  //             [sellStockTransaction.symbol]: {
-  //               symbol: sellStockTransaction.symbol,
-  //               amountOwned:
-  //                 portfolio.ownedStocks[sellStockTransaction.symbol]
-  //                   .amountOwned - 1,
-  //               name: sellStockTransaction.name,
-  //             },
-  //           },
-  //           portfolioWorth:
-  //             portfolio.portfolioWorth -
-  //             sellStockTransaction.data.priceAtTransaction,
-  //         };
-  //         await firebaseData
-  //           .firestore()
-  //           .collection("portfolios")
-  //           .doc(state.uid)
-  //           .set(
-  //             {
-  //               availableFunds: portfolio.availableFunds,
-  //               ownedStocks: portfolio.ownedStocks,
-  //               portfolioWorth: portfolio.portfolioWorth,
-  //             },
-  //             { merge: true }
-  //           );
-  //         await firebaseData
-  //           .firestore()
-  //           .collection("portfolios")
-  //           .doc(state.uid)
-  //           .get()
-  //           .then((doc: doc) => {
-  //             if (doc.exists) {
-  //               portfolio = doc.data();
-  //             } else {
-  //               console.log("bruh");
-  //             }
-  //           })
-  //           .catch((error) => {
-  //             console.error(error);
-  //           });
-  //         commit("setUserPortfolio", portfolio);
-  //         userPortfolios.forEach(
-  //           (loopPortfolio: UserPortfolio, index: number) => {
-  //             if (portfolio.name === loopPortfolio.name) {
-  //               userPortfolios[index] = portfolio;
-  //             }
-  //           }
-  //         );
-  //       }
-  //     });
-  //   }
-  //   // ? Maybe make it 1
-  //   else {
-  //     delete portfolio.ownedStocks[sellStockTransaction.symbol];
-  //     portfolio.availableFunds =
-  //       portfolio.availableFunds + sellStockTransaction.data.priceAtTransaction;
-  //     portfolio.portfolioWorth =
-  //       portfolio.portfolioWorth - sellStockTransaction.data.priceAtTransaction;
-  //     // portfolio = {
-  //     //   availableFunds: portfolio.availableFunds + sellStockTransaction.data.priceAtTransaction,
-  //     //   portfolioWorth: portfolio.portfolioWorth - sellStockTransaction.data.priceAtTransaction
-  //     // },
-  //     await firebaseData
-  //       .firestore()
-  //       .collection("portfolios")
-  //       .doc(state.uid)
-  //       .set(
-  //         {
-  //           availableFunds: portfolio.availableFunds,
-  //           ownedStocks: {
-  //             [sellStockTransaction.symbol]:
-  //               firebase.firestore.FieldValue.delete(),
-  //           },
-  //           portfolioWorth: portfolio.portfolioWorth,
-  //         },
-  //         { merge: true }
-  //       );
-  //     await firebaseData
-  //       .firestore()
-  //       .collection("portfolios")
-  //       .doc(state.uid)
-  //       .get()
-  //       .then((doc: doc) => {
-  //         if (doc.exists) {
-  //           portfolio = doc.data();
-  //         }
-  //       })
-  //       .catch((error) => {
-  //         console.error(error);
-  //       });
-  //     commit("setUserPortfolio", portfolio);
-  //   }
-  // },
+  async sellStock(
+    { commit, rootGetters, getters },
+    sellStockTransaction: newStockTransaction
+  ) {
+    let uid: string = rootGetters["userModule/user"].uid;
+    let symbol: string = sellStockTransaction.symbol;
+    let localPortfolio: UserPortfolio = getters.portfolio;
+    let portfolioCollection = collection(firestore, "portfolios");
+    let portfolioUserDocument = doc(portfolioCollection, uid);
+    let updatedPortfolio = sellTransactionUpdate(
+      localPortfolio,
+      sellStockTransaction
+    );
+    updatedPortfolio;
+  },
 };
 
 interface State {
@@ -200,7 +120,7 @@ export interface stockData {
   name: string;
 }
 
-export default {
+export default { 
   namespaced: true,
   actions,
   mutations,

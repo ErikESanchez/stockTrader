@@ -24,7 +24,6 @@ const mutations: MutationTree<any> = {
     state.stocks.push(newStock);
   },
   formatDatabaseData(state, stockPayload: StockDataSymbol) {
-    console.log("bruh");
     let formattedStockData = formattingDatabaseData(stockPayload);
     state.formattedStocks = formattedStockData;
   },

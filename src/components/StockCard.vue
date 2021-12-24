@@ -4,7 +4,7 @@
       <div class="card-body text-center row-4">
         <h5 class="card-title">
           <router-link :to="stockRoute" class="text-white">
-            {{ stock['name'] }}
+            {{ stock["name"] }}
           </router-link>
         </h5>
         <p class="card-text text-success">{{ stock["open"] }}$</p>
@@ -18,7 +18,7 @@
           class="input-group-text"
           style="margin-top: 5px"
           type="number"
-          :min="0"
+          :min="1"
           v-model="amountToBuy"
         />
       </div>
@@ -29,8 +29,11 @@
 <script lang="ts">
 import Vue from "vue";
 import store from "@/store";
-import { newStockTransaction, UserPortfolio } from "@/interfaces/global.interface";
-import { FormatedStock, StockDataFormat, } from "@/interfaces/market.interface";
+import {
+  newStockTransaction,
+  UserPortfolio,
+} from "@/interfaces/global.interface";
+import { FormatedStock, StockDataFormat } from "@/interfaces/market.interface";
 
 export default Vue.extend({
   props: ["stock"],
@@ -43,15 +46,12 @@ export default Vue.extend({
   methods: {
     buyStock(stock: FormatedStock): void {
       let portfolio: UserPortfolio = store.getters["portfolio/portfolio"];
-      console.log(stock)
       if (portfolio.funds > stock.high) {
         let boughtStockTransaction: newStockTransaction = {
           symbol: stock.symbol,
-          data: {
-            priceAtTransaction: stock.high,
-            amount: this.amountToBuy,
-            time: new Date().toString(),
-          },
+          priceAtTransaction: stock.high,
+          amount: this.amountToBuy,
+          time: new Date().toString(),
         };
         store.dispatch("portfolio/buyStock", boughtStockTransaction);
       }

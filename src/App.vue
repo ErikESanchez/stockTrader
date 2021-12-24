@@ -25,8 +25,8 @@ export default Vue.extend({
     onAuthStateChanged(auth, async (user) => {
       if (user) {
         store.commit("userModule/setUser", user);
-        await store.dispatch("portfolio/getAllPortfolios", user.uid);
         await store.dispatch("marketData/getDatabaseDailyData");
+        await store.dispatch("portfolio/getAllPortfolios", user.uid);
       } else {
         // user is signed out
       }

@@ -28,7 +28,6 @@ export function formattingDatabaseData(
       lastRefreshed: metaData["3. Last Refreshed"],
     };
     if (idx === arr.length - 1) {
-      console.log(formatedStockData);
       return formatedStockData;
     } else {
       return undefined;

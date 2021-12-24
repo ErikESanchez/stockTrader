@@ -27,9 +27,9 @@ export default Vue.extend({
     return {};
   },
   watch: {
-    stockData(event){
-      console.log(event)
-    }
+    stockData(event) {
+      console.log(event);
+    },
   },
   mounted() {},
   methods: {},
