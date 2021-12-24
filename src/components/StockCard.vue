@@ -4,12 +4,12 @@
       <div class="card-body text-center row-4">
         <h5 class="card-title">
           <router-link :to="stockRoute" class="text-white">
-            {{ stock["stockData"]["name"] }}
+            {{ stock['name'] }}
           </router-link>
         </h5>
-        <p class="card-text text-success">{{ stock["stockData"]["open"] }}$</p>
+        <p class="card-text text-success">{{ stock["open"] }}$</p>
         <p class="card-text text-white">
-          {{ stock["stockData"]["lastRefreshed"] }}
+          {{ stock["lastRefreshed"] }}
         </p>
         <button class="btn btn-light rounded-pill" @click="buyStock(stock)">
           Buy Stock
@@ -29,25 +29,26 @@
 <script lang="ts">
 import Vue from "vue";
 import store from "@/store";
-import { stockDataFormat } from "@/storeModules/marketData";
 import { newStockTransaction, UserPortfolio } from "@/interfaces/global.interface";
+import { FormatedStock, StockDataFormat, } from "@/interfaces/market.interface";
 
 export default Vue.extend({
   props: ["stock"],
   data() {
     return {
       amountToBuy: 1,
-      stockRoute: "stocks/" + this.stock["stockData"]["name"],
+      stockRoute: "stocks/" + this.stock["symbol"],
     };
   },
   methods: {
-    buyStock(stock: stockDataFormat): void {
+    buyStock(stock: FormatedStock): void {
       let portfolio: UserPortfolio = store.getters["portfolio/portfolio"];
-      if (portfolio.funds > stock.stockData.high) {
+      console.log(stock)
+      if (portfolio.funds > stock.high) {
         let boughtStockTransaction: newStockTransaction = {
-          symbol: stock.stockData.symbol,
+          symbol: stock.symbol,
           data: {
-            priceAtTransaction: stock.stockData.high,
+            priceAtTransaction: stock.high,
             amount: this.amountToBuy,
             time: new Date().toString(),
           },

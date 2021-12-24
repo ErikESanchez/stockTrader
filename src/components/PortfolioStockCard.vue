@@ -3,16 +3,12 @@
     <div class="card bg-dark text-white" style="margin-bottom: 5px">
       <div class="card-body text-center">
         <router-link :to="stockRoute" class="text-white">
-          <h5 class="card-title">{{ stock.portfolio.name }}</h5>
+          <h5 class="card-title">{{ symbol }}</h5>
         </router-link>
-        <p class="card-text">Share: {{ stock.portfolio.amountOwned }}</p>
+        <p class="card-text">Share: {{ ownedStock.owned }}</p>
         <p class="card-text">
-          Price of Stock:
-          {{
-            stock["allStockData"]["Time Series(Daily)"][
-              stock["allStockData"]["Meta Data"]["3. Last Refreshed"]
-            ]["2. high"]
-          }}
+          Price: 
+          {{ stockData["high"] }}$
         </p>
         <button class="btn btn-light rounded-pill" @click="sellStock(stock)">
           Sell Stock
@@ -23,17 +19,16 @@
 </template>
 
 <script lang="ts">
-/* eslint-disable */
-import { stockData } from "@/storeModules/portfolio";
 import Vue from "vue";
 import store from "../store";
 export default Vue.extend({
-  props: ["stock"],
+  props: ["ownedStock", "symbol", "stockData"],
   data() {
     return {
-      stockRoute: "stocks/" + this.stock.portfolio.name,
+      stockRoute: "stocks/" + this.symbol,
     };
   },
+  mounted() {},
   methods: {
     sellStock(stock: any) {
       // *Change selling logic to conform with all the data in the stock parameter

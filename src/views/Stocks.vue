@@ -3,7 +3,7 @@
     <div class="row">
       <stock-card
         class="col-sm"
-        v-for="(stock, index) in formatedStocks"
+        v-for="(stock, index) in formattedStocks"
         :stock="stock"
         :key="index"
       />
@@ -19,7 +19,7 @@ import { mapGetters } from "vuex";
 
 export default Vue.extend({
   name: "stocksView",
-  computed: { ...mapGetters({ formatedStocks: "marketData/formatedStocks" }) },
+  computed: { ...mapGetters({ formattedStocks: "marketData/formattedStocks" }) },
   methods: {
     async getDatabaseDailyData() {
       await store.dispatch("marketData/getDatabaseDailyData");
