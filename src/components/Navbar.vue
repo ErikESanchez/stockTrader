@@ -38,7 +38,7 @@
                   class="nav-link text-success"
                   style="font: 18px Nunito, sans-serif; margin-top: 5px"
                 >
-                  {{ portfolio.availableFunds }} $
+                  {{ portfolio.funds }} $
                 </div>
               </li>
 

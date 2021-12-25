@@ -4,11 +4,11 @@
     style=" background-color: #232627; margin-bottom: 5px"
   >
     <div class="card-body" style="font: 16px Nunito, sans-serif">
-      <h5 class="card-title text-center col">{{ userPortfolio.name }}</h5>
+      <h5 class="card-title text-center col">{{ individualPortfolio.name }}</h5>
       <img
         class="float-end img-responsive col"
-        :src="userPortfolio.photoURL"
-        v-if="userPortfolio.photoURL != ''"
+        :src="individualPortfolio.photoURL"
+        v-if="individualPortfolio.photoURL != ''"
       />
       <h6 class="card-subtitle text-center mb-2 text-white col">
         <!-- <div style="overflow-x: auto; white-space: nowrap" class="col">
@@ -19,15 +19,15 @@
         <!-- </div> -->
         Funds:
         <div class="text-success col" style="display: inline-block">
-          {{ userPortfolio.availableFunds }} $
+          {{ individualPortfolio.funds }} $
         </div>
       </h6>
 
       <div
         class="col"
-        v-if="Object.entries(userPortfolio.ownedStocks).length !== 0"
+        v-if="Object.entries(individualPortfolio.ownedStocks).length !== 0"
       >
-        <pie-chart :portfolioChart="userPortfolio.ownedStocks" />
+        <pie-chart :portfolioStockData="individualPortfolio.ownedStocks" />
       </div>
     </div>
   </div>
@@ -37,7 +37,7 @@
 import Vue from "vue";
 import UserPortfolioPie from "@/components/UserPortfolioPie.vue";
 export default Vue.extend({
-  props: ["userPortfolio"],
+  props: ["individualPortfolio"],
   components: {
     pieChart: UserPortfolioPie,
   },

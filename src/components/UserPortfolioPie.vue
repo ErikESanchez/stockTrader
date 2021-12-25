@@ -11,7 +11,7 @@ export default Vue.extend({
   components: {
     apexcharts: VueApexCharts,
   },
-  props: ["portfolioChart"],
+  props: ["portfolioStockData"],
   data() {
     return {
       series: [] as Array<number>,
@@ -64,15 +64,15 @@ export default Vue.extend({
   },
   methods: {
     // Todo: Add values to the series array in data 'this.series'
-    renderPortfolioData(portfolio: portfolioStock) {
-      for (let stock in portfolio){
-        this.series.push(portfolio[stock].amountOwned)
-        this.chartOptions.labels.push(portfolio[stock].symbol)
+    renderPortfolioData(ownedStocks: portfolioStock) {
+      for (let symbol in ownedStocks){
+        this.series.push(ownedStocks[symbol].owned)
+        this.chartOptions.labels.push(symbol)
       }
     },
   },
   watch: {
-    portfolioChart: {
+    portfolioStockData: {
       handler(val: portfolioStock) {
         this.renderPortfolioData(val);
       },
@@ -84,7 +84,7 @@ export default Vue.extend({
 
 interface portfolioStock {
   [symbol: string]: {
-    amountOwned: number;
+    owned: number;
     symbol: string;
   };
 }
