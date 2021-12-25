@@ -5,18 +5,23 @@ import { firestore } from "@/firebase";
 import {
   CompanyInfo,
   formattingDatabaseData,
+  MonthData,
   StockDataFormat,
   StockDataSymbol,
 } from "@/interfaces/market.interface";
 
 const state: State = {
   formattedStocks: {},
+  monthData: {},
 };
 
 const getters: GetterTree<any, any> = {
   formattedStocks: (state) => {
     return state.formattedStocks;
   },
+  monthData: (state: State) => {
+    return state.monthData
+  }
 };
 
 const mutations: MutationTree<any> = {
@@ -25,7 +30,8 @@ const mutations: MutationTree<any> = {
   },
   formatDatabaseData(state, stockPayload: StockDataSymbol) {
     let formattedStockData = formattingDatabaseData(stockPayload);
-    state.formattedStocks = formattedStockData;
+    state.formattedStocks = formattedStockData.formattedStockData;
+    state.monthData = formattedStockData.monthData;
   },
 };
 
@@ -61,7 +67,6 @@ export const actions: ActionTree<any, any> = {
       let symbolDocMonth = doc(symbolCollectionSeries, currentMonth);
 
       let stockSnapshotData = await getDoc(symbolDocMonth);
-
       if (idx === arr.length - 1 && stockSnapshotData.exists()) {
         stockData[symbol]["Time Series(Daily)"] = stockSnapshotData.data();
         commit("formatDatabaseData", stockData);
@@ -76,6 +81,7 @@ interface State {
   formattedStocks: {
     [symbol: string]: StockDataFormat;
   };
+  monthData: MonthData;
 }
 
 export default {

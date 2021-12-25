@@ -1,44 +1,59 @@
 export function formattingDatabaseData(
   stockPayload: StockDataSymbol
-): StockDataFormat {
-  let formatedStockData: StockDataFormat = {};
-  //   for (const symbol of stockPayload) {
-  //     console.log(symbol);
-  //   }
-  Object.keys(stockPayload).forEach((symbol: string, idx, arr) => {
-    let lastTradingDay: string =
-      stockPayload[symbol]["Meta Data"]["3. Last Refreshed"];
-    let metaData: MetaData = stockPayload[symbol]["Meta Data"];
-    let priceData: TimeSeriesData =
-      stockPayload[symbol]["Time Series(Daily)"][lastTradingDay];
-    let companyOverview: CompanyOverview =
-      stockPayload[symbol]["Company Overview"];
-    formatedStockData[symbol] = {
-      name: companyOverview["Name"],
-      country: companyOverview["Country"],
-      description: companyOverview["Description"],
-      exchange: companyOverview["Exchange"],
-      sector: companyOverview["Sector"],
-      symbol: companyOverview["Symbol"],
-      open: Number(priceData["1. open"]),
-      high: Number(priceData["2. high"]),
-      low: Number(priceData["3. low"]),
-      close: Number(priceData["4. close"]),
-      volume: Number(priceData["5. volume"]),
-      lastRefreshed: metaData["3. Last Refreshed"],
-    };
-    if (idx === arr.length - 1) {
-      return formatedStockData;
-    } else {
-      return undefined;
-    }
-  });
-  return formatedStockData
+): FormattedDataReturn {
+  let formattedStockData: StockDataFormat = {};
+  let monthData: MonthData = {};
+  let dataReturn: FormattedDataReturn;
+  // ? Perhaps a for of loop
+  function organize(): any {
+    Object.keys(stockPayload).forEach((symbol: string, idx, arr) => {
+      let lastTradingDay: string =
+        stockPayload[symbol]["Meta Data"]["3. Last Refreshed"];
+      let metaData: MetaData = stockPayload[symbol]["Meta Data"];
+      let priceData: TimeSeriesData =
+        stockPayload[symbol]["Time Series(Daily)"][lastTradingDay];
+      let companyOverview: CompanyOverview =
+        stockPayload[symbol]["Company Overview"];
+      formattedStockData[symbol] = {
+        name: companyOverview["Name"],
+        country: companyOverview["Country"],
+        description: companyOverview["Description"],
+        exchange: companyOverview["Exchange"],
+        sector: companyOverview["Sector"],
+        symbol: companyOverview["Symbol"],
+        open: Number(priceData["1. open"]),
+        high: Number(priceData["2. high"]),
+        low: Number(priceData["3. low"]),
+        close: Number(priceData["4. close"]),
+        volume: Number(priceData["5. volume"]),
+        lastRefreshed: metaData["3. Last Refreshed"],
+      };
+      let timeSeries: TimeSeriesDailyData =
+        stockPayload[symbol]["Time Series(Daily)"];
+      monthData[symbol] = timeSeries;
+      if (idx === arr.length - 1) {
+        // console.log(monthData);
+        dataReturn = {
+          formattedStockData,
+          monthData,
+        };
+        return dataReturn;
+      } else {
+        return undefined;
+      }
+    });
+    return dataReturn;
+  }
+  return organize();
 }
 
 interface TimeSeriesDaily {
   "Meta Data(Daily)": MetaData;
   "Time Series(Daily)": TimeSeriesDailyData;
+}
+
+export interface MonthData {
+  [symbol: string]: TimeSeriesDailyData;
 }
 
 interface MetaData {
@@ -80,10 +95,15 @@ interface TIME_SERIES {
 }
 
 export interface StockDataFormat {
-  [symbol: string]: FormatedStock
+  [symbol: string]: FormattedStock;
 }
 
-export interface FormatedStock {
+export interface FormattedDataReturn {
+  formattedStockData: StockDataFormat;
+  monthData: MonthData;
+}
+
+export interface FormattedStock {
   symbol: string;
   name: string;
   description: string;

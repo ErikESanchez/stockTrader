@@ -9,17 +9,17 @@
         >
           <div class="card-body text-center">
             <h5 class="card-title">
-              {{ stockData["Company Overview"]["Name"] }}
+              <!-- {{ stockData["Company Overview"]["Name"] }} -->
             </h5>
             <h6 class="card-subtitle mb-2 text-white">
-              {{ stockData["Time Series(Daily)"][latestDate]["2. high"] }}
+              <!-- {{ stockData["Time Series(Daily)"][latestDate]["2. high"] }} -->
             </h6>
             <div v-if="portfolio.ownedStocks">
               <p
                 class="card-text"
                 v-if="portfolio.ownedStocks[symbol] !== undefined"
               >
-                Shares: {{ portfolio.ownedStocks[symbol]["amountOwned"] }}
+                <!-- Shares: {{ portfolio.ownedStocks[symbol]["amountOwned"] }} -->
               </p>
             </div>
             <!-- ⬇ Move buying and selling functionality -->
@@ -43,7 +43,7 @@
     </div>
     <div class="row">
       <div class="col text-white" v-if="loaded === true">
-        {{ stockData["Company Overview"]["Description"] }}
+        <!-- {{ stockData["Company Overview"]["Description"] }} -->
       </div>
     </div>
     <div
@@ -85,8 +85,6 @@
 import Vue from "vue";
 import StockChart from "../components/StockChart.vue";
 import store from "@/store";
-import { TimeSeriesDaily, StockData } from "@/storeModules/marketData";
-import { newStockTransaction, UserPortfolio } from "@/storeModules/portfolio";
 import { mapGetters } from "vuex";
 export default Vue.extend({
   name: "singleStock",
@@ -96,8 +94,8 @@ export default Vue.extend({
   data() {
     return {
       loaded: Boolean(),
-      chartData: Object(),
       stockData: Object(),
+      chartData: Object(),
       latestDate: String(),
       symbol: String(),
     };
@@ -106,101 +104,92 @@ export default Vue.extend({
     this.chartDataFormat(12);
   },
   watch: {
-    allStocks() {
+    monthData() {
       this.chartDataFormat(12);
     },
   },
   methods: {
-    buyStock(stock: StockData): void {
-      let portfolio: UserPortfolio = this.portfolio;
-      if (
-        portfolio.availableFunds >
-        Number(stock["Time Series(Daily)"][this.latestDate]["2. high"])
-      ) {
-        let boughtStockTransaction: newStockTransaction = {
-          symbol: stock["Meta Data"]["2. Symbol"],
-          data: {
-            priceAtTransaction: Number(
-              stock["Time Series(Daily)"][this.latestDate]["2. high"]
-            ),
-            amount: 1,
-            time: new Date(),
-          },
-          name: stock["Company Overview"].Name,
-        };
-        store.dispatch("portfolio/buyStock", boughtStockTransaction);
-      }
-    },
-    sellStock(stock: StockData) {
-      let sellStockTransaction: newStockTransaction = {
-        symbol: stock["Meta Data"]["2. Symbol"],
-        data: {
-          priceAtTransaction: Number(
-            stock["Time Series(Daily)"][this.latestDate]["2. high"]
-          ),
-          amount: 1,
-          time: new Date(),
-        },
-        name: stock["Company Overview"].Name,
-      };
-      store.dispatch("portfolio/sellStock", sellStockTransaction);
-    },
     async chartDataFormat(days: number): Promise<void> {
-      const name: string = this.$router.currentRoute.params.stockName;
-      if (this.allStocks[name] != undefined) {
-        this.stockData = this.allStocks[name];
-        this.symbol = this.stockData["Meta Data"]["2. Symbol"];
+      const symbol: string = this.$router.currentRoute.params.stockName;
+      if (this.monthData[symbol] != undefined) {
         let dataCollection: DataCollection = {
           labels: [],
           datasets: [
             {
-              name: name,
+              name: symbol,
               data: [],
             },
           ],
         };
-        await store
-          .dispatch("marketData/getMonthData", name)
-          .then((monthData: TimeSeriesDaily) => {
-            if (monthData) {
-              const orderedDates: Array<string> = Object.keys(
-                monthData["Time Series(Daily)"]
-              ).sort(function(a: string, b: string) {
-                a = a
-                  .split("/")
-                  .reverse()
-                  .join("");
-                b = b
-                  .split("/")
-                  .reverse()
-                  .join("");
-                return a > b ? 1 : a < b ? -1 : 0;
-              });
-              orderedDates.forEach(
-                (date: string, index: number, dateArray: Array<string>) => {
-                  if (
-                    monthData["Time Series(Daily)"][date] != undefined &&
-                    index > days
-                  ) {
-                    dataCollection.datasets[0].data.push(
-                      monthData["Time Series(Daily)"][date]["4. close"]
-                    );
-                    dataCollection.labels.push(date);
-                    if (index === dateArray.length - 1) {
-                      this.latestDate = date;
-                      this.loaded = true;
-                      this.chartData = dataCollection;
-                    }
-                  }
-                }
+        const orderedDates: Array<string> = Object.keys(
+          this.monthData[symbol]
+        ).sort(function (a: string, b: string) {
+          a = a.split("/").reverse().join("");
+          b = b.split("/").reverse().join("");
+          return a > b ? 1 : a < b ? -1 : 0;
+        });
+        console.log(this.monthData["AAPL"]);
+        orderedDates.forEach(
+          (date: string, index: number, dateArray: Array<string>) => {
+            if (this.monthData[symbol]) {
+              dataCollection.datasets[0].data.push(
+                this.monthData[symbol][date]["4. close"]
               );
+              console.log(date)
+              dataCollection.labels.push(date);
+              if (index === dateArray.length - 1) {
+                this.latestDate = date;
+                this.loaded = true;
+                this.chartData = dataCollection;
+              }
             }
-          });
+          }
+        );
+        // await store
+        //   .dispatch("marketData/getMonthData", name)
+        //   .then((monthData: TimeSeriesDaily) => {
+        //     if (monthData) {
+        //     }
+        //   });
       }
     },
+    // buyStock(stock: any) {
+    //   let portfolio: UserPortfolio = this.portfolio;
+    //   if (
+    //     portfolio.funds >
+    //     Number(stock["Time Series(Daily)"][this.latestDate]["2. high"])
+    //   ) {
+    //     let boughtStockTransaction: newStockTransaction = {
+    //       symbol: stock["Meta Data"]["2. Symbol"],
+    //       data: {
+    //         priceAtTransaction: Number(
+    //           stock["Time Series(Daily)"][this.latestDate]["2. high"]
+    //         ),
+    //         amount: 1,
+    //         time: new Date(),
+    //       },
+    //       name: stock["Company Overview"].Name,
+    //     };
+    //     store.dispatch("portfolio/buyStock", boughtStockTransaction);
+    //   }
+    // },
+    // sellStock(stock: StockData) {
+    //   let sellStockTransaction: newStockTransaction = {
+    //     symbol: stock["Meta Data"]["2. Symbol"],
+    //     data: {
+    //       priceAtTransaction: Number(
+    //         stock["Time Series(Daily)"][this.latestDate]["2. high"]
+    //       ),
+    //       amount: 1,
+    //       time: new Date(),
+    //     },
+    //     name: stock["Company Overview"].Name,
+    //   };
+    //   store.dispatch("portfolio/sellStock", sellStockTransaction);
+    // },
   },
   computed: {
-    ...mapGetters({ allStocks: "marketData/allStockData" }),
+    ...mapGetters({ monthData: "marketData/monthData" }),
     ...mapGetters({ portfolio: "portfolio/portfolio" }),
   },
 });
