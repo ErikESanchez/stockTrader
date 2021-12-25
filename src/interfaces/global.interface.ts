@@ -1,8 +1,8 @@
 export interface UserPortfolio {
   funds: number;
+  portfolioWorth?: number;
   name?: string;
   ownedStocks: FirebaseStockInfo;
-  portfolioWorth: number;
   photoURL?: string;
 }
 
@@ -22,4 +22,9 @@ export interface newStockTransaction {
   priceAtTransaction: number;
   amount: number;
   time: string;
+}
+
+export interface PortfolioChange {
+  funds: number;
+  ownedStocks: FirebaseStockInfo
 }

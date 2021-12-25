@@ -2,39 +2,55 @@ import {
   FirebaseStockInfo,
   FirebaseStockTransactions,
   newStockTransaction,
+  PortfolioChange,
   UserPortfolio,
 } from "./global.interface";
 
 export function buyTransactionUpdate(
   localPortfolio: UserPortfolio,
   stockTransaction: newStockTransaction
-): FirebaseStockInfo {
+): PortfolioChange {
   let symbol: string = stockTransaction.symbol;
-  let ownedStock: FirebaseStockInfo;
+  let portfolioChanges: PortfolioChange;
+  let updatedFunds: number = localPortfolio.funds - stockTransaction.priceAtTransaction
   if (localPortfolio.ownedStocks[symbol]) {
     let newAmountOfOwned: number =
       localPortfolio.ownedStocks[symbol].owned + stockTransaction.amount;
-    ownedStock = {
-      [symbol]: {
-        owned: newAmountOfOwned,
+    portfolioChanges = {
+      ownedStocks: {
+        [symbol]: {
+          owned: newAmountOfOwned,
+        },
       },
-    };
-    return ownedStock;
+      funds: updatedFunds
+    }
+    return portfolioChanges;
   } else {
-    ownedStock = {
-      [symbol]: {
-        owned: stockTransaction.amount,
+    portfolioChanges = {
+      ownedStocks: {
+        [symbol]: {
+          owned: stockTransaction.amount,
+        },
       },
-    };
-    return ownedStock;
+      funds: updatedFunds
+    }
+    return portfolioChanges;
   }
 }
 
-// export function sellTransactionUpdate(
-//   localPortfolio: UserPortfolio,
-//   sellStockTransaction: newStockTransaction
-// ) {
-//   console.log(sellStockTransaction);
-//   let symbol: string = sellStockTransaction.symbol;
-// }
+export function sellTransactionUpdate(
+  localPortfolio: UserPortfolio,
+  sellStockTransaction: newStockTransaction
+): PortfolioChange {
+  let symbol: string = sellStockTransaction.symbol;
+  let portfolioChanges: PortfolioChange = {
+    funds: localPortfolio.funds + sellStockTransaction.amount,
+    ownedStocks: {
+      [symbol]: {
+        owned: localPortfolio.ownedStocks[symbol].owned + sellStockTransaction.amount
+      }
+    }
+  };
+  return portfolioChanges
+}
 

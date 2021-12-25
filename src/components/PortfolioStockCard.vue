@@ -18,7 +18,7 @@
           style="margin-top: 5px"
           type="number"
           :min="1"
-          v-model="amountToBuy"
+          v-model="amountToSell"
         />
       </div>
     </div>
@@ -34,18 +34,17 @@ export default Vue.extend({
   data() {
     return {
       stockRoute: "stocks/" + this.symbol,
-      amountToBuy: 1,
+      amountToSell: 1,
     };
   },
   mounted() {},
   methods: {
-    sellStock(stock: any) {
+    sellStock() {
       // *Change selling logic to conform with all the data in the stock parameter
-
       let sellStockTransaction: newStockTransaction = {
         symbol: this.symbol,
         priceAtTransaction: this.stockData["high"],
-        amount: this.amountToBuy,
+        amount: -this.amountToSell,
         time: new Date().toString(),
       };
       store.dispatch("portfolio/sellStock", sellStockTransaction);
