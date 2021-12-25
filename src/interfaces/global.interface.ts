@@ -13,10 +13,8 @@ export interface FirebaseStockInfo {
 }
 
 export interface FirebaseStockTransactions {
-  [timeOfTransaction: string]: {
     priceAtTransaction: number;
     quantity: number;
-  };
 }
 
 export interface newStockTransaction {

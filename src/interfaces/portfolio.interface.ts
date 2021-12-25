@@ -8,38 +8,33 @@ import {
 export function buyTransactionUpdate(
   localPortfolio: UserPortfolio,
   stockTransaction: newStockTransaction
-): UserPortfolio {
+): FirebaseStockInfo {
   let symbol: string = stockTransaction.symbol;
-  let transaction: FirebaseStockTransactions = {
-    [stockTransaction.time]: {
-      quantity: stockTransaction.amount,
-      priceAtTransaction: stockTransaction.priceAtTransaction,
-    },
-  };
-//   console.log(localPortfolio);
+  let ownedStock: FirebaseStockInfo;
   if (localPortfolio.ownedStocks[symbol]) {
     let newAmountOfOwned: number =
       localPortfolio.ownedStocks[symbol].owned + stockTransaction.amount;
-    localPortfolio.ownedStocks = {
+    ownedStock = {
       [symbol]: {
         owned: newAmountOfOwned,
       },
     };
-    return localPortfolio;
+    return ownedStock;
   } else {
-    localPortfolio.ownedStocks = {
+    ownedStock = {
       [symbol]: {
         owned: stockTransaction.amount,
       },
     };
-    return localPortfolio;
+    return ownedStock;
   }
 }
 
-export function sellTransactionUpdate(
-  localPortfolio: UserPortfolio,
-  sellStockTransaction: newStockTransaction
-) {
-  console.log(sellStockTransaction);
-  let symbol: string = sellStockTransaction.symbol;
-}
+// export function sellTransactionUpdate(
+//   localPortfolio: UserPortfolio,
+//   sellStockTransaction: newStockTransaction
+// ) {
+//   console.log(sellStockTransaction);
+//   let symbol: string = sellStockTransaction.symbol;
+// }
+

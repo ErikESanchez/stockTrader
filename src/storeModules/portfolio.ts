@@ -3,9 +3,10 @@ import { auth, firestore } from "@/firebase";
 import { collection, getDocs, getDoc, doc, setDoc } from "firebase/firestore";
 import {
   buyTransactionUpdate,
-  sellTransactionUpdate,
+  // sellTransactionUpdate,
 } from "@/interfaces/portfolio.interface";
 import {
+  FirebaseStockInfo,
   newStockTransaction,
   UserPortfolio,
 } from "@/interfaces/global.interface";
@@ -52,57 +53,43 @@ const actions: ActionTree<any, any> = {
     let uid: string = rootGetters["userModule/user"].uid;
     let symbol: string = stockTransaction.symbol;
     let localPortfolio: UserPortfolio = getters.portfolio;
-    let portfolioCollection = collection(firestore, "portfolios");
-    let portfolioUserDocument = doc(portfolioCollection, uid);
-    let portfolioTransactionsCollection = collection(
-      portfolioUserDocument,
-      "transactions"
-    );
-    let portfolioTransactionDocument = doc(
-      portfolioTransactionsCollection,
-      symbol
-    );
-    // * Updating firebase values
-    let updatedPortfolio = buyTransactionUpdate(
+    let portfolioUserDocument = doc(firestore, `portfolios/${uid}`);
+    let updatedTransactions: FirebaseStockInfo = buyTransactionUpdate(
       localPortfolio,
       stockTransaction
     );
-    let updatedOwnedStock = updatedPortfolio.ownedStocks[symbol];
-    const transactionSnapshot = await getDoc(portfolioUserDocument);
-    const portfolioSnapshot = await getDoc(portfolioTransactionDocument);
-// 
-    // if (portfolioSnapshot.exists()) {
-      console.log(portfolioSnapshot.data());
-    // } else {
-      // console.log("Does not exist");
-    // }
-    // setDoc(
-    //   portfolioUserDocument,
-    //   {
-    //     ownedStocks: {
-    //       [symbol]: updatedOwnedStock,
-    //     },
-    //   },
-    //   { merge: true }
-    // ).then(() => {
-    //   commit("setUserPortfolio", updatedPortfolio);
-    // });
+    await setDoc(
+      portfolioUserDocument,
+      {
+        ownedStocks: updatedTransactions
+      },
+      { merge: true }
+    ).then(async () => {
+      localPortfolio.ownedStocks[symbol] = updatedTransactions[symbol]
+      commit("setUserPortfolio", localPortfolio);
+      let transactionSymbol = collection(firestore, `portfolios/${uid}/transactions/buying/${symbol}`)
+      let transactionTimeDocument = doc(transactionSymbol, stockTransaction.time)
+      setDoc(transactionTimeDocument, {
+        priceAtTransaction: stockTransaction.priceAtTransaction,
+        amount: stockTransaction.amount
+      })
+    })
   },
-  async sellStock(
-    { commit, rootGetters, getters },
-    sellStockTransaction: newStockTransaction
-  ) {
-    let uid: string = rootGetters["userModule/user"].uid;
-    let symbol: string = sellStockTransaction.symbol;
-    let localPortfolio: UserPortfolio = getters.portfolio;
-    let portfolioCollection = collection(firestore, "portfolios");
-    let portfolioUserDocument = doc(portfolioCollection, uid);
-    let updatedPortfolio = sellTransactionUpdate(
-      localPortfolio,
-      sellStockTransaction
-    );
-    updatedPortfolio;
-  },
+  // async sellStock(
+  //   { commit, rootGetters, getters },
+  //   sellStockTransaction: newStockTransaction
+  // ) {
+  //   let uid: string = rootGetters["userModule/user"].uid;
+  //   let symbol: string = sellStockTransaction.symbol;
+  //   let localPortfolio: UserPortfolio = getters.portfolio;
+  //   let portfolioCollection = collection(firestore, "portfolios");
+  //   let portfolioUserDocument = doc(portfolioCollection, uid);
+  //   let updatedPortfolio = sellTransactionUpdate(
+  //     localPortfolio,
+  //     sellStockTransaction
+  //   );
+  //   updatedPortfolio;
+  // },
 };
 
 interface State {
@@ -120,7 +107,7 @@ export interface stockData {
   name: string;
 }
 
-export default { 
+export default {
   namespaced: true,
   actions,
   mutations,
