@@ -1,60 +1,56 @@
 <template>
   <div>
-    <div class="card bg-dark text-white" style="margin-bottom: 5px">
+    <div class="card bg-dark text-white container" style="margin-bottom: 5px">
       <div class="card-body text-center">
         <router-link :to="stockRoute" class="text-white">
-          <h5 class="card-title">{{ stock.portfolio.name }}</h5>
+          <h5 class="card-title">{{ symbol }}</h5>
         </router-link>
-        <p class="card-text">Share: {{ stock.portfolio.amountOwned }}</p>
+        <p class="card-text">Share: {{ ownedStock.owned }}</p>
         <p class="card-text">
-          Price of Stock:
-          {{
-            stock["allStockData"]["Time Series(Daily)"][
-              stock["allStockData"]["Meta Data"]["3. Last Refreshed"]
-            ]["2. high"]
-          }}
+          Price:
+          {{ stockData["high"] }}
         </p>
-        <button class="btn btn-light rounded-pill" @click="sellStock(stock)">
+        <button class="btn btn-light rounded-pill" @click="sellStock()">
           Sell Stock
         </button>
+        <input
+          class="input-group-text"
+          style="margin-top: 5px"
+          type="number"
+          :min="1"
+          v-model="amountToSell"
+        />
       </div>
     </div>
   </div>
 </template>
 
 <script lang="ts">
-/* eslint-disable */
-import { newStockTransaction, stockData } from "@/storeModules/portfolio";
-import { OwnedAndMarketStocks, SingleOwnedMarketAndStocks } from "@/views/Portfolio.vue";
+import { newStockTransaction } from "@/interfaces/global.interface";
 import Vue from "vue";
 import store from "../store";
 export default Vue.extend({
-  props: ["stock"],
+  props: ["ownedStock", "symbol", "stockData"],
   data() {
     return {
-      stockRoute: "stocks/" + this.stock.portfolio.name,
+      stockRoute: "stocks/" + this.symbol,
+      amountToSell: 1,
     };
   },
+  mounted() {},
   methods: {
-    sellStock(stock: SingleOwnedMarketAndStocks) {
+    sellStock() {
       // *Change selling logic to conform with all the data in the stock parameter
-      let latestDate: string = stock["allStockData"]["Meta Data"]["3. Last Refreshed"];
-      console.log(latestDate)
       let sellStockTransaction: newStockTransaction = {
-        symbol: stock.allStockData["Meta Data"]["2. Symbol"],
-        data: {
-          priceAtTransaction: Number(stock.allStockData["Time Series(Daily)"][latestDate]["2. high"]),
-          amount: 1,
-          time: new Date(),
-        },
-        name: stock.allStockData["Company Overview"].Name,
+        symbol: this.symbol,
+        priceAtTransaction: this.stockData["high"],
+        amount: -this.amountToSell,
+        time: new Date().toString(),
       };
       store.dispatch("portfolio/sellStock", sellStockTransaction);
     },
   },
 });
-
-
 </script>
 
 <style></style>

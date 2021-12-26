@@ -1,13 +1,17 @@
 import Vue from "vue";
 // @ts-ignore
 import { ActionTree, GetterTree, MutationTree } from "vuex";
-import { firebaseData } from "@/firebase";
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signOut,
+  updateProfile,
+} from "firebase/auth";
 import router from "@/router";
-import { UserPortfolio } from "./portfolio";
+import { auth } from "@/firebase";
 
 const state: State = {
-  user: Object(),
-  errorMessageForAuth: null,
+  user: Object(), // interface userInterface | null
 };
 
 const getters: GetterTree<any, any> = {
@@ -20,108 +24,75 @@ const mutations: MutationTree<any> = {
   setUser(state: State, user: any) {
     Vue.set(state, "user", user);
   },
-  setErrorMessageForAuth(state: State, errorMessageForAuth: any) {
-    Vue.set(state, "errorMessageForAuth", errorMessageForAuth);
-  },
 };
 
 const actions: ActionTree<any, any> = {
-  async signIn({ commit }: { commit: Function }, userInput: UserInput) {
+  async signIn({ commit }, userInput: UserInput) {
     if (userInput.username !== "" && userInput.password !== "") {
-      new Promise((resolve, reject) => {
-        firebaseData
-          .auth()
-          .signInWithEmailAndPassword(userInput.username, userInput.password)
-          .then((user) => {
-            commit("setUser", user);
+      return new Promise((resolve, reject) => {
+        signInWithEmailAndPassword(auth, userInput.username, userInput.password)
+          .then((userCredential) => {
+            commit("setUser", userCredential.user);
             router.push("/");
             return resolve(resolve);
           })
-          .catch(function (error: any) {
-            return reject(error.message);
+          .catch((error: any) => {
+            // console.log(error.code, error.message);
+            return reject(error.code);
           });
       });
-    }
+    } else return Promise.reject();
   },
-  async signOut({ state }: { state: State }) {
-    firebaseData
-      .auth()
-      .signOut()
+  async signOut({ commit }) {
+    await signOut(auth)
       .then(() => {
-        // console.log("Signed Out");
-        Vue.set(state, "user", Object());
-        state.user = Object();
+        commit("setUser", Object());
       })
-      .catch(function (error: any) {
-        // console.log("Oops... an error occured", error);
-      });
+      .catch(function(error: any) {});
   },
-  async createNewUser({ commit }: { commit: Function }, userInput: UserInput) {
-    if (userInput.username != "" && userInput.password != "") {
-      new Promise((resolve, reject) => {
-        firebaseData
-          .auth()
-          .createUserWithEmailAndPassword(
-            userInput.username,
-            userInput.password
-          )
+  async createNewUser({ commit }, input: UserInput) {
+    if (input.username != "" && input.password != "") {
+      return new Promise((resolve, reject) => {
+        createUserWithEmailAndPassword(auth, input.username, input.password)
           .then(() => {
-            return resolve("resolve");
-          })
-          .catch(function (error: any) {
-            // console.error(error.code, error.message);
-            return reject(error.message);
-          });
-      }).then(() => {
-        firebaseData.auth().onAuthStateChanged(async (user: any) => {
-          if (user) {
-            var uid = user.uid;
-            await firebaseData
-              .firestore()
-              .collection("portfolios")
-              .doc(uid)
-              .set({
-                availableFunds: 10000,
-                name: userInput.username,
-                ownedStocks: {},
-                portfolioWorth: 0,
-                photoURL: "",
-              });
             router.push("/");
-          }
-        });
-        return Promise.resolve();
+            return resolve(resolve);
+          })
+          .catch((error: any) => {
+            return reject(error);
+          });
       });
     }
   },
-  changeUserName({ state }: { state: State }, newUsername: string) {
-    state.user.displayName = newUsername;
-    state.user
-      // @ts-ignore
-      .updateProfile({
+  async changeUserName({ state }, newUsername: string) {
+    if (auth.currentUser) {
+      updateProfile(auth.currentUser, {
         displayName: newUsername,
       })
-      .then(function () {
-        // Update successful.
-      })
-      .catch(function (error: any) {
-        console.error(error);
-        // An error happened.
-      });
+        .then(function() {
+          // Update successful.
+        })
+        .catch(function(error: any) {
+          console.error(error);
+          // An error happened.
+        });
+    }
   },
-  changeUserPicture({ state }: { state: State }, userLink: string) {
-    state.user.photoURL = userLink;
-    state.user
-      // @ts-ignore
-      .updateProfile({
+  changeUserPicture({ state, getters }, userLink: string) {
+    if (auth.currentUser) {
+      console.log(userLink);
+      updateProfile(auth.currentUser, {
+        // ? Isn't changing or updating photoURL firebase-side
         photoURL: userLink,
       })
-      .then(function () {
-        // Update succcessful
-      })
-      .catch(function (error: any) {
-        console.error(error);
-      });
+        .then(function() {
+          console.log("bruh");
+          // Update succcessful
+        })
+        .catch(function(error: any) {
+          console.error(error);
+        });
+    }
   },
 };
 
@@ -130,7 +101,10 @@ interface State {
     displayName: string;
     photoURL: string;
   };
-  errorMessageForAuth: any;
+}
+
+interface Getters {
+  getUser(): string;
 }
 
 export interface ScreenDimensions {

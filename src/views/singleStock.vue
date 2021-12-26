@@ -9,19 +9,17 @@
         >
           <div class="card-body text-center">
             <h5 class="card-title">
-              {{ stockData["Company Overview"]["Name"] }}
+              {{ stockData[symbol].name }}
             </h5>
             <h6 class="card-subtitle mb-2 text-white">
-              {{ stockData["Time Series(Daily)"][latestDate]["2. high"] }}
+              {{ stockData[symbol]["high"] }}
             </h6>
-            <div v-if="portfolio.ownedStocks">
-              <p
-                class="card-text"
-                v-if="portfolio.ownedStocks[symbol] !== undefined"
-              >
-                Shares: {{ portfolio.ownedStocks[symbol]["amountOwned"] }}
+            <!-- Need to find out why it gives error -->
+            <!-- <div v-if="portfolio.ownedStocks[symbol] !== undefined">
+              <p class="card-text">
+                Shares: {{ portfolio.ownedStocks[symbol]["owned"] }}
               </p>
-            </div>
+            </div> -->
             <!-- ⬇ Move buying and selling functionality -->
             <button
               type="button"
@@ -43,7 +41,7 @@
     </div>
     <div class="row">
       <div class="col text-white" v-if="loaded === true">
-        {{ stockData["Company Overview"]["Description"] }}
+        <!-- {{ stockData[symbol]["description"] }} -->
       </div>
     </div>
     <div
@@ -75,7 +73,7 @@
       <label
         class="btn btn-outline-primary"
         for="btnradio3"
-        @click="chartDataFormat(12)"
+        @click="chartDataFormat(7)"
         >1 Month</label
       >
     </div>
@@ -85,8 +83,6 @@
 import Vue from "vue";
 import StockChart from "../components/StockChart.vue";
 import store from "@/store";
-import { TimeSeriesDaily, StockData } from "@/storeModules/marketData";
-import { newStockTransaction, UserPortfolio } from "@/storeModules/portfolio";
 import { mapGetters } from "vuex";
 export default Vue.extend({
   name: "singleStock",
@@ -97,7 +93,6 @@ export default Vue.extend({
     return {
       loaded: Boolean(),
       chartData: Object(),
-      stockData: Object(),
       latestDate: String(),
       symbol: String(),
     };
@@ -106,102 +101,94 @@ export default Vue.extend({
     this.chartDataFormat(12);
   },
   watch: {
-    allStocks() {
-      this.chartDataFormat(12);
+    monthData() {
+      this.chartDataFormat(25);
     },
   },
   methods: {
-    buyStock(stock: StockData): void {
-      let portfolio: UserPortfolio = this.portfolio;
-      if (
-        portfolio.availableFunds >
-        Number(stock["Time Series(Daily)"][this.latestDate]["2. high"])
-      ) {
-        let boughtStockTransaction: newStockTransaction = {
-          symbol: stock["Meta Data"]["2. Symbol"],
-          data: {
-            priceAtTransaction: Number(
-              stock["Time Series(Daily)"][this.latestDate]["2. high"]
-            ),
-            amount: 1,
-            time: new Date(),
-          },
-          name: stock["Company Overview"].Name,
-        };
-        store.dispatch("portfolio/buyStock", boughtStockTransaction);
-      }
-    },
-    sellStock(stock: StockData) {
-      let sellStockTransaction: newStockTransaction = {
-        symbol: stock["Meta Data"]["2. Symbol"],
-        data: {
-          priceAtTransaction: Number(
-            stock["Time Series(Daily)"][this.latestDate]["2. high"]
-          ),
-          amount: 1,
-          time: new Date(),
-        },
-        name: stock["Company Overview"].Name,
-      };
-      store.dispatch("portfolio/sellStock", sellStockTransaction);
-    },
     async chartDataFormat(days: number): Promise<void> {
-      const name: string = this.$router.currentRoute.params.stockName;
-      if (this.allStocks[name] != undefined) {
-        this.stockData = this.allStocks[name];
-        this.symbol = this.stockData["Meta Data"]["2. Symbol"];
+      this.symbol = this.$router.currentRoute.params.stockName;
+      if (this.monthData[this.symbol] != undefined) {
         let dataCollection: DataCollection = {
           labels: [],
           datasets: [
             {
-              name: name,
+              name: this.symbol,
               data: [],
             },
           ],
         };
-        await store
-          .dispatch("marketData/getMonthData", name)
-          .then((monthData: TimeSeriesDaily) => {
-            if (monthData) {
-              const orderedDates: Array<string> = Object.keys(
-                monthData["Time Series(Daily)"]
-              ).sort(function(a: string, b: string) {
-                a = a
-                  .split("/")
-                  .reverse()
-                  .join("");
-                b = b
-                  .split("/")
-                  .reverse()
-                  .join("");
-                return a > b ? 1 : a < b ? -1 : 0;
-              });
-              orderedDates.forEach(
-                (date: string, index: number, dateArray: Array<string>) => {
-                  if (
-                    monthData["Time Series(Daily)"][date] != undefined &&
-                    index > days
-                  ) {
-                    dataCollection.datasets[0].data.push(
-                      monthData["Time Series(Daily)"][date]["4. close"]
-                    );
-                    dataCollection.labels.push(date);
-                    if (index === dateArray.length - 1) {
-                      this.latestDate = date;
-                      this.loaded = true;
-                      this.chartData = dataCollection;
-                    }
-                  }
-                }
+        const orderedDates: Array<string> = Object.keys(
+          this.monthData[this.symbol]
+        ).sort(function (a: string, b: string) {
+          a = a.split("/").reverse().join("");
+          b = b.split("/").reverse().join("");
+          return a > b ? 1 : a < b ? -1 : 0;
+        });
+        orderedDates.forEach(
+          (date: string, index: number, dateArray: Array<string>) => {
+            if (this.monthData[this.symbol]) {
+              dataCollection.datasets[0].data.push(
+                this.monthData[this.symbol][date]["4. close"]
               );
+              dataCollection.labels.push(date);
+              if (index === dateArray.length - 1) {
+                this.latestDate = date;
+                this.loaded = true;
+                this.chartData = dataCollection;
+              }
             }
-          });
+          }
+        );
+        // await store
+        //   .dispatch("marketData/getMonthData", name)
+        //   .then((monthData: TimeSeriesDaily) => {
+        //     if (monthData) {
+        //     }
+        //   });
       }
     },
+    // buyStock(stock: any) {
+    //   let portfolio: UserPortfolio = this.portfolio;
+    //   if (
+    //     portfolio.funds >
+    //     Number(stock["Time Series(Daily)"][this.latestDate]["2. high"])
+    //   ) {
+    //     let boughtStockTransaction: newStockTransaction = {
+    //       symbol: stock["Meta Data"]["2. Symbol"],
+    //       data: {
+    //         priceAtTransaction: Number(
+    //           stock["Time Series(Daily)"][this.latestDate]["2. high"]
+    //         ),
+    //         amount: 1,
+    //         time: new Date(),
+    //       },
+    //       name: stock["Company Overview"].Name,
+    //     };
+    //     store.dispatch("portfolio/buyStock", boughtStockTransaction);
+    //   }
+    // },
+    // sellStock(stock: StockData) {
+    //   let sellStockTransaction: newStockTransaction = {
+    //     symbol: stock["Meta Data"]["2. Symbol"],
+    //     data: {
+    //       priceAtTransaction: Number(
+    //         stock["Time Series(Daily)"][this.latestDate]["2. high"]
+    //       ),
+    //       amount: 1,
+    //       time: new Date(),
+    //     },
+    //     name: stock["Company Overview"].Name,
+    //   };
+    //   store.dispatch("portfolio/sellStock", sellStockTransaction);
+    // },
   },
   computed: {
-    ...mapGetters({ allStocks: "marketData/allStockData" }),
-    ...mapGetters({ portfolio: "portfolio/portfolio" }),
+    ...mapGetters({
+      portfolio: "portfolio/portfolio",
+      monthData: "marketData/monthData",
+      stockData: "marketData/formattedStocks",
+    }),
   },
 });
 

@@ -12,35 +12,26 @@
 <script lang="ts">
 import Vue from "vue";
 import Navbar from "./components/Navbar.vue";
-import { firebaseData } from "@/firebase";
 import store from "@/store";
-import { mapGetters } from "vuex";
-import { ScreenDimensions } from "./storeModules/userModule";
-// Todo: Create type definiton!
-// @ts-ignore
-import { debounce } from "debounce";
+import { auth } from "@/firebase";
+import { onAuthStateChanged } from "@firebase/auth";
+
 export default Vue.extend({
   name: "App",
   components: {
     Navbar,
   },
   async mounted() {
-    if (this.formatedStocks[0] === undefined) {
-      await store.dispatch("marketData/getDatabaseDailyData");
-    }
-    firebaseData.auth().onAuthStateChanged(async (user) => {
+    onAuthStateChanged(auth, async (user) => {
       if (user) {
         store.commit("userModule/setUser", user);
-        await store.dispatch("portfolio/getAllDBPortfolios", user.uid);
-        let userPortfolios = store.getters["portfolio/userPortfolios"];
-        store.dispatch("userPublicData/downloadUserPictures", userPortfolios);
+        await store.dispatch("marketData/getDatabaseDailyData");
+        await store.dispatch("portfolio/getAllPortfolios", user.uid);
       } else {
-        store.commit("userModule/setUser", Object);
-        console.log("$$$ Sign Up to get some dolla dolla bills yall $$$");
+        // user is signed out
       }
     });
   },
-  computed: mapGetters({ formatedStocks: "marketData/formatedStocks" }),
 });
 </script>
 
@@ -50,7 +41,7 @@ export default Vue.extend({
 #app {
   font: 17px Poppins Helvetica, sans-serif !important;
   background: #181a1b !important;
-  color: white
+  color: white;
 }
 html {
   font: 17px Poppins Helvetica, sans-serif !important;

@@ -71,9 +71,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { firebaseData } from "../firebase";
 import store from "@/store";
-import { mapGetters } from "vuex";
 export default Vue.extend({
   data() {
     return {
@@ -89,8 +87,9 @@ export default Vue.extend({
       await store
         .dispatch("userModule/createNewUser", this.userInput)
         .then(() => {
-          let modalBackdrop =
-            document.getElementsByClassName("modal-backdrop")[0];
+          let modalBackdrop = document.getElementsByClassName(
+            "modal-backdrop"
+          )[0];
           modalBackdrop.remove();
         })
         .catch((error) => {

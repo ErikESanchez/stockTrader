@@ -1,13 +1,21 @@
-import Vue from "vue";
 import { ActionTree, GetterTree, MutationTree } from "vuex";
-import { firebaseData } from "@/firebase";
-import { Portfolio } from "@/Classes/Portfolio";
-import firebase from "firebase/compat/app";
+import { auth, firestore } from "@/firebase";
+import { collection, getDocs, getDoc, doc, setDoc } from "firebase/firestore";
+import {
+  buyTransactionUpdate,
+  sellTransactionUpdate,
+  // sellTransactionUpdate,
+} from "@/interfaces/portfolio.interface";
+import {
+  FirebaseStockInfo,
+  newStockTransaction,
+  PortfolioChange,
+  UserPortfolio,
+} from "@/interfaces/global.interface";
+import store from "@/store";
 const state: State = {
-  funds: Number(),
   portfolio: Object(),
   userPortfolios: [],
-  uid: String(),
 };
 const getters: GetterTree<any, any> = {
   portfolio: (state: State) => {
@@ -24,243 +32,116 @@ const mutations: MutationTree<any> = {
   setUserPortfolio(state, portfolio: UserPortfolio) {
     state.portfolio = portfolio;
   },
-  setUid(state, uid: string) {
-    state.uid = uid;
-  },
 };
+
 const actions: ActionTree<any, any> = {
-  async getAllDBPortfolios({ commit }, uid: string) {
+  async getAllPortfolios({ commit }, uid: string) {
     let localUserPortfolios: Array<UserPortfolio> = [];
-    await firebaseData
-      .firestore()
-      .collection("portfolios")
-      // ! I don't know why this makes three calls?
-      // ? The get function just automatically makes them
-      .get()
-      .then((querySnapshot: any) => {
-        querySnapshot.forEach((userPortfolios: doc) => {
-          localUserPortfolios.push(userPortfolios.data());
-          if (userPortfolios.id === uid) {
-            console.log();
-            commit("setUserPortfolio", userPortfolios.data() as UserPortfolio);
-          }
-        });
-      });
+    const querySnapshot = await getDocs(collection(firestore, "portfolios"));
+    querySnapshot.forEach((userPortfolios: UserPortfoliosDoc) => {
+      if (userPortfolios.data()) {
+        localUserPortfolios.push(userPortfolios.data());
+      }
+      if (userPortfolios.id === uid) {
+        commit("setUserPortfolio", userPortfolios.data());
+      }
+    });
     commit("setAllUserPortfolios", localUserPortfolios as Array<UserPortfolio>);
-    commit("setUid", uid);
   },
+  // ? Perhaps call another functions to calculate portfolio
+  // ? worth every buy or sell for other stock prices
   async buyStock(
-    { state, dispatch, commit },
+    { commit, rootGetters, getters },
     stockTransaction: newStockTransaction
   ) {
-    let portfolio: UserPortfolio = state.portfolio;
-    let portfolioClass: Portfolio = new Portfolio(portfolio, stockTransaction);
-    if (portfolio.ownedStocks[`${stockTransaction.symbol}`]) {
-      console.log(`You own ${stockTransaction.symbol}, adding to portfolio`);
-      portfolio = {
-        availableFunds: portfolioClass.calculateBoughtAvailableFunds(),
+    let uid: string = rootGetters["userModule/user"].uid;
+    let symbol: string = stockTransaction.symbol;
+    let localPortfolio: UserPortfolio = getters.portfolio;
+    let portfolioUserDocument = doc(firestore, `portfolios/${uid}`);
+    let updatedTransactions: PortfolioChange = buyTransactionUpdate(
+      localPortfolio,
+      stockTransaction
+    );
+    await setDoc(
+      portfolioUserDocument,
+      {
+        ownedStocks: updatedTransactions.ownedStocks,
+        funds: updatedTransactions.funds,
+      },
+      { merge: true }
+    ).then(async () => {
+      localPortfolio = {
         ownedStocks: {
-          [stockTransaction.symbol]: {
-            symbol: stockTransaction.symbol,
-            amountOwned:
-              portfolio.ownedStocks[stockTransaction.symbol].amountOwned +
-              stockTransaction.data.amount,
-            name: stockTransaction.name,
-          },
+          [symbol]: updatedTransactions.ownedStocks[symbol],
         },
-        portfolioWorth: portfolioClass.calculateBoughtPortfolioWorth(),
+        funds: updatedTransactions.funds,
       };
-      await firebaseData
-        .firestore()
-        .collection("portfolios")
-        .doc(state.uid)
-        .set(
-          {
-            availableFunds: portfolio.availableFunds,
-            ownedStocks: portfolio.ownedStocks,
-            portfolioWorth: portfolio.portfolioWorth,
-          },
-          { merge: true }
-        );
-      commit("setUserPortfolio", portfolio);
-      dispatch("getAllDBPortfolios", state.uid);
-    } else if (
-      portfolio.ownedStocks[`${stockTransaction.symbol}`] === undefined
-    ) {
-      await firebaseData
-        .firestore()
-        .collection("portfolios")
-        .doc(state.uid as string)
-        // todo: maybe change this to update ╰(*°▽°*)╯
-        .set(
-          {
-            availableFunds: portfolioClass.calculateBoughtAvailableFunds(),
-            ownedStocks: {
-              [stockTransaction.symbol]: {
-                amountOwned: stockTransaction.data.amount,
-                symbol: stockTransaction.symbol,
-                name: stockTransaction.name,
-              },
-            },
-            portfolioWorth: portfolioClass.calculateBoughtPortfolioWorth(),
-          },
-          { merge: true }
-        );
-      dispatch("getAllDBPortfolios", state.uid);
-    }
+      commit("setUserPortfolio", localPortfolio);
+      let transactionSymbol = collection(
+        firestore,
+        `portfolios/${uid}/transactions/buying/${symbol}`
+      );
+      let transactionTimeDocument = doc(
+        transactionSymbol,
+        stockTransaction.time
+      );
+      setDoc(transactionTimeDocument, {
+        priceAtTransaction: stockTransaction.priceAtTransaction,
+        amount: stockTransaction.amount,
+      });
+    });
   },
   async sellStock(
-    { commit, rootState, getters },
+    { commit, rootGetters, getters },
     sellStockTransaction: newStockTransaction
   ) {
-    let userPortfolios: Array<UserPortfolio> = getters.userPortfolios;
-    let portfolio: UserPortfolio = state.portfolio;
-    if (portfolio.ownedStocks[sellStockTransaction.symbol].amountOwned >= 2) {
-      rootState.marketData.formatedStocks.forEach(async (stock: any) => {
-        if (stock.stockData.symbol === sellStockTransaction.symbol) {
-          portfolio = {
-            availableFunds:
-              portfolio.availableFunds +
-              sellStockTransaction.data.priceAtTransaction,
-            ownedStocks: {
-              [sellStockTransaction.symbol]: {
-                symbol: sellStockTransaction.symbol,
-                amountOwned:
-                  portfolio.ownedStocks[sellStockTransaction.symbol]
-                    .amountOwned - 1,
-                name: sellStockTransaction.name,
-              },
-            },
-            portfolioWorth:
-              portfolio.portfolioWorth -
-              sellStockTransaction.data.priceAtTransaction,
-          };
-          await firebaseData
-            .firestore()
-            .collection("portfolios")
-            .doc(state.uid)
-            .set(
-              {
-                availableFunds: portfolio.availableFunds,
-                ownedStocks: portfolio.ownedStocks,
-                portfolioWorth: portfolio.portfolioWorth,
-              },
-              { merge: true }
-            );
-          await firebaseData
-            .firestore()
-            .collection("portfolios")
-            .doc(state.uid)
-            .get()
-            .then((doc: doc) => {
-              if (doc.exists) {
-                portfolio = doc.data();
-              } else {
-                console.log("bruh");
-              }
-            })
-            .catch((error) => {
-              console.error(error);
-            });
-          commit("setUserPortfolio", portfolio);
-          userPortfolios.forEach(
-            (loopPortfolio: UserPortfolio, index: number) => {
-              if (portfolio.name === loopPortfolio.name) {
-                userPortfolios[index] = portfolio;
-              }
-            }
-          );
-        }
+    // Todo: Make logic to remove symbol from ownedStocks or make a check for 0
+    let uid: string = rootGetters["userModule/user"].uid;
+    let symbol: string = sellStockTransaction.symbol;
+    let localPortfolio: UserPortfolio = getters.portfolio;
+    let portfolioUserDocument = doc(firestore, `portfolios/${uid}`);
+    let updatedPortfolio = sellTransactionUpdate(
+      localPortfolio,
+      sellStockTransaction
+    );
+    setDoc(portfolioUserDocument, {
+      funds: updatedPortfolio.funds,
+      ownedStocks: {
+        [symbol]: updatedPortfolio.ownedStocks[symbol],
+      },
+    }).then(() => {
+      localPortfolio.ownedStocks[symbol] = updatedPortfolio.ownedStocks[symbol];
+      commit("setUserPortfolio", localPortfolio);
+      let transactionSymbol = collection(
+        firestore,
+        `portfolios/${uid}/transactions/selling/${symbol}`
+      );
+      let transactionTimeDocument = doc(
+        transactionSymbol,
+        sellStockTransaction.time
+      );
+      // ? Maybe I should make the amount positive?
+      setDoc(transactionTimeDocument, {
+        priceAtTransaction: sellStockTransaction.priceAtTransaction,
+        amount: sellStockTransaction.amount,
       });
-    }
-    // ? Maybe make it 1
-    else {
-      delete portfolio.ownedStocks[sellStockTransaction.symbol];
-      portfolio.availableFunds =
-        portfolio.availableFunds + sellStockTransaction.data.priceAtTransaction;
-      portfolio.portfolioWorth =
-        portfolio.portfolioWorth - sellStockTransaction.data.priceAtTransaction;
-      // portfolio = {
-      //   availableFunds: portfolio.availableFunds + sellStockTransaction.data.priceAtTransaction,
-      //   portfolioWorth: portfolio.portfolioWorth - sellStockTransaction.data.priceAtTransaction
-      // },
-      await firebaseData
-        .firestore()
-        .collection("portfolios")
-        .doc(state.uid)
-        .set(
-          {
-            availableFunds: portfolio.availableFunds,
-            ownedStocks: {
-              [sellStockTransaction.symbol]:
-                firebase.firestore.FieldValue.delete(),
-            },
-            portfolioWorth: portfolio.portfolioWorth,
-          },
-          { merge: true }
-        );
-      await firebaseData
-        .firestore()
-        .collection("portfolios")
-        .doc(state.uid)
-        .get()
-        .then((doc: doc) => {
-          if (doc.exists) {
-            portfolio = doc.data();
-          }
-        })
-        .catch((error) => {
-          console.error(error);
-        });
-      commit("setUserPortfolio", portfolio);
-    }
+    });
   },
-  // Todo: Create a little message popup (that doesn't interupt UX) for either insufficient funds to not stocks to sell
 };
 
 interface State {
-  funds: number;
   portfolio: UserPortfolio;
   userPortfolios: Object;
-  uid: string;
 }
 
-export interface UserPortfolio {
-  availableFunds: number;
-  name?: string;
-  ownedStocks: firebaseStockTransaction;
-  portfolioWorth: number;
-  photoURL?: string;
-}
-
-export interface firebaseStockTransaction {
-  [symbol: string]: {
-    symbol: string;
-    amountOwned: number;
-    name: string;
-  };
-}
-
-export interface newStockTransaction {
-  symbol: string;
-  data: stockTransactionData;
-  name: string;
-}
-
-interface stockTransactionData {
-  priceAtTransaction: number;
-  amount: number;
-  time: Date;
+interface UserPortfoliosDoc {
+  [id: string]: any;
 }
 
 export interface stockData {
   amountOwned: number;
   symbol: string;
   name: string;
-}
-
-interface doc {
-  [id: string]: any;
 }
 
 export default {
