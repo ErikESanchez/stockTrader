@@ -9,19 +9,17 @@
         >
           <div class="card-body text-center">
             <h5 class="card-title">
-              <!-- {{ stockData["Company Overview"]["Name"] }} -->
+              {{ stockData[symbol].name }}
             </h5>
             <h6 class="card-subtitle mb-2 text-white">
-              <!-- {{ stockData["Time Series(Daily)"][latestDate]["2. high"] }} -->
+              {{ stockData[symbol]["high"] }}
             </h6>
-            <div v-if="portfolio.ownedStocks">
-              <p
-                class="card-text"
-                v-if="portfolio.ownedStocks[symbol] !== undefined"
-              >
-                <!-- Shares: {{ portfolio.ownedStocks[symbol]["amountOwned"] }} -->
+            <!-- Need to find out why it gives error -->
+            <!-- <div v-if="portfolio.ownedStocks[symbol] !== undefined">
+              <p class="card-text">
+                Shares: {{ portfolio.ownedStocks[symbol]["owned"] }}
               </p>
-            </div>
+            </div> -->
             <!-- ⬇ Move buying and selling functionality -->
             <button
               type="button"
@@ -43,7 +41,7 @@
     </div>
     <div class="row">
       <div class="col text-white" v-if="loaded === true">
-        <!-- {{ stockData["Company Overview"]["Description"] }} -->
+        <!-- {{ stockData[symbol]["description"] }} -->
       </div>
     </div>
     <div
@@ -75,7 +73,7 @@
       <label
         class="btn btn-outline-primary"
         for="btnradio3"
-        @click="chartDataFormat(12)"
+        @click="chartDataFormat(7)"
         >1 Month</label
       >
     </div>
@@ -94,7 +92,6 @@ export default Vue.extend({
   data() {
     return {
       loaded: Boolean(),
-      stockData: Object(),
       chartData: Object(),
       latestDate: String(),
       symbol: String(),
@@ -105,37 +102,35 @@ export default Vue.extend({
   },
   watch: {
     monthData() {
-      this.chartDataFormat(12);
+      this.chartDataFormat(25);
     },
   },
   methods: {
     async chartDataFormat(days: number): Promise<void> {
-      const symbol: string = this.$router.currentRoute.params.stockName;
-      if (this.monthData[symbol] != undefined) {
+      this.symbol = this.$router.currentRoute.params.stockName;
+      if (this.monthData[this.symbol] != undefined) {
         let dataCollection: DataCollection = {
           labels: [],
           datasets: [
             {
-              name: symbol,
+              name: this.symbol,
               data: [],
             },
           ],
         };
         const orderedDates: Array<string> = Object.keys(
-          this.monthData[symbol]
+          this.monthData[this.symbol]
         ).sort(function (a: string, b: string) {
           a = a.split("/").reverse().join("");
           b = b.split("/").reverse().join("");
           return a > b ? 1 : a < b ? -1 : 0;
         });
-        console.log(this.monthData["AAPL"]);
         orderedDates.forEach(
           (date: string, index: number, dateArray: Array<string>) => {
-            if (this.monthData[symbol]) {
+            if (this.monthData[this.symbol]) {
               dataCollection.datasets[0].data.push(
-                this.monthData[symbol][date]["4. close"]
+                this.monthData[this.symbol][date]["4. close"]
               );
-              console.log(date)
               dataCollection.labels.push(date);
               if (index === dateArray.length - 1) {
                 this.latestDate = date;
@@ -189,8 +184,11 @@ export default Vue.extend({
     // },
   },
   computed: {
-    ...mapGetters({ monthData: "marketData/monthData" }),
-    ...mapGetters({ portfolio: "portfolio/portfolio" }),
+    ...mapGetters({
+      portfolio: "portfolio/portfolio",
+      monthData: "marketData/monthData",
+      stockData: "marketData/formattedStocks",
+    }),
   },
 });
 

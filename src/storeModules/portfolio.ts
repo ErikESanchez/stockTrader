@@ -2,7 +2,8 @@ import { ActionTree, GetterTree, MutationTree } from "vuex";
 import { auth, firestore } from "@/firebase";
 import { collection, getDocs, getDoc, doc, setDoc } from "firebase/firestore";
 import {
-  buyTransactionUpdate, sellTransactionUpdate,
+  buyTransactionUpdate,
+  sellTransactionUpdate,
   // sellTransactionUpdate,
 } from "@/interfaces/portfolio.interface";
 import {
@@ -47,7 +48,7 @@ const actions: ActionTree<any, any> = {
     });
     commit("setAllUserPortfolios", localUserPortfolios as Array<UserPortfolio>);
   },
-  // ? Perhaps call another functions to calculate portfolio 
+  // ? Perhaps call another functions to calculate portfolio
   // ? worth every buy or sell for other stock prices
   async buyStock(
     { commit, rootGetters, getters },
@@ -65,25 +66,36 @@ const actions: ActionTree<any, any> = {
       portfolioUserDocument,
       {
         ownedStocks: updatedTransactions.ownedStocks,
-        funds: updatedTransactions.funds
+        funds: updatedTransactions.funds,
       },
       { merge: true }
     ).then(async () => {
-      localPortfolio.ownedStocks[symbol] = updatedTransactions.ownedStocks[symbol]
-      localPortfolio.funds = updatedTransactions.funds
+      localPortfolio = {
+        ownedStocks: {
+          [symbol]: updatedTransactions.ownedStocks[symbol],
+        },
+        funds: updatedTransactions.funds,
+      };
       commit("setUserPortfolio", localPortfolio);
-      let transactionSymbol = collection(firestore, `portfolios/${uid}/transactions/buying/${symbol}`)
-      let transactionTimeDocument = doc(transactionSymbol, stockTransaction.time)
+      let transactionSymbol = collection(
+        firestore,
+        `portfolios/${uid}/transactions/buying/${symbol}`
+      );
+      let transactionTimeDocument = doc(
+        transactionSymbol,
+        stockTransaction.time
+      );
       setDoc(transactionTimeDocument, {
         priceAtTransaction: stockTransaction.priceAtTransaction,
-        amount: stockTransaction.amount
-      })
-    })
+        amount: stockTransaction.amount,
+      });
+    });
   },
   async sellStock(
     { commit, rootGetters, getters },
     sellStockTransaction: newStockTransaction
   ) {
+    // Todo: Make logic to remove symbol from ownedStocks or make a check for 0
     let uid: string = rootGetters["userModule/user"].uid;
     let symbol: string = sellStockTransaction.symbol;
     let localPortfolio: UserPortfolio = getters.portfolio;
@@ -95,19 +107,25 @@ const actions: ActionTree<any, any> = {
     setDoc(portfolioUserDocument, {
       funds: updatedPortfolio.funds,
       ownedStocks: {
-        [symbol]: updatedPortfolio.ownedStocks[symbol]
-      }
+        [symbol]: updatedPortfolio.ownedStocks[symbol],
+      },
     }).then(() => {
-      localPortfolio.ownedStocks[symbol] = updatedPortfolio.ownedStocks[symbol]
-      commit('setUserPortfolio', localPortfolio);
-      let transactionSymbol = collection(firestore, `portfolios/${uid}/transactions/selling/${symbol}`)
-      let transactionTimeDocument = doc(transactionSymbol, sellStockTransaction.time)
+      localPortfolio.ownedStocks[symbol] = updatedPortfolio.ownedStocks[symbol];
+      commit("setUserPortfolio", localPortfolio);
+      let transactionSymbol = collection(
+        firestore,
+        `portfolios/${uid}/transactions/selling/${symbol}`
+      );
+      let transactionTimeDocument = doc(
+        transactionSymbol,
+        sellStockTransaction.time
+      );
       // ? Maybe I should make the amount positive?
       setDoc(transactionTimeDocument, {
         priceAtTransaction: sellStockTransaction.priceAtTransaction,
-        amount: sellStockTransaction.amount
-      })
-    })
+        amount: sellStockTransaction.amount,
+      });
+    });
   },
 };
 

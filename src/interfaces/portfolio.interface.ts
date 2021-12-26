@@ -12,8 +12,19 @@ export function buyTransactionUpdate(
 ): PortfolioChange {
   let symbol: string = stockTransaction.symbol;
   let portfolioChanges: PortfolioChange;
-  let updatedFunds: number = localPortfolio.funds - stockTransaction.priceAtTransaction
-  if (localPortfolio.ownedStocks[symbol]) {
+  let updatedFunds: number =
+    localPortfolio.funds - stockTransaction.priceAtTransaction;
+  if (localPortfolio.ownedStocks == undefined) {
+    portfolioChanges = {
+      ownedStocks: {
+        [symbol]: {
+          owned: stockTransaction.amount,
+        },
+      },
+      funds: updatedFunds,
+    };
+    return portfolioChanges;
+  } else {
     let newAmountOfOwned: number =
       localPortfolio.ownedStocks[symbol].owned + stockTransaction.amount;
     portfolioChanges = {
@@ -22,18 +33,8 @@ export function buyTransactionUpdate(
           owned: newAmountOfOwned,
         },
       },
-      funds: updatedFunds
-    }
-    return portfolioChanges;
-  } else {
-    portfolioChanges = {
-      ownedStocks: {
-        [symbol]: {
-          owned: stockTransaction.amount,
-        },
-      },
-      funds: updatedFunds
-    }
+      funds: updatedFunds,
+    };
     return portfolioChanges;
   }
 }
@@ -47,10 +48,11 @@ export function sellTransactionUpdate(
     funds: localPortfolio.funds + sellStockTransaction.amount,
     ownedStocks: {
       [symbol]: {
-        owned: localPortfolio.ownedStocks[symbol].owned + sellStockTransaction.amount
-      }
-    }
+        owned:
+          localPortfolio.ownedStocks[symbol].owned +
+          sellStockTransaction.amount,
+      },
+    },
   };
-  return portfolioChanges
+  return portfolioChanges;
 }
-
