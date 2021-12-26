@@ -1,3 +1,4 @@
+// skipLibCheck will type check firebase types if off
 {
   "compilerOptions": {
     "target": "esnext",
@@ -8,6 +9,7 @@
     "experimentalDecorators": true,
     "strict": true,
     "jsx": "preserve",
+    "skipLibCheck": true,
     "importHelpers": true,
     "moduleResolution": "node",
     "esModuleInterop": true,

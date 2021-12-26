@@ -33,7 +33,7 @@ import {
   newStockTransaction,
   UserPortfolio,
 } from "@/interfaces/global.interface";
-import { FormatedStock, StockDataFormat } from "@/interfaces/market.interface";
+import { FormattedStock } from "@/interfaces/market.interface";
 
 export default Vue.extend({
   props: ["stock"],
@@ -44,7 +44,7 @@ export default Vue.extend({
     };
   },
   methods: {
-    buyStock(stock: FormatedStock): void {
+    buyStock(stock: FormattedStock): void {
       let portfolio: UserPortfolio = store.getters["portfolio/portfolio"];
       if (portfolio.funds > stock.high) {
         let boughtStockTransaction: newStockTransaction = {
