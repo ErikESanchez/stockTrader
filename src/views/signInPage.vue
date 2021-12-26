@@ -72,9 +72,6 @@
 <script lang="ts">
 import Vue from "vue";
 import store from "@/store";
-import { UserInput } from "../storeModules/userModule";
-import { mapGetters } from "vuex";
-
 export default Vue.extend({
   name: "signin",
   data() {

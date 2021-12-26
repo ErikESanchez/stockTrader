@@ -2,9 +2,6 @@
   "compilerOptions": {
     "target": "esnext",
     "module": "esnext",
-    "noImplicitAny": true,
-    "noImplicitThis": true,
-    "noImplicitReturns": true,
     "experimentalDecorators": true,
     "strict": true,
     "jsx": "preserve",

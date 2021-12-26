@@ -17,7 +17,7 @@ export interface FirebaseStockTransactions {
     quantity: number;
 }
 
-export interface newStockTransaction {
+export interface NewStockTransaction {
   symbol: string;
   priceAtTransaction: number;
   amount: number;

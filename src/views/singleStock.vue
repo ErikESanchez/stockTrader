@@ -59,7 +59,7 @@
       <label
         class="btn btn-outline-primary"
         for="btnradio2"
-        @click="chartDataFormat(25)"
+        @click="chartDataFormat()"
         >1 Week</label
       >
 
@@ -73,7 +73,7 @@
       <label
         class="btn btn-outline-primary"
         for="btnradio3"
-        @click="chartDataFormat(7)"
+        @click="chartDataFormat()"
         >1 Month</label
       >
     </div>
@@ -82,7 +82,6 @@
 <script lang="ts">
 import Vue from "vue";
 import StockChart from "../components/StockChart.vue";
-import store from "@/store";
 import { mapGetters } from "vuex";
 export default Vue.extend({
   name: "singleStock",
@@ -98,15 +97,16 @@ export default Vue.extend({
     };
   },
   mounted() {
-    this.chartDataFormat(12);
+    this.chartDataFormat();
   },
   watch: {
     monthData() {
-      this.chartDataFormat(25);
+      this.chartDataFormat();
     },
   },
   methods: {
-    async chartDataFormat(days: number): Promise<void> {
+    // days
+    async chartDataFormat(): Promise<void> {
       this.symbol = this.$router.currentRoute.params.stockName;
       if (this.monthData[this.symbol] != undefined) {
         let dataCollection: DataCollection = {

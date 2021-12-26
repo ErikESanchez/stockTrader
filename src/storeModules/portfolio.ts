@@ -8,7 +8,7 @@ import {
 } from "@/interfaces/portfolio.interface";
 import {
   FirebaseStockInfo,
-  newStockTransaction,
+  NewStockTransaction,
   PortfolioChange,
   UserPortfolio,
 } from "@/interfaces/global.interface";
@@ -36,7 +36,7 @@ const mutations: MutationTree<any> = {
 
 const actions: ActionTree<any, any> = {
   async getAllPortfolios({ commit }, uid: string) {
-    let localUserPortfolios: Array<UserPortfolio> = [];
+    const localUserPortfolios: Array<UserPortfolio> = [];
     const querySnapshot = await getDocs(collection(firestore, "portfolios"));
     querySnapshot.forEach((userPortfolios: UserPortfoliosDoc) => {
       if (userPortfolios.data()) {
@@ -52,13 +52,13 @@ const actions: ActionTree<any, any> = {
   // ? worth every buy or sell for other stock prices
   async buyStock(
     { commit, rootGetters, getters },
-    stockTransaction: newStockTransaction
+    stockTransaction: NewStockTransaction
   ) {
-    let uid: string = rootGetters["userModule/user"].uid;
-    let symbol: string = stockTransaction.symbol;
+    const uid: string = rootGetters["userModule/user"].uid;
+    const symbol: string = stockTransaction.symbol;
     let localPortfolio: UserPortfolio = getters.portfolio;
-    let portfolioUserDocument = doc(firestore, `portfolios/${uid}`);
-    let updatedTransactions: PortfolioChange = buyTransactionUpdate(
+    const portfolioUserDocument = doc(firestore, `portfolios/${uid}`);
+    const updatedTransactions: PortfolioChange = buyTransactionUpdate(
       localPortfolio,
       stockTransaction
     );
@@ -77,11 +77,11 @@ const actions: ActionTree<any, any> = {
         funds: updatedTransactions.funds,
       };
       commit("setUserPortfolio", localPortfolio);
-      let transactionSymbol = collection(
+      const transactionSymbol = collection(
         firestore,
         `portfolios/${uid}/transactions/buying/${symbol}`
       );
-      let transactionTimeDocument = doc(
+      const transactionTimeDocument = doc(
         transactionSymbol,
         stockTransaction.time
       );
@@ -93,14 +93,14 @@ const actions: ActionTree<any, any> = {
   },
   async sellStock(
     { commit, rootGetters, getters },
-    sellStockTransaction: newStockTransaction
+    sellStockTransaction: NewStockTransaction
   ) {
     // Todo: Make logic to remove symbol from ownedStocks or make a check for 0
-    let uid: string = rootGetters["userModule/user"].uid;
-    let symbol: string = sellStockTransaction.symbol;
-    let localPortfolio: UserPortfolio = getters.portfolio;
-    let portfolioUserDocument = doc(firestore, `portfolios/${uid}`);
-    let updatedPortfolio = sellTransactionUpdate(
+    const uid: string = rootGetters["userModule/user"].uid;
+    const symbol: string = sellStockTransaction.symbol;
+    const localPortfolio: UserPortfolio = getters.portfolio;
+    const portfolioUserDocument = doc(firestore, `portfolios/${uid}`);
+    const updatedPortfolio = sellTransactionUpdate(
       localPortfolio,
       sellStockTransaction
     );
@@ -112,11 +112,11 @@ const actions: ActionTree<any, any> = {
     }).then(() => {
       localPortfolio.ownedStocks[symbol] = updatedPortfolio.ownedStocks[symbol];
       commit("setUserPortfolio", localPortfolio);
-      let transactionSymbol = collection(
+      const transactionSymbol = collection(
         firestore,
         `portfolios/${uid}/transactions/selling/${symbol}`
       );
-      let transactionTimeDocument = doc(
+      const transactionTimeDocument = doc(
         transactionSymbol,
         sellStockTransaction.time
       );

@@ -26,8 +26,8 @@
 </template>
 
 <script lang="ts">
-import { newStockTransaction } from "@/interfaces/global.interface";
 import Vue from "vue";
+import { NewStockTransaction } from "@/interfaces/global.interface";
 import store from "../store";
 export default Vue.extend({
   props: ["ownedStock", "symbol", "stockData"],
@@ -41,7 +41,7 @@ export default Vue.extend({
   methods: {
     sellStock() {
       // *Change selling logic to conform with all the data in the stock parameter
-      let sellStockTransaction: newStockTransaction = {
+      let sellStockTransaction: NewStockTransaction = {
         symbol: this.symbol,
         priceAtTransaction: this.stockData["high"],
         amount: -this.amountToSell,

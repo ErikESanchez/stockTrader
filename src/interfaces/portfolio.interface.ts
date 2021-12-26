@@ -1,18 +1,18 @@
 import {
   FirebaseStockInfo,
   FirebaseStockTransactions,
-  newStockTransaction,
+  NewStockTransaction,
   PortfolioChange,
   UserPortfolio,
 } from "./global.interface";
 
 export function buyTransactionUpdate(
   localPortfolio: UserPortfolio,
-  stockTransaction: newStockTransaction
+  stockTransaction: NewStockTransaction
 ): PortfolioChange {
-  let symbol: string = stockTransaction.symbol;
+  const symbol: string = stockTransaction.symbol;
   let portfolioChanges: PortfolioChange;
-  let updatedFunds: number =
+  const updatedFunds: number =
     localPortfolio.funds - stockTransaction.priceAtTransaction;
   if (localPortfolio.ownedStocks == undefined) {
     portfolioChanges = {
@@ -25,7 +25,7 @@ export function buyTransactionUpdate(
     };
     return portfolioChanges;
   } else {
-    let newAmountOfOwned: number =
+    const newAmountOfOwned: number =
       localPortfolio.ownedStocks[symbol].owned + stockTransaction.amount;
     portfolioChanges = {
       ownedStocks: {
@@ -41,10 +41,10 @@ export function buyTransactionUpdate(
 
 export function sellTransactionUpdate(
   localPortfolio: UserPortfolio,
-  sellStockTransaction: newStockTransaction
+  sellStockTransaction: NewStockTransaction
 ): PortfolioChange {
-  let symbol: string = sellStockTransaction.symbol;
-  let portfolioChanges: PortfolioChange = {
+  const symbol: string = sellStockTransaction.symbol;
+  const portfolioChanges: PortfolioChange = {
     funds: localPortfolio.funds + sellStockTransaction.amount,
     ownedStocks: {
       [symbol]: {

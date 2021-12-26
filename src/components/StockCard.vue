@@ -30,7 +30,7 @@
 import Vue from "vue";
 import store from "@/store";
 import {
-  newStockTransaction,
+  NewStockTransaction,
   UserPortfolio,
 } from "@/interfaces/global.interface";
 import { FormattedStock } from "@/interfaces/market.interface";
@@ -47,7 +47,7 @@ export default Vue.extend({
     buyStock(stock: FormattedStock): void {
       let portfolio: UserPortfolio = store.getters["portfolio/portfolio"];
       if (portfolio.funds > stock.high) {
-        let boughtStockTransaction: newStockTransaction = {
+        let boughtStockTransaction: NewStockTransaction = {
           symbol: stock.symbol,
           priceAtTransaction: stock.high,
           amount: this.amountToBuy,

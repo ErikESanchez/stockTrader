@@ -29,7 +29,7 @@ const mutations: MutationTree<any> = {
     state.stocks.push(newStock);
   },
   formatDatabaseData(state, stockPayload: StockDataSymbol) {
-    let formattedStockData = formattingDatabaseData(stockPayload);
+    const formattedStockData = formattingDatabaseData(stockPayload);
     state.formattedStocks = formattedStockData.formattedStockData;
     state.monthData = formattedStockData.monthData;
   },
@@ -37,12 +37,12 @@ const mutations: MutationTree<any> = {
 
 export const actions: ActionTree<any, any> = {
   async getDatabaseDailyData({ commit }) {
-    let stockData: StockDataSymbol = {};
+    const stockData: StockDataSymbol = {};
     const stocksSnapshotInfo = await getDocs(collection(firestore, "stocks"));
     stocksSnapshotInfo.forEach((stockInfo) => {
       if (stockInfo.data()) {
-        let companyInfo = stockInfo.data() as CompanyInfo;
-        let symbol: string = companyInfo["Meta Data(Daily)"]["2. Symbol"];
+        const companyInfo = stockInfo.data() as CompanyInfo;
+        const symbol: string = companyInfo["Meta Data(Daily)"]["2. Symbol"];
         stockData[symbol] = {
           ["Meta Data"]: companyInfo["Meta Data(Daily)"],
           ["Company Overview"]: companyInfo["Company Overview"],
@@ -53,7 +53,7 @@ export const actions: ActionTree<any, any> = {
         return;
       }
     });
-    let currentMonth: string = moment(new Date()).format("YYYY-MM");
+    const currentMonth: string = moment(new Date()).format("YYYY-MM");
     // let lastMonth: string = moment(
     //   new Date().setMonth(new Date().getMonth() - 1)
     // ).format("YYYY-MM");
@@ -61,12 +61,12 @@ export const actions: ActionTree<any, any> = {
     // ! MIGHT ERRR
     // for of loop instead
     Object.keys(stockData).forEach(async (symbol, idx, arr) => {
-      let stocksCollection = collection(firestore, "stocks");
-      let symbolDoc = doc(stocksCollection, symbol);
-      let symbolCollectionSeries = collection(symbolDoc, "Time Series(Daily)");
-      let symbolDocMonth = doc(symbolCollectionSeries, currentMonth);
+      const stocksCollection = collection(firestore, "stocks");
+      const symbolDoc = doc(stocksCollection, symbol);
+      const symbolCollectionSeries = collection(symbolDoc, "Time Series(Daily)");
+      const symbolDocMonth = doc(symbolCollectionSeries, currentMonth);
 
-      let stockSnapshotData = await getDoc(symbolDocMonth);
+      const stockSnapshotData = await getDoc(symbolDocMonth);
       if (idx === arr.length - 1 && stockSnapshotData.exists()) {
         stockData[symbol]["Time Series(Daily)"] = stockSnapshotData.data();
         commit("formatDatabaseData", stockData);

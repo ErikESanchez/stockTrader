@@ -1,18 +1,18 @@
 export function formattingDatabaseData(
   stockPayload: StockDataSymbol
 ): FormattedDataReturn {
-  let formattedStockData: StockDataFormat = {};
-  let monthData: MonthData = {};
+  const formattedStockData: StockDataFormat = {};
+  const monthData: MonthData = {};
   let dataReturn: FormattedDataReturn;
   // ? Perhaps a for of loop
   function organize(): any {
     Object.keys(stockPayload).forEach((symbol: string, idx, arr) => {
-      let lastTradingDay: string =
+      const lastTradingDay: string =
         stockPayload[symbol]["Meta Data"]["3. Last Refreshed"];
-      let metaData: MetaData = stockPayload[symbol]["Meta Data"];
-      let priceData: TimeSeriesData =
+      const metaData: MetaData = stockPayload[symbol]["Meta Data"];
+      const priceData: TimeSeriesData =
         stockPayload[symbol]["Time Series(Daily)"][lastTradingDay];
-      let companyOverview: CompanyOverview =
+      const companyOverview: CompanyOverview =
         stockPayload[symbol]["Company Overview"];
       formattedStockData[symbol] = {
         name: companyOverview["Name"],
@@ -28,7 +28,7 @@ export function formattingDatabaseData(
         volume: Number(priceData["5. volume"]),
         lastRefreshed: metaData["3. Last Refreshed"],
       };
-      let timeSeries: TimeSeriesDailyData =
+      const timeSeries: TimeSeriesDailyData =
         stockPayload[symbol]["Time Series(Daily)"];
       monthData[symbol] = timeSeries;
       if (idx === arr.length - 1) {
