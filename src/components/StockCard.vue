@@ -12,12 +12,15 @@
           {{ stock["lastRefreshed"] }}
         </p>
 
-        <button class="btn btn-light rounded-pill" @click="buyStock(stock)">
-          <!-- data-bs-toggle="modal"
-          data-bs-target="#exampleModal" -->
+        <button
+          class="btn btn-light rounded-pill"
+          data-bs-toggle="modal"
+          :data-bs-target="modalName"
+          @click="buyStock(stock)"
+        >
           Buy Stock
         </button>
-        <modal />
+        <modal :stock="stock" :amountToBuy="amountToBuy" />
         <input
           class="input-group-text"
           style="margin-top: 5px"
@@ -43,6 +46,11 @@ import Modal from "@/components/Modal.vue";
 export default Vue.extend({
   components: { Modal },
   props: ["stock"],
+  computed: {
+    modalName() {
+      return `#${this.stock.symbol}`;
+    },
+  },
   data() {
     return {
       amountToBuy: 1,

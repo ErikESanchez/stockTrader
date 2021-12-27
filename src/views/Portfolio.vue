@@ -6,7 +6,7 @@
           class="col-sm"
           v-for="(ownedStock, symbol) in portfolio.ownedStocks"
           :ownedStock="ownedStock"
-          :stockData="formattedStocks[symbol]"
+          :stock="formattedStocks[symbol]"
           :symbol="symbol"
           :key="symbol"
         />
@@ -27,7 +27,7 @@ export default Vue.extend({
     return {};
   },
   watch: {
-    stockData(event) {
+    stock(event) {
       console.log(event);
     },
   },

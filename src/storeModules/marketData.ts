@@ -79,25 +79,16 @@ export const actions: ActionTree<any, any> = {
     });
   },
   async randomizeStockPrice({ commit, getters }) {
-    console.log("randomizeStockPrice called");
     const formattedStocks: StockDataFormat = getters.formattedStocks;
-    console.log("Old FormattedStocks", formattedStocks);
-    const newPriceObject: NewPrice = {};
     Object.keys(formattedStocks).forEach(
       (symbol: string, index: number, array: Array<string>) => {
         const price: number = formattedStocks[symbol].high;
 
         const randomPercentage: number = Math.random() * (1.01 - 0.99) + 0.99;
         const newPrice: number = price * randomPercentage;
-        console.log(symbol, newPrice);
-        formattedStocks[symbol].high = newPrice;
-        if (index === array.length - 1) {
-          console.log("New FormattedStocks", formattedStocks);
-          return newPriceObject;
-        }
+        formattedStocks[symbol].high = Number(newPrice.toFixed(2));
       }
     );
-    // console.log(newPriceObject)
   },
 };
 
