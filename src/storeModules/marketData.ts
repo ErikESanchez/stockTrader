@@ -16,12 +16,12 @@ const state: State = {
 };
 
 const getters: GetterTree<any, any> = {
-  formattedStocks: (state) => {
+  formattedStocks: (state): StockDataFormat => {
     return state.formattedStocks;
   },
   monthData: (state: State) => {
-    return state.monthData
-  }
+    return state.monthData;
+  },
 };
 
 const mutations: MutationTree<any> = {
@@ -63,7 +63,10 @@ export const actions: ActionTree<any, any> = {
     Object.keys(stockData).forEach(async (symbol, idx, arr) => {
       const stocksCollection = collection(firestore, "stocks");
       const symbolDoc = doc(stocksCollection, symbol);
-      const symbolCollectionSeries = collection(symbolDoc, "Time Series(Daily)");
+      const symbolCollectionSeries = collection(
+        symbolDoc,
+        "Time Series(Daily)"
+      );
       const symbolDocMonth = doc(symbolCollectionSeries, currentMonth);
 
       const stockSnapshotData = await getDoc(symbolDocMonth);
@@ -75,6 +78,27 @@ export const actions: ActionTree<any, any> = {
         stockData[symbol]["Time Series(Daily)"] = stockSnapshotData.data();
     });
   },
+  async randomizeStockPrice({ commit, getters }) {
+    console.log("randomizeStockPrice called");
+    const formattedStocks: StockDataFormat = getters.formattedStocks;
+    console.log("Old FormattedStocks", formattedStocks);
+    const newPriceObject: NewPrice = {};
+    Object.keys(formattedStocks).forEach(
+      (symbol: string, index: number, array: Array<string>) => {
+        const price: number = formattedStocks[symbol].high;
+
+        const randomPercentage: number = Math.random() * (1.01 - 0.99) + 0.99;
+        const newPrice: number = price * randomPercentage;
+        console.log(symbol, newPrice);
+        formattedStocks[symbol].high = newPrice;
+        if (index === array.length - 1) {
+          console.log("New FormattedStocks", formattedStocks);
+          return newPriceObject;
+        }
+      }
+    );
+    // console.log(newPriceObject)
+  },
 };
 
 interface State {
@@ -82,6 +106,12 @@ interface State {
     [symbol: string]: StockDataFormat;
   };
   monthData: MonthData;
+}
+
+interface NewPrice {
+  [symbol: string]: {
+    price: number;
+  };
 }
 
 export default {

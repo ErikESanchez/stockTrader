@@ -31,6 +31,10 @@ export default Vue.extend({
         // user is signed out
       }
     });
+    // Todo find a place where it won't be affect in profile, sign in, etc...
+    setInterval(function () {
+      store.dispatch("marketData/randomizeStockPrice");
+    }, 1000);
   },
 });
 </script>

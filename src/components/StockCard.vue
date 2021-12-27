@@ -7,7 +7,7 @@
             {{ stock["name"] }}
           </router-link>
         </h5>
-        <p class="card-text text-success">{{ stock["open"] }}$</p>
+        <p class="card-text text-success">{{ stock["high"] }}$</p>
         <p class="card-text text-white">
           {{ stock["lastRefreshed"] }}
         </p>
