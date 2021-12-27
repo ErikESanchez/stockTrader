@@ -88,9 +88,8 @@ export default Vue.extend({
       await store
         .dispatch("userModule/signIn", this.userInput)
         .then(() => {
-          let modalBackdrop = document.getElementsByClassName(
-            "modal-backdrop"
-          )[0];
+          let modalBackdrop =
+            document.getElementsByClassName("modal-backdrop")[0];
           modalBackdrop.remove();
         })
         .catch((error) => {

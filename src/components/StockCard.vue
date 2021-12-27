@@ -11,9 +11,13 @@
         <p class="card-text text-white">
           {{ stock["lastRefreshed"] }}
         </p>
+
         <button class="btn btn-light rounded-pill" @click="buyStock(stock)">
+          <!-- data-bs-toggle="modal"
+          data-bs-target="#exampleModal" -->
           Buy Stock
         </button>
+        <modal />
         <input
           class="input-group-text"
           style="margin-top: 5px"
@@ -34,8 +38,10 @@ import {
   UserPortfolio,
 } from "@/interfaces/global.interface";
 import { FormattedStock } from "@/interfaces/market.interface";
+import Modal from "@/components/Modal.vue";
 
 export default Vue.extend({
+  components: { Modal },
   props: ["stock"],
   data() {
     return {

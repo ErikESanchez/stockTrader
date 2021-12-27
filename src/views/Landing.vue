@@ -23,6 +23,11 @@ export default Vue.extend({
   components: {
     UserPortfolios,
   },
+  data() {
+    return {
+      modal: false,
+    };
+  },
   computed: {
     ...mapGetters("userModule", ["user"]),
     ...mapGetters("portfolio", ["userPortfolios"]),
