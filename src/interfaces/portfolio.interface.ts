@@ -14,7 +14,10 @@ export function buyTransactionUpdate(
   let portfolioChanges: PortfolioChange;
   const updatedFunds: number =
     localPortfolio.funds - stockTransaction.priceAtTransaction;
-  if (localPortfolio.ownedStocks == undefined) {
+  if (
+    localPortfolio.ownedStocks == undefined ||
+    localPortfolio.ownedStocks[symbol] == undefined
+  ) {
     portfolioChanges = {
       ownedStocks: {
         [symbol]: {
