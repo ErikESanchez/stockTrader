@@ -6,7 +6,8 @@
         v-for="(stock, index) in formattedStocks"
         :stock="stock"
         :key="index"
-      />
+      >
+      </stock-card>
     </div>
   </div>
 </template>
@@ -19,7 +20,14 @@ import { mapGetters } from "vuex";
 
 export default Vue.extend({
   name: "stocksView",
-  computed: { ...mapGetters({ formattedStocks: "marketData/formattedStocks" }) },
+  computed: {
+    ...mapGetters({ formattedStocks: "marketData/formattedStocks" }),
+  },
+  watch: {
+    formattedStocks(event) {
+      console.log(event);
+    },
+  },
   methods: {
     async getDatabaseDailyData() {
       await store.dispatch("marketData/getDatabaseDailyData");

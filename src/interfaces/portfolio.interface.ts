@@ -47,6 +47,7 @@ export function sellTransactionUpdate(
   sellStockTransaction: NewStockTransaction
 ): PortfolioChange {
   const symbol: string = sellStockTransaction.symbol;
+  // const ownedStock = localPortfolio.ownedStocks[symbol]
   const portfolioChanges: PortfolioChange = {
     funds: localPortfolio.funds + sellStockTransaction.amount,
     ownedStocks: {

@@ -7,13 +7,20 @@
             {{ stock["name"] }}
           </router-link>
         </h5>
-        <p class="card-text text-success">{{ stock["open"] }}$</p>
+        <p class="card-text text-success">{{ stock["high"] }}$</p>
         <p class="card-text text-white">
           {{ stock["lastRefreshed"] }}
         </p>
-        <button class="btn btn-light rounded-pill" @click="buyStock(stock)">
+
+        <button
+          class="btn btn-light rounded-pill"
+          data-bs-toggle="modal"
+          :data-bs-target="modalName"
+          @click="buyStock(stock)"
+        >
           Buy Stock
         </button>
+        <modal :stock="stock" :amountToBuy="amountToBuy" />
         <input
           class="input-group-text"
           style="margin-top: 5px"
@@ -34,9 +41,16 @@ import {
   UserPortfolio,
 } from "@/interfaces/global.interface";
 import { FormattedStock } from "@/interfaces/market.interface";
+import Modal from "@/components/Modal.vue";
 
 export default Vue.extend({
+  components: { Modal },
   props: ["stock"],
+  computed: {
+    modalName() {
+      return `#${this.stock.symbol}`;
+    },
+  },
   data() {
     return {
       amountToBuy: 1,
