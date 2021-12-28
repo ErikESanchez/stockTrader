@@ -18,7 +18,10 @@
         >
           Sell Stock
         </button>
+        <!-- v-if="ownedStock.owned <= amountToSell" -->
+
         <modal :stock="stock" :amountToSell="amountToSell" />
+        <!-- <modal v-else :errorMessage="'You do don\'t own enough stocks'" /> -->
         <input
           class="input-group-text"
           style="margin-top: 5px"
@@ -57,7 +60,7 @@ export default Vue.extend({
     sellStock(stock: FormattedStock) {
       // *Change selling logic to conform with all the data in the stock parameter
       let sellStockTransaction: NewStockTransaction = {
-        symbol: stock.name,
+        symbol: stock.symbol,
         priceAtTransaction: stock["high"],
         amount: -this.amountToSell,
         time: new Date().toString(),

@@ -56,7 +56,7 @@ const actions: ActionTree<any, any> = {
   ) {
     const uid: string = rootGetters["userModule/user"].uid;
     const symbol: string = stockTransaction.symbol;
-    let localPortfolio: UserPortfolio = getters.portfolio;
+    const localPortfolio: UserPortfolio = getters.portfolio;
     const portfolioUserDocument = doc(firestore, `portfolios/${uid}`);
     const updatedTransactions: PortfolioChange = buyTransactionUpdate(
       localPortfolio,
@@ -70,12 +70,11 @@ const actions: ActionTree<any, any> = {
       },
       { merge: true }
     ).then(async () => {
-      localPortfolio = {
-        ownedStocks: {
-          [symbol]: updatedTransactions.ownedStocks[symbol],
-        },
-        funds: updatedTransactions.funds,
-      };
+      localPortfolio.ownedStocks[symbol];
+      localPortfolio.ownedStocks[symbol] =
+        updatedTransactions.ownedStocks[symbol];
+      localPortfolio.funds = updatedTransactions.funds;
+      console.log(localPortfolio);
       commit("setUserPortfolio", localPortfolio);
       const transactionSymbol = collection(
         firestore,
@@ -104,12 +103,16 @@ const actions: ActionTree<any, any> = {
       localPortfolio,
       sellStockTransaction
     );
-    setDoc(portfolioUserDocument, {
-      funds: updatedPortfolio.funds,
-      ownedStocks: {
-        [symbol]: updatedPortfolio.ownedStocks[symbol],
+    setDoc(
+      portfolioUserDocument,
+      {
+        funds: updatedPortfolio.funds,
+        ownedStocks: {
+          [symbol]: updatedPortfolio.ownedStocks[symbol],
+        },
       },
-    }).then(() => {
+      { merge: true }
+    ).then(() => {
       localPortfolio.ownedStocks[symbol] = updatedPortfolio.ownedStocks[symbol];
       commit("setUserPortfolio", localPortfolio);
       const transactionSymbol = collection(

@@ -1,5 +1,6 @@
 <template>
   <div>
+    {{stock}}
     <div
       class="modal fade"
       :id="stock['symbol']"
@@ -18,6 +19,7 @@
             <div v-if="amountToSell">
               You've sold {{ amountToSell }} of {{ stock["name"] }}
             </div>
+            <div v-if="errorMessage">{{ errorMessage }}</div>
             <button
               type="button"
               class="btn-close"
@@ -45,7 +47,7 @@
 <script lang="ts">
 import Vue from "vue";
 export default Vue.extend({
-  props: ["stock", "amountToBuy", "amountToSell"],
+  props: ["stock", "amountToBuy", "amountToSell", "errorMessage"],
 });
 </script>
 
