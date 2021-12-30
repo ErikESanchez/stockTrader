@@ -17,25 +17,20 @@
 <script lang="ts">
 import Vue from "vue";
 import PortfolioStockCard from "@/components/PortfolioStockCard.vue";
-import { mapGetters } from "vuex";
+import { mapGetters, mapState } from "vuex";
 export default Vue.extend({
   name: "portfolio",
   components: {
     PortfolioStockCard,
   },
-  data() {
-    return {};
-  },
   watch: {
-    stock(event) {
-      console.log(event);
+    portfolio(event) {
+      console.log('Portfolio Watcher', event);
     },
   },
-  mounted() {},
-  methods: {},
   computed: {
-    ...mapGetters({ portfolio: "portfolio/portfolio" }),
-    ...mapGetters({ formattedStocks: "marketData/formattedStocks" }),
+    ...mapState({ portfolio: "portfolio/portfolio" }),
+    ...mapGetters({ formattedStocks: "marketData/formattedStocks", portfolio: "portfolio/portfolio" }),
   },
 });
 

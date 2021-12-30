@@ -1,6 +1,5 @@
 <template>
   <div>
-    {{stock}}
     <div
       class="modal fade"
       :id="stock['symbol']"

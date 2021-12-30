@@ -5,6 +5,7 @@
         class="col-sm"
         v-for="(stock, index) in formattedStocks"
         :stock="stock"
+        :funds="portfolio.funds"
         :key="index"
       >
       </stock-card>
@@ -21,7 +22,10 @@ import { mapGetters } from "vuex";
 export default Vue.extend({
   name: "stocksView",
   computed: {
-    ...mapGetters({ formattedStocks: "marketData/formattedStocks" }),
+    ...mapGetters({
+      formattedStocks: "marketData/formattedStocks",
+      portfolio: "portfolio/portfolio",
+    }),
   },
   watch: {
     formattedStocks(event) {

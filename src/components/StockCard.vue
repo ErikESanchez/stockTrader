@@ -11,16 +11,25 @@
         <p class="card-text text-white">
           {{ stock["lastRefreshed"] }}
         </p>
-
-        <button
-          class="btn btn-light rounded-pill"
-          data-bs-toggle="modal"
-          :data-bs-target="modalName"
-          @click="buyStock(stock)"
-        >
-          Buy Stock
-        </button>
-        <modal :stock="stock" :amountToBuy="amountToBuy" />
+        <div v-if="funds >= stock.high">
+          <button
+            class="btn btn-light"
+            data-bs-toggle="modal"
+            :data-bs-target="modalName"
+            @click="buyStock(stock)"
+          >
+            Buy Stock
+          </button>
+          <modal :stock="stock" :amountToBuy="amountToBuy" />
+        </div>
+        <div v-else>
+          <button
+            class="btn btn-light"
+            disabled
+          >
+            Buy Stock
+          </button>
+        </div>
         <input
           class="input-group-text"
           style="margin-top: 5px"
@@ -45,7 +54,7 @@ import Modal from "@/components/Modal.vue";
 
 export default Vue.extend({
   components: { Modal },
-  props: ["stock"],
+  props: ["stock", "funds"],
   computed: {
     modalName() {
       return `#${this.stock.symbol}`;
@@ -64,7 +73,7 @@ export default Vue.extend({
         let boughtStockTransaction: NewStockTransaction = {
           symbol: stock.symbol,
           priceAtTransaction: stock.high,
-          amount: this.amountToBuy,
+          amount: Number(this.amountToBuy),
           time: new Date().toString(),
         };
         store.dispatch("portfolio/buyStock", boughtStockTransaction);

@@ -10,18 +10,17 @@
           Price:
           {{ stock["high"] }}
         </p>
-        <button
-          class="btn btn-light rounded-pill"
-          data-bs-toggle="modal"
-          :data-bs-target="modalName"
-          @click="sellStock(stock)"
-        >
-          Sell Stock
-        </button>
-        <!-- v-if="ownedStock.owned <= amountToSell" -->
+        <div v-if="ownedStock.owned >= amountToSell">
+          <button class="btn btn-light" @click="sellStock(stock)">
+            Sell Stock
+          </button>
+          <!-- <modal :stock="stock" :amountToSell="amountToSell" /> -->
+        </div>
+        <div v-else>
+          <!-- Put a popover here signifying need more stocks to sell -->
+          <button class="btn btn-light" disabled>Sell Stock</button>
+        </div>
 
-        <modal :stock="stock" :amountToSell="amountToSell" />
-        <!-- <modal v-else :errorMessage="'You do don\'t own enough stocks'" /> -->
         <input
           class="input-group-text"
           style="margin-top: 5px"
@@ -38,7 +37,7 @@
 import Vue from "vue";
 import { NewStockTransaction } from "@/interfaces/global.interface";
 import store from "../store";
-import Modal from "./Modal.vue";
+// import Modal from "./Modal.vue";
 import { FormattedStock } from "@/interfaces/market.interface";
 export default Vue.extend({
   // todo typecast props
@@ -62,14 +61,11 @@ export default Vue.extend({
       let sellStockTransaction: NewStockTransaction = {
         symbol: stock.symbol,
         priceAtTransaction: stock["high"],
-        amount: -this.amountToSell,
+        amount: Number(-this.amountToSell),
         time: new Date().toString(),
       };
       store.dispatch("portfolio/sellStock", sellStockTransaction);
     },
-  },
-  components: {
-    Modal,
   },
 });
 </script>

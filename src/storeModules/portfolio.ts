@@ -1,6 +1,13 @@
 import { ActionTree, GetterTree, MutationTree } from "vuex";
 import { auth, firestore } from "@/firebase";
-import { collection, getDocs, getDoc, doc, setDoc } from "firebase/firestore";
+import {
+  collection,
+  getDocs,
+  getDoc,
+  doc,
+  setDoc,
+  deleteField,
+} from "firebase/firestore";
 import {
   buyTransactionUpdate,
   sellTransactionUpdate,
@@ -51,12 +58,12 @@ const actions: ActionTree<any, any> = {
   // ? Perhaps call another functions to calculate portfolio
   // ? worth every buy or sell for other stock prices
   async buyStock(
-    { commit, rootGetters, getters },
+    { commit, rootGetters, state },
     stockTransaction: NewStockTransaction
   ) {
     const uid: string = rootGetters["userModule/user"].uid;
     const symbol: string = stockTransaction.symbol;
-    const localPortfolio: UserPortfolio = getters.portfolio;
+    const localPortfolio: UserPortfolio = state.portfolio;
     const portfolioUserDocument = doc(firestore, `portfolios/${uid}`);
     const updatedTransactions: PortfolioChange = buyTransactionUpdate(
       localPortfolio,
@@ -70,12 +77,10 @@ const actions: ActionTree<any, any> = {
       },
       { merge: true }
     ).then(async () => {
-      localPortfolio.ownedStocks[symbol];
       localPortfolio.ownedStocks[symbol] =
         updatedTransactions.ownedStocks[symbol];
       localPortfolio.funds = updatedTransactions.funds;
       console.log(localPortfolio);
-      commit("setUserPortfolio", localPortfolio);
       const transactionSymbol = collection(
         firestore,
         `portfolios/${uid}/transactions/buying/${symbol}`
@@ -91,44 +96,73 @@ const actions: ActionTree<any, any> = {
     });
   },
   async sellStock(
-    { commit, rootGetters, getters },
+    { commit, rootGetters, state },
     sellStockTransaction: NewStockTransaction
   ) {
     // Todo: Make logic to remove symbol from ownedStocks or make a check for 0
     const uid: string = rootGetters["userModule/user"].uid;
     const symbol: string = sellStockTransaction.symbol;
-    const localPortfolio: UserPortfolio = getters.portfolio;
+    const localPortfolio: UserPortfolio = state.portfolio;
     const portfolioUserDocument = doc(firestore, `portfolios/${uid}`);
     const updatedPortfolio = sellTransactionUpdate(
       localPortfolio,
       sellStockTransaction
     );
-    setDoc(
-      portfolioUserDocument,
-      {
-        funds: updatedPortfolio.funds,
-        ownedStocks: {
-          [symbol]: updatedPortfolio.ownedStocks[symbol],
+    if (updatedPortfolio.ownedStocks[symbol].owned == 0) {
+      setDoc(
+        portfolioUserDocument,
+        {
+          funds: updatedPortfolio.funds,
+          ownedStocks: {
+            [symbol]: deleteField(),
+          },
         },
-      },
-      { merge: true }
-    ).then(() => {
-      localPortfolio.ownedStocks[symbol] = updatedPortfolio.ownedStocks[symbol];
-      commit("setUserPortfolio", localPortfolio);
-      const transactionSymbol = collection(
-        firestore,
-        `portfolios/${uid}/transactions/selling/${symbol}`
-      );
-      const transactionTimeDocument = doc(
-        transactionSymbol,
-        sellStockTransaction.time
-      );
-      // ? Maybe I should make the amount positive?
-      setDoc(transactionTimeDocument, {
-        priceAtTransaction: sellStockTransaction.priceAtTransaction,
-        amount: sellStockTransaction.amount,
+        { merge: true }
+      ).then(() => {
+        delete updatedPortfolio.ownedStocks[symbol];
+        const transactionSymbol = collection(
+          firestore,
+          `portfolios/${uid}/transactions/selling/${symbol}`
+        );
+        const transactionTimeDocument = doc(
+          transactionSymbol,
+          sellStockTransaction.time
+        );
+        setDoc(transactionTimeDocument, {
+          priceAtTransaction: sellStockTransaction.priceAtTransaction,
+          amount: sellStockTransaction.amount,
+        });
+        commit("setUserPortfolio", updatedPortfolio);
       });
-    });
+    } else {
+      setDoc(
+        portfolioUserDocument,
+        {
+          funds: updatedPortfolio.funds,
+          ownedStocks: {
+            [symbol]: updatedPortfolio.ownedStocks[symbol],
+          },
+        },
+        { merge: true }
+      ).then(() => {
+        localPortfolio.ownedStocks[symbol] =
+          updatedPortfolio.ownedStocks[symbol];
+        commit("setUserPortfolio", localPortfolio);
+        const transactionSymbol = collection(
+          firestore,
+          `portfolios/${uid}/transactions/selling/${symbol}`
+        );
+        const transactionTimeDocument = doc(
+          transactionSymbol,
+          sellStockTransaction.time
+        );
+        // ? Maybe I should make the amount positive?
+        setDoc(transactionTimeDocument, {
+          priceAtTransaction: sellStockTransaction.priceAtTransaction,
+          amount: sellStockTransaction.amount,
+        });
+      });
+    }
   },
 };
 
